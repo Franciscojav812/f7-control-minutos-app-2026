@@ -166,16 +166,18 @@ function addAct(m,o,label){
 const isGol=a=>a.k==='tiro'&&a.res==='gol';
 const sc=m=>({f:m.acts.filter(a=>isGol(a)&&a.lado==='favor').length,c:m.acts.filter(a=>isGol(a)&&a.lado==='contra').length});
 const cnt=(acts,f)=>acts.filter(f).length;
+/* Sugerencia FORMATIVA (UEFA C: en formación la competición es un medio; no se cambia el sistema por el marcador).
+   Prebenjamín: sin sugerencia. Alevín: recordatorio según el momento del partido, sin proponer sistemas. */
 function suggest(m){
-  const {f,c}=sc(m),d=f-c,left=(m.part===1?(lim(m)-el())+m.half*60000:lim(m)-el())/60000;
-  let g,txt;
-  if(d<=-2){g=['2-3-1','2-1-3','2-2-2'];txt=`Perdéis ${f}-${c}: toca arriesgar, sistemas muy ofensivos.`}
-  else if(d===-1){g=['2-2-2','1-3-2'];txt=`Perdéis ${f}-${c}: más presión arriba, sistemas ofensivos.`}
-  else if(d===0&&left<=5){g=['2-2-2','1-3-2'];txt=`Empate ${f}-${c} y queda poco: busca el gol con un sistema ofensivo.`}
-  else if(d===0){g=['3-2-1','3-1-2'];txt=`Empate ${f}-${c}: sistema equilibrado.`}
-  else if(d===1&&left>8){g=['3-2-1','3-1-2'];txt=`Ganáis ${f}-${c}: mantened el equilibrio.`}
-  else{g=['4-1-1','3-3-0'];txt=`Ganáis ${f}-${c}: proteged la ventaja con un sistema defensivo.`}
-  return{txt,g:g.filter(x=>x!==m.form)};
+  if(ALL.cur!=='ale')return null;
+  const {f,c}=sc(m),d=f-c,e=el(),H=m.half*60000,inPart=m.part===1?e:e-m.p1End,leftPart=(H-inPart)/60000;
+  let txt;
+  if(d>=3)txt=`Ventaja amplia (${f}-${c}): buen momento para dar minutos y probar posiciones nuevas.`;
+  else if(d<=-3)txt=`Resultado en contra (${f}-${c}): valora el esfuerzo y las buenas decisiones, no solo el marcador.`;
+  else if(inPart<5*60000)txt='Inicio de parte: ocupar bien el campo, con amplitud y profundidad, antes de buscar el gol.';
+  else if(leftPart<=4&&leftPart>0)txt='Final de parte: concentración y comunicación hasta el pitido.';
+  else txt='En ataque, crear y ocupar espacios y ofrecer líneas de pase. En defensa, ser siempre útil: ayudar al compañero que presiona.';
+  return{txt,g:[]};
 }
 /* estadísticas por jugador de UN partido (g.acts) */
 function gstats(g){
@@ -341,7 +343,7 @@ function vMatch(){
   <div class="bg-panel border border-line rounded-2xl p-3 mt-3"><div class="flex items-center gap-2"><span class="font-semibold">Sistema</span>
     <select data-a="form" class="flex-1 h-12 rounded-xl bg-ink px-2 text-chalk font-semibold">${optsForm(m.form)}</select>
     <span class="px-3 py-1 rounded-full text-sm font-bold ${BADGE[F.k]}">${F.c}</span></div>
-    <p class="mt-2 text-sm text-mute">${sg.txt}</p><div class="flex flex-wrap gap-2 mt-2">${sg.g.map(k=>`<button data-a="sug" data-id="${k}" class="chip">${k} · ${FORMS[k].c}</button>`).join('')}</div></div>
+    ${sg?`<p class="mt-2 text-sm text-mute">💡 ${esc(sg.txt)}</p>`:''}</div>
   <div class="flex items-baseline justify-between mt-5 mb-2"><h2 class="font-disp text-3xl font-bold italic text-turf">EN CAMPO</h2>
     <span class="text-sm font-semibold text-right ${m.sel?'text-amber':'text-mute'}">${m.sel?'Toca a un suplente (cambio) o a otro jugador del campo (intercambiar posición)':'Toca a un jugador para cambiarlo o moverlo de posición'}</span></div>
   <div class="pitch">${F.rows.map(r=>`<div class="prow">${r.map(tok).join('')}</div>`).join('')}</div>

@@ -103,6 +103,7 @@ th{color:var(--mute);font-weight:600;border-top:0}
 td:first-child,th:first-child{text-align:left}
 .num{font-variant-numeric:tabular-nums}
 details>summary{cursor:pointer;font-weight:700}
+.ficha table td:first-child{color:var(--mute);width:96px;vertical-align:top}.ficha td{text-align:left}
 a{color:var(--turf)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -125,8 +126,8 @@ a{color:var(--turf)}
 const SRC_KEY='f7minutos.club.v2',KEY='ftms.v1',VER=1;
 const TEAMS={pre:{name:'Prebenjamín A',half:20,cat:'pre'},ale:{name:'Alevín B',half:25,cat:'ale'}};
 const CATS={
- pre:{n:'Prebenjamín',foco:'Juegos reducidos, coordinación, mucha toma de decisión individual y muchos contactos con balón. Mensajes cortos y en positivo.'},
- ale:{n:'Alevín',foco:'Introducción a conceptos grupales: líneas de pase, apoyos, roles por posición y ayudas defensivas.'}};
+ pre:{n:'Prebenjamín',foco:'Formar antes que ganar. Reparto orientativo del entrenamiento: 40 % coordinación, 50 % técnico-táctico y 10 % juego. Prioridad: pase, control y conducción. Un objetivo por sesión, explicaciones muy breves y por imitación.'},
+ ale:{n:'Alevín',foco:'Reparto orientativo: 25 % coordinación, 50 % técnico-táctico y 25 % juego. Ganan peso el regate, el remate, la protección y las acciones defensivas. Uno o dos objetivos por sesión; empezar a explicar el porqué.'}};
 
 /* ---- Sistemas de fútbol 7 (los mismos 8 de la app de minutos). formato:'F7' deja sitio para añadir F11 ---- */
 const SIS={
@@ -148,7 +149,7 @@ const ZONAS=['Izquierda','Centro','Derecha'];
 const PERD=['Salida','Medio','Ataque','Sin pérdida'];
 const RANG=['0','1-2','3-5','6+'];
 const PRES=['Baja','Media','Alta'];
-const RAT=[['salida','Salida de balón','salida'],['ptp','Presión tras pérdida','transicion'],['repliegue','Repliegue y vuelta','repliegue'],['espacios','Ocupar espacios (amplitud)','espacios'],['final','Finalización','finalizacion'],['actitud','Actitud y comunicación','actitud']];
+const RAT=[['salida','Salida de balón','salida'],['ptp','Reacción tras pérdida','transicion'],['repliegue','Ayudas y repliegue','repliegue'],['espacios','Crear y ocupar espacios','espacios'],['final','Finalización','finalizacion'],['actitud','Actitud y comunicación','actitud']];
 
 /* ---- utilidades ---- */
 const $=s=>document.querySelector(s);
@@ -245,19 +246,37 @@ function sisTemp(T){
    Cada regla devuelve {t:'f'|'m', area, peso, titulo, dato, charla, tarea}
    t:'f' punto fuerte · t:'m' área de mejora. Todo explica el dato que la dispara.
    ========================================================== */
+/* Concepto de la formación UEFA C (RFEF) al que pertenece cada área del informe */
+const CONCEPTO={salida:'Crear líneas de pase y perfil corporal',transicion:'Ser siempre útil al perder el balón',repliegue:'Ocupación racional del espacio en defensa',defensa:'Cobertura, permuta y triángulo defensivo',espacios:'Crear y ocupar espacios',ataque:'Crear superioridades (1c1, 2c1)',finalizacion:'Remate',abp:'Balón parado',actitud:'Comunicación y concentración',porteria:'Acciones del portero'};
+/* Fichas de tarea con los campos de la ficha RFEF: título, estrategia didáctica, objetivo (verbo en infinitivo),
+   situación de juego, tiempo, espacio, descripción, normas de provocación y consignas.
+   Prebenjamín: pase, control, conducción y 1c1/2c1 en espacios pequeños. Alevín: conceptos grupales. */
 const TAREA={
- salida:{pre:'Rondo 3x1 con portero en la zona de inicio: salir conduciendo o pasando a quien esté libre (5-8\').',ale:'Salida 3+P contra 2 presionadores: fijar al que presiona y pasar al lado contrario (8-10\').'},
- transicion:{pre:'Juego 3x3 con la regla "¡robo!": al perder el balón, todos lo persiguen 5 segundos.',ale:'4x4 + comodines: 5 segundos de presión tras pérdida y siempre 2 jugadores por detrás del balón.'},
- repliegue:{pre:'Carrera de vuelta: tras cada tiro, el primero que llega a su mitad suma un punto.',ale:'Transición 4x3: al perder, volver por dentro hacia la portería propia antes de presionar.'},
- abp:{pre:'Córneres en juego: cada uno vigila a un rival y al balón, sin perderlos de vista.',ale:'Defensa de córner con roles: primer palo, segundo palo y rechace; rotar los roles.'},
- finalizacion:{pre:'Conducción + tiro: mirar la portería, elegir palo y tirar raso. Muchas repeticiones.',ale:'Centro atrás desde banda: atacar primer y segundo palo, tirar raso y cruzado.'},
- espacios:{pre:'Juego con 4 miniporterías: aprender a buscar el lado libre.',ale:'Posesión 4x4 por carriles: pisar las bandas para dar amplitud y alguien en profundidad.'},
- actitud:{pre:'Juego con "pide y nombra": antes de recibir, se dice el nombre del compañero.',ale:'Partido condicionado: el gol solo vale si antes ha habido una indicación en voz alta.'},
- ataque:{pre:'Juegos de 1x1 y 2x1 hacia portería: atreverse a regatear y tirar.',ale:'Ataque 3x2: buscar al compañero libre (tercer hombre) y terminar en tiro.'},
- defensa:{pre:'1x1 defensivo en pasillo: perfilarse y no tirarse al suelo.',ale:'Defensa 3x3 con ayudas: si un compañero es superado, el más cercano cubre.'},
- porteria:{pre:'Juegos de blocaje y caída lateral con balón blando.',ale:'Portero: blocaje, desvío y saque rápido con la mano al compañero libre.'}};
+ salida:{pre:{tit:'Salir jugando 2c1',est:'Oleada',obj:'Mejorar el pase y el control para salir desde portería',sit:'Sectorial · jugador',t:"2x6'",esp:'20x15 m',desc:'El portero pasa a uno de dos compañeros; juntos superan a un defensor y conducen hasta la línea contraria.',nor:'El defensor solo puede salir cuando el portero pasa.',con:['Separarse para dar una línea de pase','Controlar mirando hacia delante','Si no hay pase claro, conducir al espacio libre']},
+  ale:{tit:'Salida 3+P contra 2',est:'Conservación',obj:'Mejorar la salida de balón creando líneas de pase',sit:'Intersectorial · jugadores',t:"2x8'",esp:'Medio campo de F7',desc:'Portero y tres jugadores salen contra dos presionadores; punto al cruzar conduciendo la línea de medio campo.',nor:'Si recuperan, los presionadores atacan la portería.',con:['Abrirse para dar amplitud','Perfil abierto antes de recibir','Fijar al que presiona y pasar al lado contrario']}},
+ transicion:{pre:{tit:'¡Robo!',est:'Partido',obj:'Reaccionar rápido tras perder el balón',sit:'Sectorial · jugadores',t:"2x6'",esp:'25x20 m',desc:'3c3 con miniporterías. Recuperar el balón antes de 5 segundos tras perderlo suma un punto.',nor:'El gol tras una recuperación rápida vale doble.',con:['El más cercano va a por el balón','Los demás se acercan para ayudar']},
+  ale:{tit:'Cinco segundos',est:'Conservación',obj:'Mejorar la reacción tras pérdida y la vigilancia',sit:'Intersectorial · jugadores',t:"2x8'",esp:'30x25 m',desc:'4c4 + 2 comodines. Al perder, el equipo tiene 5 segundos para recuperar; si lo logra, suma un punto.',nor:'Al atacar, siempre dos jugadores por detrás del balón.',con:['Presiona el más cercano','Cerrar las líneas de pase cercanas','Los de atrás vigilan al rival libre']}},
+ repliegue:{pre:{tit:'Volver a casa',est:'Juego adaptado al fútbol',obj:'Orientarse hacia la propia portería',sit:'—',t:"10'",esp:'20x20 m',desc:'Todos conducen libres. A la señal dejan el balón y corren a su zona de color antes que los demás.',nor:'—',con:['Mirar alrededor antes de salir','Volver por dentro, sin dar vueltas']},
+  ale:{tit:'Transición 4c3',est:'Oleada',obj:'Mejorar el repliegue tras pérdida',sit:'Intersectorial · jugadores',t:"2x8'",esp:'Campo de F7',desc:'4 atacan contra 3; si los defensores recuperan, contraatacan y los atacantes deben volver.',nor:'El gol del contraataque vale doble.',con:['Al perder, volver por dentro hacia la portería','Juntarse antes de presionar','Proteger el espacio de la espalda']}},
+ abp:{pre:{tit:'Córner en juego',est:'Partido',obj:'Vigilar al rival y al balón en los córneres',sit:'Completa · equipo',t:"2x5'",esp:'Medio campo',desc:'Partido corto en el que cada balón que sale por la línea de fondo es córner; se rotan los lanzadores.',nor:'Cada defensor elige a quién vigila antes del saque.',con:['Ver el balón y al rival a la vez','Estar entre el rival y la portería']},
+  ale:{tit:'Roles en córner',est:'Partido',obj:'Organizar la defensa de córner por roles',sit:'Completa · equipo',t:"2x6'",esp:'Medio campo',desc:'Serie de córneres en contra con primer palo, segundo palo, rechace y marcas; tras cada uno se rota de rol.',nor:'Despejar fuera del área da un punto a la defensa.',con:['Cada uno sabe su rol antes del saque','Atacar el balón, no esperarlo','Salir juntos tras el despeje']}},
+ finalizacion:{pre:{tit:'Conduce y tira',est:'Oleada',obj:'Mejorar el remate tras conducción',sit:'Individual · jugador',t:"10'",esp:'15x15 m',desc:'Oleadas 1c0 y después 1c1: conducir y tirar a una portería pequeña con portero.',nor:'Solo se tira desde fuera de una zona marcada junto a la portería.',con:['Mirar la portería antes de tirar','Tirar raso con el interior']},
+  ale:{tit:'Centro atrás',est:'Oleada',obj:'Mejorar el remate tras centro desde banda',sit:'Sectorial · jugadores',t:"2x7'",esp:'Medio campo',desc:'2c1 por banda que termina en pase atrás; un compañero ataca el primer palo y otro el segundo.',nor:'El gol de primer toque vale doble.',con:['Atacar el primer y el segundo palo','Pase atrás raso','Rematar raso y cruzado']}},
+ espacios:{pre:{tit:'Cuatro miniporterías',est:'Partido',obj:'Buscar el espacio libre para atacar',sit:'Sectorial · jugadores',t:"2x6'",esp:'25x25 m',desc:'3c3 con dos miniporterías por equipo, una en cada esquina del fondo.',nor:'—',con:['Levantar la cabeza para ver la portería libre','Separarse del compañero con balón']},
+  ale:{tit:'Posesión por carriles',est:'Conservación',obj:'Crear y ocupar espacios con amplitud y profundidad',sit:'Intersectorial · jugadores',t:"2x8'",esp:'35x30 m en tres carriles',desc:'4c4 + 2 comodines en las bandas; punto al llevar el balón de un carril lateral al otro.',nor:'Siempre un jugador en cada carril lateral.',con:['Pisar la banda para dar amplitud','Uno siempre en profundidad','Ofrecer línea de pase al compañero con balón']}},
+ actitud:{pre:{tit:'Pide y nombra',est:'Juego adaptado al fútbol',obj:'Mejorar la comunicación entre compañeros',sit:'—',t:"10'",esp:'20x20 m',desc:'Pases libres en grupos; antes de pasar se dice el nombre de quien recibe.',nor:'Un pase sin nombre: el balón pasa al otro grupo.',con:['Mirar al compañero','Decir su nombre en voz alta']},
+  ale:{tit:'Partido hablado',est:'Partido',obj:'Mejorar la comunicación en defensa y en ataque',sit:'Completa · equipo',t:"2x10'",esp:'Campo de F7',desc:'El gol solo vale si antes un compañero ha dado una indicación en voz alta ("¡solo!", "¡cambia!").',nor:'—',con:['Avisar al compañero antes de que reciba','Pedir el balón en voz alta']}},
+ ataque:{pre:{tit:'Oleadas 1c1',est:'Oleada',obj:'Resolver situaciones de 1c1',sit:'Individual · jugador',t:"12'",esp:'15x15 m',desc:'Atacante contra defensor hacia una portería pequeña; tres turnos por equipo y se cambian los roles.',nor:'El defensor empieza unos pasos atrás para facilitar el ataque.',con:['Cambiar de dirección','Cambiar de ritmo para superar al rival']},
+  ale:{tit:'Superioridad 3c2',est:'Oleada',obj:'Crear y resolver superioridades numéricas',sit:'Sectorial · jugadores',t:"2x8'",esp:'Medio campo',desc:'3c2 hacia portería; si los defensores recuperan, cruzan conduciendo la línea de medio campo.',nor:'El gol tras pase al compañero libre vale doble.',con:['Fijar a un defensor antes de pasar','Línea de pase siempre con el poseedor','Atacar con amplitud']}},
+ defensa:{pre:{tit:'1c1 en pasillo',est:'Oleada',obj:'Mejorar la entrada en 1c1',sit:'Individual · jugador',t:"10'",esp:'Pasillo de 8x15 m',desc:'El atacante intenta cruzar la línea conduciendo; el defensor intenta robar sin salir del pasillo.',nor:'—',con:['Perfilarse de lado, no de frente','No tirarse al suelo','Esperar el momento para robar']},
+  ale:{tit:'Ayudas 3c3',est:'Partido',obj:'Mejorar la cobertura y la permuta',sit:'Sectorial · jugadores',t:"2x8'",esp:'30x20 m',desc:'3c3 con porteros; el gol tras superar a un defensor sin que nadie le cubra vale doble.',nor:'—',con:['Estar siempre en disposición de ayudar','Si superan al compañero, salir a cubrir','Si me superan, volver al hueco libre (permuta)']}},
+ porteria:{pre:{tit:'Blocajes',est:'Circuito',obj:'Mejorar el blocaje y la caída',sit:'Individual · jugador',t:"10'",esp:'Área de portería',desc:'Lanzamientos suaves con la mano a distintas alturas; el portero bloca y se levanta rápido.',nor:'—',con:['Manos delante del cuerpo','Caer de lado, no de espaldas']},
+  ale:{tit:'Parar y salir',est:'Oleada',obj:'Mejorar la parada y el saque rápido',sit:'Sectorial · jugadores',t:"2x6'",esp:'Medio campo',desc:'Tiro a portería; tras la parada, el portero saca rápido con la mano a un compañero que se desmarca.',nor:'Sacar en menos de 5 segundos suma un punto.',con:['Colocarse antes del tiro','Blocar o desviar fuera','Sacar al compañero libre']}}};
+const fichaTxt=f=>f?`${f.tit} (${f.est}) · Objetivo: ${f.obj} · ${f.sit} · ${f.t} · ${f.esp}. ${f.desc}${f.nor&&f.nor!=='—'?' Norma: '+f.nor:''} Consignas: ${f.con.join('; ')}.`:'';
+/* límites por categoría (UEFA C): iniciación 1 objetivo por sesión; benjamín y alevín, 1 o 2 */
+const MAXM={pre:1,ale:2};
 function rules(T,g,F){
- const s=sig(T,g),b=base(T,g),cat=T.cat,R=[],add=(o)=>{o.tarea=o.tarea||(TAREA[o.area]?TAREA[o.area][cat]:'');R.push(o)};
+ const s=sig(T,g),b=base(T,g),cat=T.cat,R=[],add=(o)=>{o.ficha=TAREA[o.area]?TAREA[o.area][cat]:null;o.concepto=CONCEPTO[o.area]||'';R.push(o)};
  const tp=s.causas['Pérdida de balón']||0,ca=s.causas['Contraataque']||0,trans=tp+ca;
  /* ---------- defensa ---------- */
  if(s.gc===0)add({t:'f',area:'defensa',peso:8,titulo:'Portería a cero',dato:`0 goles encajados con ${s.tirosC} tiros del rival.`,charla:C(cat,'¡Nadie nos marcó! Defendimos todos juntos.','Portería a cero: la defensa y las ayudas funcionaron.')});
@@ -266,7 +285,7 @@ function rules(T,g,F){
  const abpC=s.causas['Balón parado']||0;
  if(abpC>=1&&(abpC>=2||abpC/Math.max(1,s.gc)>=0.4))add({t:'m',area:'abp',peso:6+abpC,titulo:'Balón parado defensivo',dato:`${abpC} gol${abpC>1?'es':''} en contra a balón parado (${s.cc} córneres del rival).`,charla:C(cat,'En los córneres, cada uno mira a su rival y al balón.','En balón parado cada uno tiene un rol: primer palo, segundo palo y rechace.')});
  const err=(s.causas['Error defensivo']||0)+(s.causas['Error del portero']||0);
- if(err>=2)add({t:'m',area:'actitud',peso:5+err,titulo:'Errores individuales',dato:`${err} goles en contra por errores defensivos o del portero.`,charla:C(cat,'Equivocarse está bien: lo importante es avisar y ayudar al compañero.','Ante la duda, comunicación: hablar ("¡mía!", "¡solo!") evita errores.'),tarea:TAREA.actitud[cat]});
+ if(err>=2)add({t:'m',area:'actitud',peso:5+err,titulo:'Errores individuales',dato:`${err} goles en contra por errores defensivos o del portero.`,charla:C(cat,'Equivocarse está bien: lo importante es avisar y ayudar al compañero.','Ante la duda, comunicación: hablar ("¡mía!", "¡solo!") evita errores.')});
  if(s.lateC>=2)add({t:'m',area:'actitud',peso:6,titulo:'Final de cada parte',dato:`${s.lateC} goles en contra en los últimos 5 minutos de alguna parte o en el añadido.`,charla:'Concentración hasta el pitido final: los últimos minutos también cuentan.'});
  if(s.oc>=3&&s.oc>s.of)add({t:'m',area:'defensa',peso:5,titulo:'Ocasiones claras concedidas',dato:`El rival tuvo ${s.oc} ocasiones claras por ${s.of} nuestras.`,charla:C(cat,'Cerca de nuestra portería, todos ayudamos a defender.','Juntar líneas: menos distancia entre defensas y medios.')});
  if(b&&s.tirosC>=b.tirosC*1.5&&s.tirosC>=6)add({t:'m',area:'defensa',peso:5,titulo:'Muchos tiros en contra',dato:`${s.tirosC} tiros del rival (media de la temporada: ${b.tirosC.toFixed(1)}).`,charla:C(cat,'Hay que llegar antes que el rival a tapar el tiro.','Cerrar el centro y obligar al rival a ir por fuera.')});
@@ -295,17 +314,19 @@ function rules(T,g,F){
   if((F.perd==='0'||F.perd==='1-2')&&F.presion==='Alta')add({t:'f',area:'salida',peso:7,titulo:'Salida limpia ante presión alta',dato:`Solo ${F.perd} pérdidas en la salida con el rival presionando arriba.`,charla:'Salimos jugando aunque el rival presionaba: ¡muy bien!'});
   if(F.recu==='3-5'||F.recu==='6+')add({t:'f',area:'transicion',peso:F.recu==='6+'?7:6,titulo:'Robos en campo rival',dato:`${F.recu} recuperaciones altas (estimación del entrenador).`,charla:C(cat,'Cuando perdemos, la recuperamos rápido: ¡seguir así!','Buena presión tras pérdida: recuperamos cerca de su portería.')});
   RAT.forEach(([k,lbl,area])=>{const v=+((F.rat||{})[k]||0);if(!v)return;
-   if(v>=4)add({t:'f',area,peso:2+v,titulo:lbl,dato:`Valoración del entrenador: ${v}/5.`,charla:`${lbl}: buen nivel en este partido.`});
-   if(v<=2)add({t:'m',area,peso:3+(3-v)*2,titulo:lbl,dato:`Valoración del entrenador: ${v}/5.`,charla:`${lbl}: lo trabajamos esta semana.`})});
+   if(v>=4)add({t:'f',area,peso:2+v,titulo:lbl,dato:`Valoración del entrenador: ${v}/5.`,charla:'Buen nivel en este partido: seguir así.'});
+   if(v<=2)add({t:'m',area,peso:3+(3-v)*2,titulo:lbl,dato:`Valoración del entrenador: ${v}/5.`,charla:'Lo trabajamos esta semana.'})});
  }
  return{s,b,R};
 }
-function pick(R,t){
- const L=R.filter(x=>x.t===t).sort((a,b)=>b.peso-a.peso),out=[],areas=new Set();
- L.forEach(x=>{if(out.length<3&&!areas.has(x.area)){out.push(x);areas.add(x.area)}});
- L.forEach(x=>{if(out.length<3&&!out.includes(x)&&!out.some(y=>y.titulo===x.titulo))out.push(x)});
+function pick(R,t,max){
+ max=max||3;const L=R.filter(x=>x.t===t).sort((a,b)=>b.peso-a.peso),out=[],areas=new Set();
+ L.forEach(x=>{if(out.length<max&&!areas.has(x.area)){out.push(x);areas.add(x.area)}});
+ L.forEach(x=>{if(out.length<max&&!out.includes(x)&&!out.some(y=>y.titulo===x.titulo))out.push(x)});
  return out;
 }
+/* mejoras de la semana según la categoría + las demás detectadas (para el cuaderno) */
+function mejoras(T,R){const m=pick(R,'m',MAXM[T.cat]||2),all=pick(R,'m',6);return{m,resto:all.filter(x=>!m.includes(x))}}
 /* ---- ajuste táctico sugerido (sistema) ---- */
 function sugSis(T,g,F,s){
  const out=[],cur=s.sisMain,S=SIS[cur],trans=(s.causas['Pérdida de balón']||0)+(s.causas['Contraataque']||0);
@@ -331,10 +352,10 @@ function cuaderno(T,g,s,F){
  return out;
 }
 function informeTxt(T,g,F){
- const {s,R}=rules(T,g,F),f=pick(R,'f'),m=pick(R,'m');
+ const {s,R}=rules(T,g,F),f=pick(R,'f'),{m}=mejoras(T,R),one=m.length===1;
  const L=[`Charla · ${TEAMS[T.id].name} · ${g.rival||'Partido'} (${s.gf}-${s.gc}) · ${fdate(g.date)}`,'','LO QUE HICIMOS BIEN'];
  f.forEach((x,i)=>L.push(`${i+1}. ${x.titulo}: ${x.charla}`));if(!f.length)L.push('—');
- L.push('','LO QUE VAMOS A MEJORAR');m.forEach((x,i)=>L.push(`${i+1}. ${x.titulo}: ${x.charla}`,`   Tarea: ${x.tarea}`));if(!m.length)L.push('—');
+ L.push('',one?'OBJETIVO DE LA SEMANA':'OBJETIVOS DE LA SEMANA');m.forEach((x,i)=>L.push(`${i+1}. ${x.ficha?x.ficha.obj:x.titulo}: ${x.charla}`,`   Tarea: ${fichaTxt(x.ficha)}`));if(!m.length)L.push('—');
  return L.join('\n');
 }
 
@@ -354,7 +375,7 @@ function carga(T){
   return{p,pct,pp,full,convL:last.filter(conv).length,nL:last.length,cn,media:cn?sm/cn/60000:0,total:sm/60000,st};
  });
 }
-const STL={rojo:['🔴','Riesgo de sobrecarga'],ambar:['🟠','Carga alta'],verde:['🟢','Carga normal'],bajo:['🔵','Pocos minutos'],portero:['⚪','Portero (juega todo)'],nd:['⚫','Sin datos']};
+const STL={rojo:['🔴','Juega casi todo'],ambar:['🟠','Muchos minutos'],verde:['🟢','Reparto equilibrado'],bajo:['🔵','Pocos minutos: prioridad'],portero:['⚪','Portero (juega todo)'],nd:['⚫','Sin datos']};
 
 /* ==========================================================
    VISTAS
@@ -385,7 +406,7 @@ function vInicio(T){
  }else h+=`<div class="card mute">Aún no hay partidos de este equipo. Cuando finalices uno en la app de minutos, aparecerá aquí.</div>`;
  if(pend)h+=`<div class="card row"><span class="tag t-pend">${pend}</span><span class="grow small">partido${pend>1?'s':''} sin formulario post-partido</span><button data-a="tab" data-id="post" class="btn">Ver</button></div>`;
  const C_=carga(T),al=C_.filter(x=>x.st==='rojo'||x.st==='bajo');
- if(al.length)h+=`<div class="card"><b>Semáforo de carga</b><p class="small">${al.map(x=>`${STL[x.st][0]} ${esc(short(T,x.p.id))}`).join(' · ')}</p><button data-a="tab" data-id="carga" class="btn w">Ver semáforo</button></div>`;
+ if(al.length)h+=`<div class="card"><b>Reparto de minutos</b><p class="small">${al.map(x=>`${STL[x.st][0]} ${esc(short(T,x.p.id))}`).join(' · ')}</p><button data-a="tab" data-id="carga" class="btn w">Ver reparto</button></div>`;
  return h+vCopias();
 }
 function vCopias(){
@@ -436,17 +457,24 @@ function vPost(T,g){
  ${has?`<button data-a="fdel" class="btn w" style="margin-top:8px;color:var(--red)">Borrar este formulario</button>`:''}</div>`;
  return h+vInforme(T,g,has?F:null);
 }
+function fichaHtml(f){
+ if(!f)return'';
+ return`<details class="ficha" style="margin-top:8px"><summary>🏃 Tarea: ${esc(f.tit)} <span class="mute small">· ${esc(f.est)} · ${esc(f.t)}</span></summary>
+ <table style="margin-top:6px"><tr><td>Objetivo</td><td style="text-align:left">${esc(f.obj)}</td></tr><tr><td>Situación</td><td style="text-align:left">${esc(f.sit)}</td></tr><tr><td>Espacio</td><td style="text-align:left">${esc(f.esp)}</td></tr>
+ <tr><td>Descripción</td><td style="text-align:left">${esc(f.desc)}</td></tr>${f.nor&&f.nor!=='—'?`<tr><td>Norma</td><td style="text-align:left">${esc(f.nor)}</td></tr>`:''}
+ <tr><td>Consignas</td><td style="text-align:left">${f.con.map(esc).join('<br>')}</td></tr></table></details>`;
+}
 function vInforme(T,g,F){
- const {s,R}=rules(T,g,F),f=pick(R,'f'),m=pick(R,'m'),ss=sugSis(T,g,F,s),cu=cuaderno(T,g,s,F);
- const it=(x,c)=>`<div class="item ${c}"><div class="b">${esc(x.titulo)}</div><div class="q">Dato: ${esc(x.dato)}</div><div class="t">💬 ${esc(x.charla)}</div>${c==='m'&&x.tarea?`<div class="t">🏃 <b>Tarea:</b> ${esc(x.tarea)}</div>`:''}</div>`;
- let h=`<h2>Informe para la charla</h2><p class="small mute">Generado por reglas a partir de los datos. Cada punto dice qué dato lo provoca: revísalo con tu criterio.</p>
+ const {s,R}=rules(T,g,F),f=pick(R,'f'),{m,resto}=mejoras(T,R),ss=T.cat==='ale'?sugSis(T,g,F,s):[],cu=cuaderno(T,g,s,F),max=MAXM[T.cat]||2;
+ if(resto.length)cu.unshift('Otras mejoras detectadas, para más adelante: '+resto.map(x=>x.titulo).join(', ')+'.');
+ const it=(x,c)=>`<div class="item ${c}"><div class="b">${esc(c==='m'&&x.ficha?x.ficha.obj:x.titulo)}</div>${c==='m'&&x.ficha?`<div class="q">${esc(x.titulo)}</div>`:''}<div class="q">Dato: ${esc(x.dato)}</div>${x.concepto?`<div class="q">Concepto UEFA C: ${esc(x.concepto)}</div>`:''}<div class="t">💬 ${esc(x.charla)}</div>${c==='m'?fichaHtml(x.ficha):''}</div>`;
+ let h=`<h2>Informe para la charla</h2><p class="small mute">Generado por reglas a partir de los datos. Cada punto dice qué dato lo provoca: revísalo con tu criterio. Sigue la formación UEFA C: ${T.cat==='pre'?'en Prebenjamín, <b>un solo objetivo</b> por semana y mensajes muy breves y en positivo':'en Alevín, <b>uno o dos objetivos</b> por semana y explicar el porqué'}.</p>
  <h3>✅ Lo que hicimos bien</h3>${f.map(x=>it(x,'f')).join('')||'<p class="mute small">No hay datos suficientes para destacar puntos fuertes. Completa el formulario.</p>'}
  ${f.length&&f.length<3?`<p class="xs mute">Solo ${f.length} punto${f.length>1?'s':''} con datos que lo respalden.</p>`:''}
- <h3>🎯 Lo que vamos a mejorar</h3>${m.map(x=>it(x,'m')).join('')||'<p class="mute small">No hay datos suficientes para señalar mejoras. Completa el formulario.</p>'}
- ${m.length&&m.length<3?`<p class="xs mute">Solo ${m.length} punto${m.length>1?'s':''} con datos que lo respalden.</p>`:''}`;
- if(ss.length)h+=`<h3>♟️ Ajuste táctico sugerido</h3>`+ss.map(o=>`<div class="item s"><div class="b">${esc(o.de)} → ${esc(o.a)} <span class="mute small">(${esc(SIS[o.a].car)})</span></div><div class="t">${esc(o.por)}</div>${o.temp?`<div class="q">${esc(o.temp)}</div>`:''}</div>`).join('')+`<p class="xs mute">Indicio con pocos partidos: en edades formativas el sistema importa menos que los principios. Pruébalo en entrenamiento antes que en partido.</p>`;
+ <h3>🎯 ${max===1?'Objetivo de la semana':'Objetivos de la semana'}</h3>${m.map(x=>it(x,'m')).join('')||'<p class="mute small">No hay datos suficientes para señalar mejoras. Completa el formulario.</p>'}`;
+ if(ss.length)h+=`<h3>♟️ Ajuste táctico sugerido</h3>`+ss.map(o=>`<div class="item s"><div class="b">${esc(o.de)} → ${esc(o.a)} <span class="mute small">(${esc(SIS[o.a].car)})</span></div><div class="t">${esc(o.por)}</div>${o.temp?`<div class="q">${esc(o.temp)}</div>`:''}</div>`).join('')+`<p class="xs mute">Indicio con pocos partidos: en formación los principios de juego importan más que el sistema. Pruébalo antes en el entrenamiento.</p>`;
  if(cu.length)h+=`<h3>📒 Solo para el entrenador</h3><div class="card small">${cu.map(x=>`<p>• ${esc(x)}</p>`).join('')}</div>`;
- h+=`<div class="grid2" style="margin-top:10px"><button data-a="copy" data-id="${esc(g.id)}" class="btn pri">Copiar charla</button><button data-a="toPlan" data-id="${esc(g.id)}" class="btn">Mejoras → Game Plan</button></div>`;
+ h+=`<div class="grid2" style="margin-top:10px"><button data-a="copy" data-id="${esc(g.id)}" class="btn pri">Copiar charla</button><button data-a="toPlan" data-id="${esc(g.id)}" class="btn">${max===1?'Objetivo':'Objetivos'} → Game Plan</button></div>`;
  return h;
 }
 /* ---- Game Plan ---- */
@@ -462,14 +490,14 @@ function optsPl(T,cur,CG,incl){
 function vPlan(T){
  const P=planOf(T),S=SIS[P.sis],CG=carga(T),dup=P.xi.filter((x,i)=>x&&P.xi.indexOf(x)!==i);
  const last=T.history[T.history.length-1],sugs=[];
- if(last){const{R}=rules(T,last,formOf(T,last)||null);pick(R,'m').forEach(x=>sugs.push(x.charla))}
+ if(last){const{R}=rules(T,last,formOf(T,last)||null);mejoras(T,R).m.forEach(x=>sugs.push(x.charla));pick(R,'f',1).forEach(x=>sugs.push(x.charla))}
  let h=`<h1>Game Plan</h1><p class="mute">Prepara el partido y ábrelo en grande en el banquillo.</p>
  <button data-a="match" class="btn pri w" style="margin-top:8px">▶ Abrir vista de partido</button>
  <div class="card"><label class="f">Rival<input data-p="rival" value="${esc(P.rival)}" class="inp"></label>
  <label class="f">Fecha<input data-p="fecha" type="date" value="${esc(P.fecha)}" class="inp"></label>
  <label class="f">Sistema inicial<select data-p="sis" class="inp">${Object.keys(SIS).map(k=>`<option value="${k}" ${P.sis===k?'selected':''}>${k} · ${SIS[k].car}</option>`).join('')}</select></label>
  <p class="small mute" style="margin-top:8px">${esc(S.idea)}<br>✔ ${S.fu.map(esc).join(' · ')}<br>✖ ${S.de.map(esc).join(' · ')}</p></div>
- <h2>Alineación</h2><p class="small mute">Solo convocados. El color es el semáforo de carga. Recuerda marcar luego los titulares en la app de minutos: el FTMS no la modifica.</p><div class="card">`;
+ <h2>Alineación</h2><p class="small mute">Solo convocados. El color es el reparto de minutos. Recuerda marcar luego los titulares en la app de minutos: el FTMS no la modifica.</p><div class="card">`;
  S.lab.forEach((l,i)=>{h+=`<label class="f">${i+1}. ${l}<select data-xi="${i}" class="inp">${optsPl(T,P.xi[i],CG)}</select></label>`});
  if(dup.length)h+=`<p class="small" style="color:var(--red)">Hay un jugador repetido en la alineación.</p>`;
  h+=`</div><h2>Balón parado</h2><div class="card">
@@ -502,8 +530,9 @@ function vMatchView(T){
 }
 /* ---- Semáforo ---- */
 function vCarga(T){
- const L=carga(T),ord={rojo:0,ambar:1,bajo:2,verde:3,portero:4,nd:5},cf=ST.cfg;
- let h=`<h1>Carga</h1><p class="mute">Porcentaje de los minutos disputados en los últimos ${cf.win} partidos del equipo. Es una referencia por minutos, no una medida médica.</p>
+ const L=carga(T),ord={bajo:0,rojo:1,ambar:2,verde:3,portero:4,nd:5},cf=ST.cfg;
+ let h=`<h1>Reparto</h1><p class="mute">Porcentaje de los minutos disputados por el equipo que ha jugado cada uno en los últimos ${cf.win} partidos.</p>
+ <p class="small mute">En estas edades lo importante es que todos jueguen y aprendan. Esto no mide carga física: según la formación UEFA C, la condición física no se entrena de forma específica hasta infantil. Primero aparecen quienes juegan poco.</p>
  <div class="card small"><div class="row wrap">${Object.entries(STL).filter(([k])=>k!=='nd').map(([k,[e,t]])=>`<span>${e} ${t}</span>`).join(' · ')}</div>
  <details style="margin-top:8px"><summary>Ajustar umbrales</summary>
  <label class="f">Ventana (partidos)<select data-cfg="win" class="inp">${[2,3,4,5].map(v=>`<option ${+cf.win===v?'selected':''}>${v}</option>`).join('')}</select></label>
@@ -532,7 +561,7 @@ function render(){
  else if(ST.tab==='plan')v=vPlan(T);
  else v=vCarga(T);
  $('#app').innerHTML=head+v;
- $('#nav').innerHTML=[['inicio','🏠','Inicio'],['post','📝','Post-partido'],['plan','📋','Game Plan'],['carga','🚦','Carga']].map(([id,i,l])=>`<button data-a="tab" data-id="${id}" class="${ST.tab===id?'on':''}"><span>${i}</span>${l}</button>`).join('');
+ $('#nav').innerHTML=[['inicio','🏠','Inicio'],['post','📝','Post-partido'],['plan','📋','Game Plan'],['carga','⚖️','Reparto']].map(([id,i,l])=>`<button data-a="tab" data-id="${id}" class="${ST.tab===id?'on':''}"><span>${i}</span>${l}</button>`).join('');
  $('#over').innerHTML=OVER&&T?`<div class="over">${vMatchView(T)}</div>`:'';
 }
 
@@ -576,7 +605,7 @@ document.addEventListener('click',ev=>{
  }
  else if(a==='fdel'){const g=T.history.find(x=>x.id===SEL);if(g&&confirm('¿Borrar el formulario de este partido?'))delete ST.post[pkey(T,g)]}
  else if(a==='copy'){const g=T.history.find(x=>x.id===id);if(g)copyText(informeTxt(T,g,formOf(T,g)||null));return}
- else if(a==='toPlan'){const g=T.history.find(x=>x.id===id);if(!g)return;const P=planOf(T),{R}=rules(T,g,formOf(T,g)||null),m=pick(R,'m');
+ else if(a==='toPlan'){const g=T.history.find(x=>x.id===id);if(!g)return;const P=planOf(T),{R}=rules(T,g,formOf(T,g)||null),{m}=mejoras(T,R);
   let n=0;m.forEach(x=>{const i=P.cons.findIndex(c=>!c.trim());if(i>=0&&!P.cons.includes(x.charla)){P.cons[i]=x.charla.slice(0,90);n++}});
   toast(n?`${n} consigna${n>1?'s':''} añadida${n>1?'s':''} al Game Plan`:'No hay huecos libres en las consignas');ST.tab='plan';SEL=null}
  else if(a==='sugc'){const P=planOf(T),x=(vPlan.sugs||[])[+id];if(!x)return;const i=P.cons.findIndex(c=>!c.trim());if(i<0){toast('Las 3 consignas están ocupadas');return}P.cons[i]=x.slice(0,90)}
