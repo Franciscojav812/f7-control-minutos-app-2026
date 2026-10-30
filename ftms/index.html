@@ -9,72 +9,94 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FTMS">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../icon-192.png">
+<link rel="apple-touch-icon" href="../icon-180.png">
 <script>
 /* /ftms -> /ftms/ : sin la barra final, las rutas relativas (sw.js, ../) apuntarían a la raíz */
 (function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html?$/.test(p))location.replace(p+'/'+location.search+location.hash)})();
 </script>
 <style>
-:root{--ink:#0b0b12;--panel:#15151f;--panel2:#1d1d2a;--line:#2b2b3b;--chalk:#f3f1ea;--mute:#9b99a8;--turf:#e0218a;--amber:#f4b53f;--red:#ef5350;--green:#3ecf8e;--blue:#5aa9ff}
+/* Identidad compartida con la app de minutos (mismos colores, fuentes y piezas) */
+:root{--ink:#0b0b12;--panel:#161622;--line:#2b2b42;--chalk:#f3f1f6;--mute:#9a98b0;--turf:#ec2f93;--bench:#1a2260;--benchl:#8da0f0;--blue2:#3a4fb8;--amber:#f4b53f;--red:#f25c5c;--green:#3ddc97;--blue:#5aa9ff;--disp:"Barlow Condensed","Arial Narrow",Impact,sans-serif}
+/* color por sección: igual que en la app de minutos */
+body{--acc:#8da0f0;--top:#1b2670}
+body[data-sec=setup],body[data-sec=carga]{--acc:#8da0f0;--top:#1b2670}
+body[data-sec=match],body[data-sec=plan]{--acc:#ec2f93;--top:#4a1442}
+body[data-sec=hist],body[data-sec=inicio]{--acc:#f4b53f;--top:#3b2b0b}
+body[data-sec=ana],body[data-sec=post]{--acc:#3ddc97;--top:#0e3a2d}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--ink);color:var(--chalk);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.4}
+html,body{margin:0;min-height:100%;overscroll-behavior:none}
+body{background:linear-gradient(180deg,var(--top) 0,var(--ink) 300px) var(--ink) no-repeat;color:var(--chalk);font-family:Barlow,"Segoe UI",system-ui,sans-serif;font-size:16px;line-height:1.4;padding-top:env(safe-area-inset-top)}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
 button:disabled{opacity:.4;cursor:default}
-main{max-width:30rem;margin:0 auto;padding:16px 16px 120px}
-h1,h2,h3{font-family:"Barlow Condensed","Barlow",system-ui,sans-serif;font-style:italic;font-weight:700;letter-spacing:-.01em;margin:0}
-h1{font-size:2.6rem;line-height:1}
-h2{font-size:1.7rem;margin:22px 0 8px}
-h3{font-size:1.3rem;margin:14px 0 6px}
+main{max-width:28rem;margin:0 auto;padding:16px 16px 120px}
+h1,h2,h3{font-family:var(--disp);font-style:italic;font-weight:700;letter-spacing:-.01em;margin:0}
+h1{font-size:3rem;line-height:1}
+#app>h1::after{content:"";display:block;width:56px;height:5px;border-radius:5px;background:var(--acc);margin:8px 0 6px}
+h2{font-size:1.875rem;margin:24px 0 8px;color:var(--acc)}
+h3{font-size:1.35rem;margin:14px 0 6px}
 p{margin:6px 0}
-.mute{color:var(--mute)}.small{font-size:.85rem}.xs{font-size:.75rem}.b{font-weight:700}
+.mute{color:var(--mute)}.small{font-size:.875rem}.xs{font-size:.75rem}.b{font-weight:700}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;margin:8px 0}
 .row{display:flex;align-items:center;gap:8px}.wrap{flex-wrap:wrap}.grow{flex:1;min-width:0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.btn{min-height:48px;border-radius:14px;padding:0 14px;background:var(--panel2);border:1px solid var(--line);font-weight:700}
-.btn.pri{background:var(--turf);border-color:var(--turf);color:#fff}
-.btn.ok{background:var(--green);border-color:var(--green);color:var(--ink)}
+.btn{min-height:52px;border-radius:16px;padding:0 14px;background:var(--bench);font-weight:700}
+.btn.pri{background:var(--turf);color:var(--ink)}
+.btn.ok{background:var(--green);color:var(--ink)}
 .btn.w{width:100%}
-.chip{min-height:40px;padding:0 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-weight:600;font-size:.9rem}
-.chip.on{background:var(--turf);border-color:var(--turf);color:#fff}
-.inp{width:100%;min-height:46px;border-radius:12px;background:var(--ink);border:1px solid var(--line);padding:0 12px;color:var(--chalk)}
+.chip{min-height:44px;padding:0 14px;border-radius:999px;background:var(--bench);border:2px solid var(--blue2);font-weight:700;font-size:.9rem;color:var(--chalk)}
+.chip.on{background:var(--amber);border-color:var(--amber);color:var(--ink)}
+.inp{width:100%;min-height:48px;border-radius:12px;background:var(--ink);border:1px solid var(--line);padding:0 12px;color:var(--chalk);font-size:1rem}
+.inp:focus{outline:none;border-color:var(--turf)}
 textarea.inp{padding:10px 12px;min-height:80px;resize:vertical}
-label.f{display:block;color:var(--mute);font-size:.85rem;margin-top:8px}
-label.f>.inp{margin-top:4px;color:var(--chalk);font-size:1rem}
+label.f{display:block;color:var(--mute);font-size:.875rem;margin-top:8px}
+label.f>.inp{margin-top:4px}
 .tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:700}
-.t-ok{background:var(--green);color:var(--ink)}.t-pend{background:var(--amber);color:var(--ink)}.t-mute{background:var(--line);color:var(--chalk)}
-.res{display:inline-block;min-width:58px;text-align:center;padding:3px 10px;border-radius:999px;font-weight:700}
-.res.G{background:var(--green);color:var(--ink)}.res.E{background:var(--amber);color:var(--ink)}.res.P{background:var(--red);color:var(--ink)}
+.t-ok{background:var(--green);color:var(--ink)}.t-pend{background:var(--amber);color:var(--ink)}.t-mute{background:var(--bench);color:var(--benchl)}
+.res{display:inline-block;min-width:58px;text-align:center;padding:3px 10px;border-radius:999px;font-weight:700;color:var(--ink)}
+.res.G{background:var(--turf)}.res.E{background:var(--amber)}.res.P{background:var(--red)}
 .dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none}
 .d-rojo{background:var(--red)}.d-ambar{background:var(--amber)}.d-verde{background:var(--green)}.d-bajo{background:var(--blue)}.d-portero{background:var(--mute)}.d-nd{background:var(--line)}
 .bar{height:6px;border-radius:6px;background:var(--ink);overflow:hidden;margin-top:6px}.bar>i{display:block;height:100%}
-.item{border-left:4px solid var(--line);padding:8px 10px;background:var(--panel2);border-radius:10px;margin:8px 0}
-.item.f{border-color:var(--green)}.item.m{border-color:var(--amber)}.item.s{border-color:var(--blue)}
+.item{border-left:4px solid var(--line);padding:10px 12px;background:var(--panel);border-radius:12px;margin:8px 0}
+.item.f{border-color:var(--green)}.item.m{border-color:var(--amber)}.item.s{border-color:var(--benchl)}
 .item .q{color:var(--mute);font-size:.85rem;margin-top:4px}
 .item .t{font-size:.9rem;margin-top:6px}
-header.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-header.top .logo{width:48px;height:48px;border-radius:50%;background:var(--turf);display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-style:italic;font-size:1.2rem;color:#fff;flex:none}
-.hbtn{flex:none;display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);color:var(--chalk);font-weight:700;font-size:.85rem;text-decoration:none}
-.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.teams button{min-height:46px;border-radius:14px;font-weight:700;background:var(--panel2);color:var(--mute)}
-.teams button.on{background:var(--turf);color:#fff}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(21,21,31,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);max-width:30rem;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
-nav button{min-height:62px;font-weight:700;font-size:.8rem;color:var(--mute)}
-nav button span{display:block;font-size:1.3rem;line-height:1.2}
-nav button.on{color:var(--turf)}
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;z-index:60;background:var(--chalk);color:var(--ink);font-weight:700;padding:8px 16px;border-radius:999px;max-width:90%;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}
-.pitch{background:repeating-linear-gradient(180deg,#14532d 0 36px,#166534 36px 72px);border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;gap:14px;border:2px solid rgba(255,255,255,.25)}
-.prow{display:flex;justify-content:space-around;gap:4px}
-.pl{display:flex;flex-direction:column;align-items:center;min-width:0;flex:1;max-width:96px}
-.pl .sh{width:38px;height:38px;border-radius:50%;background:var(--turf);color:#fff;display:grid;place-items:center;font-weight:700;border:2px solid #fff}
-.pl .sh.gk{background:var(--amber);color:var(--ink)}
-.pl .nm{font-weight:700;font-size:.85rem;margin-top:3px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px #000}
-.pl .ps{font-size:.68rem;color:#d1fae5}
-.over{position:fixed;inset:0;z-index:50;background:var(--ink);overflow:auto}
+/* cabecera idéntica a la de la app de minutos */
+header.top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+header.top img{width:56px;height:56px;border-radius:50%;flex:none;box-shadow:0 0 0 2px var(--turf)}
+.app-kicker{font:700 12px Barlow,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:2px}
+.team-t{font-family:var(--disp);font-style:italic;font-weight:700;font-size:1.875rem;line-height:1.05}
+.hbtn{flex:none;margin-left:auto;display:flex;align-items:center;gap:4px;height:44px;padding:0 12px;border-radius:12px;background:var(--bench);border:1px solid var(--line);color:var(--benchl);font-weight:700;font-size:.875rem;text-decoration:none}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.teams button{min-height:48px;border-radius:16px;font-weight:700;background:var(--bench);color:var(--benchl)}
+.teams button.on{background:var(--turf);color:var(--ink)}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(22,22,34,.95);border-top:1px solid color-mix(in srgb,var(--acc) 40%,var(--line));display:grid;grid-template-columns:repeat(4,1fr);max-width:28rem;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
+nav button{min-height:64px;font-weight:700;font-size:.8rem;color:var(--mute)}
+nav button span{display:block;font-size:1.25rem;line-height:1.2}
+nav button.on{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:112px;z-index:60;background:var(--chalk);color:var(--ink);font-weight:700;padding:8px 16px;border-radius:999px;max-width:90%;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}
+/* campo y camisetas: los mismos que en la app de minutos */
+.pitch{position:relative;border-radius:28px;padding:22px 4px 16px;overflow:hidden;background:repeating-linear-gradient(180deg,#1e8f4d 0 46px,#198044 46px 92px);box-shadow:inset 0 0 0 3px rgba(238,243,236,.55),0 10px 30px rgba(34,163,90,.18)}
+.pitch::before{content:"";position:absolute;left:50%;top:-46px;width:92px;height:92px;margin-left:-46px;border:3px solid rgba(238,243,236,.45);border-radius:50%}
+.pitch::after{content:"";position:absolute;left:24%;right:24%;bottom:0;height:70px;border:3px solid rgba(238,243,236,.45);border-bottom:0}
+.prow{position:relative;z-index:1;display:flex;justify-content:space-around;margin-bottom:18px}
+.prow:last-child{margin:0}
+.pl{display:flex;flex-direction:column;align-items:center;width:31%;max-width:108px;min-width:0}
+.jersey{display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:16px 16px 22px 22px;font:italic 700 28px var(--disp);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.28)}
+.jersey.red{background:linear-gradient(90deg,#ec2f93 0 17%,#14141c 17% 83%,#ec2f93 83%);color:#ff4fae;box-shadow:inset 0 5px 0 #ec2f93,0 4px 0 rgba(0,0,0,.3)}
+.jersey.amb{background:var(--amber);color:var(--ink)}
+.pl .nm{margin-top:5px;max-width:100%;padding:1px 9px;border-radius:99px;background:rgba(12,20,17,.82);font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl .ps{font:italic 700 14px var(--disp);text-shadow:0 1px 3px #000;margin-top:2px}
+.over{position:fixed;inset:0;z-index:50;overflow:auto;background:linear-gradient(180deg,#4a1442 0,var(--ink) 300px) var(--ink) no-repeat;padding-top:env(safe-area-inset-top)}
 .over main{padding-bottom:40px}
 .big{font-size:1.25rem;font-weight:700}
 .cons{counter-reset:c;list-style:none;padding:0;margin:0}
 .cons li{counter-increment:c;display:flex;gap:10px;align-items:flex-start;font-size:1.25rem;font-weight:700;margin:10px 0}
-.cons li::before{content:counter(c);flex:none;width:34px;height:34px;border-radius:50%;background:var(--turf);color:#fff;display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-style:italic}
+.cons li::before{content:counter(c);flex:none;width:36px;height:36px;border-radius:12px;background:var(--turf);color:var(--ink);display:grid;place-items:center;font:italic 700 1.3rem var(--disp)}
 table{width:100%;border-collapse:collapse;font-size:.88rem}
 td,th{padding:6px 4px;border-top:1px solid var(--line);text-align:center}
 th{color:var(--mute);font-weight:600;border-top:0}
@@ -82,6 +104,7 @@ td:first-child,th:first-child{text-align:left}
 .num{font-variant-numeric:tabular-nums}
 details>summary{cursor:pointer;font-weight:700}
 a{color:var(--turf)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
@@ -466,11 +489,11 @@ function vPlan(T){
 }
 function vMatchView(T){
  const P=planOf(T),S=SIS[P.sis],sh=id=>id?esc(short(T,id)):'—';
- const tok=i=>`<div class="pl"><div class="sh ${i===0?'gk':''}">${P.xi[i]?esc(short(T,P.xi[i])[0]):'?'}</div><div class="nm">${sh(P.xi[i])}</div><div class="ps">${S.lab[i]}</div></div>`;
+ const tok=i=>`<div class="pl"><span class="jersey ${i===0?'amb':'red'}">${P.xi[i]?esc(short(T,P.xi[i])[0]):'?'}</span><div class="nm">${sh(P.xi[i])}</div><div class="ps">${S.lab[i]}</div></div>`;
  return`<main><div class="row"><div class="grow"><div class="mute small">${TEAMS[T.id].name}${P.fecha?' · '+fdate(P.fecha+'T12:00'):''}</div><h1>${esc(P.rival||'Partido')}</h1></div><button data-a="closeM" class="btn">Cerrar</button></div>
  <div class="row" style="margin:8px 0"><span class="tag t-mute">${esc(P.sis)}</span><span class="small mute">${esc(S.car)}</span></div>
  <div class="pitch">${S.rows.map(r=>`<div class="prow">${r.map(tok).join('')}</div>`).join('')}</div>
- <h2>Consignas</h2><ol class="cons">${P.cons.filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join('')||'<li class="mute">Sin consignas</li>'}</ol>
+ <h2>Consignas</h2>${P.cons.some(x=>x.trim())?`<ol class="cons">${P.cons.filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:'<p class="mute">Sin consignas. Añádelas en el Game Plan.</p>'}
  <h2>Balón parado</h2><div class="card"><div class="grid2 big" style="font-size:1.05rem">
   <div><span class="mute small">Córner a favor</span><br>${sh(P.abp.cf)}</div><div><span class="mute small">Faltas</span><br>${sh(P.abp.ff)}</div>
   <div><span class="mute small">Penalti</span><br>${sh(P.abp.pen)}</div><div></div>
@@ -499,7 +522,8 @@ function vCarga(T){
 /* ---- render ---- */
 function render(){
  const T=team(ST.team);
- const head=`<header class="top"><div class="logo">FT</div><div class="grow"><div class="big" style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:1.5rem">FTMS · ${TEAMS[ST.team].name}</div><div class="mute small">Club San José del Parque · Fútbol 7 · ${TEAMS[ST.team].half}×2</div></div><a href="../" class="hbtn" aria-label="Abrir la app de minutos">⏱ Minutos</a></header>
+ document.body.dataset.sec=ST.tab;
+ const head=`<header class="top"><img src="../crest.jpg" alt="Escudo Club San José del Parque"><div class="grow"><div class="app-kicker">FTMS · Táctica</div><div class="team-t">${TEAMS[ST.team].name}</div><div class="mute small" style="font-weight:600">Club San José del Parque · Fútbol 7 · ${TEAMS[ST.team].half}×2 min</div></div><a href="../" class="hbtn" aria-label="Abrir la app de minutos">⏱ Minutos</a></header>
  <div class="teams">${Object.keys(TEAMS).map(id=>`<button data-a="team" data-id="${id}" class="${ST.team===id?'on':''}">${TEAMS[id].name}</button>`).join('')}</div>`;
  let v;
  if(!T&&ST.tab!=='inicio')v=`<h1>FTMS</h1>`+noData();

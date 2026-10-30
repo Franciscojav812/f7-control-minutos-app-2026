@@ -1068,3 +1068,21 @@ body {
     }
   }
 }
+
+/* ==========================================================
+   Identidad común Minutos F7 + FTMS · color por sección
+   Mismo color = mismo tipo de sección en las dos apps:
+   azul = equipo (Plantilla · Carga) · magenta = partido (Partido · Game Plan)
+   ámbar = resumen (Historial · Inicio) · menta = análisis (Análisis · Post-partido)
+   ========================================================== */
+body{--acc:#8da0f0;--top:#1b2670}
+body[data-sec=setup],body[data-sec=carga]{--acc:#8da0f0;--top:#1b2670}
+body[data-sec=match],body[data-sec=plan]{--acc:#ec2f93;--top:#4a1442}
+body[data-sec=hist],body[data-sec=inicio]{--acc:#f4b53f;--top:#3b2b0b}
+body[data-sec=ana],body[data-sec=post]{--acc:#3ddc97;--top:#0e3a2d}
+body{background:linear-gradient(180deg,var(--top) 0,#0b0b12 300px) #0b0b12 no-repeat}
+.app-kicker{font:700 12px Barlow,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:2px}
+#app>h1::after{content:"";display:block;width:56px;height:5px;border-radius:5px;background:var(--acc);margin:8px 0 6px}
+#app h2.font-disp:not(.text-turf):not(.text-benchl){color:var(--acc)}
+#nav{border-top-color:color-mix(in srgb,var(--acc) 40%,#2b2b42)}
+#nav button.text-turf{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}

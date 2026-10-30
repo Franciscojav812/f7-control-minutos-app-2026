@@ -476,9 +476,10 @@ function vAna(){
   return h;
 }
 function render(){
+  document.body.dataset.sec=ALL.tab;
   const T=TEAMS[ALL.cur],v={setup:vSetup,match:vMatch,hist:vHist,ana:vAna}[ALL.tab]();
   const keep=$('#newp')?$('#newp').value:'';
-  $('#app').innerHTML=`<header class="flex items-center gap-3 mb-3"><img src="${CREST}" alt="Escudo Club San José del Parque" class="w-14 h-14 rounded-full shrink-0 ring-2 ring-turf"><div class="leading-tight"><div class="font-disp text-3xl font-bold italic">${T.name}</div><div class="text-mute text-sm font-semibold">Club San José del Parque · Fútbol 7 · ${T.half}×2 min</div></div><a href="ftms/" data-a="ftms" class="ml-auto shrink-0 h-11 px-3 rounded-xl bg-bench border border-line font-bold text-sm text-benchl flex items-center gap-1" aria-label="Abrir FTMS (suite táctica)">📋 FTMS</a></header>
+  $('#app').innerHTML=`<header class="flex items-center gap-3 mb-3"><img src="${CREST}" alt="Escudo Club San José del Parque" class="w-14 h-14 rounded-full shrink-0 ring-2 ring-turf"><div class="leading-tight min-w-0"><div class="app-kicker">Minutos F7</div><div class="font-disp text-3xl font-bold italic">${T.name}</div><div class="text-mute text-sm font-semibold">Club San José del Parque · Fútbol 7 · ${T.half}×2 min</div></div><a href="ftms/" data-a="ftms" class="ml-auto shrink-0 h-11 px-3 rounded-xl bg-bench border border-line font-bold text-sm text-benchl flex items-center gap-1" aria-label="Abrir FTMS (suite táctica)">📋 FTMS</a></header>
   <div class="grid grid-cols-2 gap-2 mb-4">`+Object.keys(TEAMS).map(id=>{const t=TEAMS[id],run=ALL.teams[id].match&&ALL.teams[id].match.running;
     return`<button data-a="team" data-id="${id}" class="min-h-12 rounded-2xl font-bold ${ALL.cur===id?'bg-turf text-ink':'bg-bench text-benchl'}">${t.name}${run?' ●':''}</button>`}).join('')+`</div>`+v+(DLG&&(S.match||DLG.k==='edit')?vDlg():'');
   if($('#newp'))$('#newp').value=keep;
