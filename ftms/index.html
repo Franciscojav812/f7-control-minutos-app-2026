@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FTMS · San José del Parque</title>
+<title>Banquillo · Táctica</title>
 <meta name="theme-color" content="#0b0b12">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FTMS">
+<meta name="apple-mobile-web-app-title" content="Banquillo">
+<link rel="manifest" href="../manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="../icon-192.png">
+<link rel="icon" type="image/svg+xml" href="../icon.svg"><link rel="icon" type="image/png" href="../icon-192.png">
 <link rel="apple-touch-icon" href="../icon-180.png">
 <script>
 /* /ftms -> /ftms/ : sin la barra final, las rutas relativas (sw.js, ../) apuntarían a la raíz */
@@ -76,6 +77,11 @@ header.top img{width:56px;height:56px;border-radius:50%;flex:none;box-shadow:0 0
 .teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px}
 .teams button{min-height:48px;border-radius:16px;font-weight:700;background:var(--bench);color:var(--benchl)}
 .teams button.on{background:var(--turf);color:var(--ink)}
+.clubhd{display:flex;align-items:center;gap:8px;margin:10px 2px 6px;font:700 12px Barlow,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.clubhd img{width:22px;height:22px;border-radius:50%;object-fit:cover}
+.clubhd+.teams{margin-bottom:6px}
+header.top img{object-fit:cover}
+.offpill{margin:-4px 0 10px;padding:8px 12px;border-radius:12px;background:#3b2b0b;color:#f4b53f;font-weight:700;font-size:14px;text-align:center}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(22,22,34,.95);border-top:1px solid color-mix(in srgb,var(--acc) 40%,var(--line));display:grid;grid-template-columns:repeat(5,1fr);max-width:28rem;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
 nav button{min-height:64px;font-weight:700;font-size:.7rem;color:var(--mute);padding:0 2px}
 nav button span{display:block;font-size:1.25rem;line-height:1.2}
@@ -136,8 +142,8 @@ a{color:var(--turf)}
 <script>
 'use strict';
 /* ==========================================================
-   FTMS · Football Tactical & Methodological Suite · Fase 1
-   Club San José del Parque · Fútbol 7
+   Banquillo · Táctica (FTMS · Football Tactical & Methodological Suite)
+   Varios clubes y equipos; fútbol 7 y fútbol 11
    - LEE (nunca escribe) los datos de la app de minutos: localStorage 'f7minutos.club.v2'
    - Guarda lo suyo en 'ftms.v1'
    ========================================================== */
@@ -145,7 +151,9 @@ const SRC_KEY='f7minutos.club.v2',KEY='ftms.v1',VER=1;
 /* Equipos: los dos originales + los creados en la app de minutos (se leen de sus datos: cfgTeams) */
 const BASE_TEAMS={pre:{name:'Prebenjamín A',half:20,cat:'pre',fmt:'F7',n:7},ale:{name:'Alevín B',half:25,cat:'ale',fmt:'F7',n:7}};
 const FMT_N={F7:7,F11:11},FMT_DEF={F7:'3-2-1',F11:'4-3-3'},FMT_LBL={F7:'Fútbol 7',F11:'Fútbol 11'};
-let TEAMS=Object.assign({},BASE_TEAMS);
+let TEAMS=Object.assign({},BASE_TEAMS),CLUBS={sjp:{name:'Club San José del Parque',crest:''}};
+/* clubs: los define la app de minutos (nombre + escudo); aquí solo se leen */
+const clubImg=cid=>{const c=CLUBS[cid];return c&&c.crest?c.crest:(cid==='sjp'?'../crest.jpg':'../icon.svg')},clubName=cid=>(CLUBS[cid]||{}).name||'';
 /* grupo metodológico de cada categoría: reglas del informe (pre | ale) y filtro de ejercicios (pre | ale | inf) */
 const catRule=c=>['pre','ben'].includes(c)?'pre':'ale',catEx=c=>['pre','ben'].includes(c)?'pre':(c==='ale'?'ale':'inf');
 const CATS={
@@ -211,7 +219,7 @@ function loadState(){
  return s;
 }
 let ST=loadState(),SEL=null,OVER=null;
-function save(){try{const o=Object.assign({},ST);localStorage.setItem(KEY,JSON.stringify(o))}catch(e){toast('⚠ No se pudo guardar: almacenamiento lleno. Exporta una copia FTMS.')}}
+function save(){try{const o=Object.assign({},ST);localStorage.setItem(KEY,JSON.stringify(o))}catch(e){toast('⚠ No se pudo guardar: almacenamiento lleno. Exporta una copia de Táctica.')}}
 
 /* ==========================================================
    CONECTOR (solo lectura)
@@ -228,8 +236,10 @@ function normG(g,i){
 }
 function syncTeams(){
  const {all}=readSrc(),cfg=(all&&all.cfgTeams)||{},T={};
- Object.keys(BASE_TEAMS).forEach(id=>{const o=cfg[id]||{};T[id]=Object.assign({},BASE_TEAMS[id],{name:o.name||BASE_TEAMS[id].name,half:o.half||BASE_TEAMS[id].half,cat:o.cat||BASE_TEAMS[id].cat})});
- Object.keys(cfg).forEach(id=>{const c=cfg[id];if(!T[id]&&c&&c.fmt)T[id]={name:c.name||id,half:c.half||25,cat:c.cat||'ale',fmt:c.fmt,n:FMT_N[c.fmt]||7}});
+ Object.keys(BASE_TEAMS).forEach(id=>{const o=cfg[id]||{};T[id]=Object.assign({},BASE_TEAMS[id],{name:o.name||BASE_TEAMS[id].name,half:o.half||BASE_TEAMS[id].half,cat:o.cat||BASE_TEAMS[id].cat,club:o.club||'sjp'})});
+ Object.keys(cfg).forEach(id=>{const c=cfg[id];if(!T[id]&&c&&c.fmt)T[id]={name:c.name||id,half:c.half||25,cat:c.cat||'ale',fmt:c.fmt,n:FMT_N[c.fmt]||7,club:c.club||'sjp'}});
+ CLUBS=(all&&all.clubs&&Object.keys(all.clubs).length)?all.clubs:{sjp:{name:'Club San José del Parque',crest:''}};
+ const c0=Object.keys(CLUBS)[0];Object.values(T).forEach(t=>{if(!CLUBS[t.club])t.club=c0});
  TEAMS=T;if(!TEAMS[ST.team])ST.team='pre';
 }
 function team(id){
@@ -429,8 +439,8 @@ const STL={rojo:['🔴','Juega casi todo'],ambar:['🟠','Muchos minutos'],verde
    ========================================================== */
 function noData(){
  return`<div class="card"><h3>No encuentro datos de la app de minutos</h3>
- <p class="mute">El FTMS lee los partidos que guarda la app de minutos en este mismo navegador. Para que funcione:</p>
- <ol class="small"><li>Abre el FTMS desde la <b>misma dirección web</b> que la app de minutos, añadiendo <b>/ftms/</b> al final.</li>
+ <p class="mute">Táctica lee los partidos que guarda la app de minutos en este mismo navegador. Para que funcione:</p>
+ <ol class="small"><li>Abre Táctica desde la <b>misma dirección web</b> que la app de minutos, añadiendo <b>/ftms/</b> al final.</li>
  <li>Usa el <b>mismo navegador</b> (y el mismo móvil) en el que registras los partidos.</li>
  <li>Si no es posible, exporta una <b>Copia JSON</b> en la app de minutos (pestaña Historial) e impórtala aquí.</li></ol>
  <button data-a="impMin" class="btn pri w">Importar copia JSON de la app de minutos</button></div>`;
@@ -441,7 +451,7 @@ function vInicio(T){
  if(!all)return h+noData()+vCopias();
  const H=T?T.history:[],last=H[H.length-1],pend=H.filter(g=>!formOf(T,g)).length;
  h+=`<div class="card"><div class="row"><span class="dot ${origen==='directo'?'d-verde':'d-ambar'}"></span><b class="grow">${origen==='directo'?'Conectado a la app de minutos':'Usando una copia importada'}</b></div>
-  <p class="small mute">${origen==='directo'?'Lectura directa en este navegador. El FTMS nunca modifica los datos de la app de minutos.':`Copia importada el ${fdate(ST.imported.at)}. No se actualiza sola: importa una copia nueva tras cada partido.`}</p>
+  <p class="small mute">${origen==='directo'?'Lectura directa en este navegador. Táctica nunca modifica los datos de la app de minutos.':`Copia importada el ${fdate(ST.imported.at)}. No se actualiza sola: importa una copia nueva tras cada partido.`}</p>
   <div class="grid2 small">${Object.keys(TEAMS).map(id=>{const t=all.teams[id];return`<div class="card" style="margin:0"><b>${TEAMS[id].name}</b><br><span class="mute">${(t&&t.history||[]).length} partidos · ${(t&&t.players||[]).length} jugadores</span></div>`}).join('')}</div>
   ${T&&T.enJuego?`<p class="small" style="color:var(--amber)">● Hay un partido en curso en la app de minutos. Aparecerá aquí cuando lo finalices.</p>`:''}
   ${origen==='importado'?`<button data-a="impMin" class="btn w" style="margin-top:8px">Importar copia más reciente</button>`:''}</div>`;
@@ -457,8 +467,8 @@ function vInicio(T){
  return h+vCopias();
 }
 function vCopias(){
- return`<h2>Copias y exportación</h2><div class="card"><p class="small mute">Lo que haces en el FTMS (formularios, planes, umbrales y ejercicios propios) vive solo en este navegador. Haz una copia de vez en cuando y guárdala fuera del móvil.</p>
- <div class="grid2"><button data-a="expFt" class="btn">Copia FTMS (.json)</button><button data-a="impFt" class="btn">Importar copia FTMS</button>
+ return`<h2>Copias y exportación</h2><div class="card"><p class="small mute">Lo que haces en Táctica (formularios, planes, umbrales y ejercicios propios) vive solo en este navegador. Haz una copia de vez en cuando y guárdala fuera del móvil.</p>
+ <div class="grid2"><button data-a="expFt" class="btn">Copia de Táctica (.json)</button><button data-a="impFt" class="btn">Importar copia de Táctica</button>
  <button data-a="csvPost" class="btn">CSV post-partido</button><button data-a="csvGol" class="btn">CSV goles en contra</button></div>
  <p class="xs mute">Los CSV usan <b>partido_id</b>, la misma columna que el Excel de la app de minutos, para unirlos en Power BI o pandas. Son datos de menores: no los subas a servicios públicos.</p></div>
  <p class="small"><a href="../">← Volver a la app de minutos</a></p>`;
@@ -545,7 +555,7 @@ function vPlan(T){
  <label class="f">Fecha<input data-p="fecha" type="date" value="${esc(P.fecha)}" class="inp"></label>
  <label class="f">Sistema inicial<select data-p="sis" class="inp">${sisDe(T.fmt).map(k=>`<option value="${k}" ${P.sis===k?'selected':''}>${k} · ${SIS[k].car}</option>`).join('')}</select></label>
  <p class="small mute" style="margin-top:8px">${esc(S.idea)}<br>✔ ${S.fu.map(esc).join(' · ')}<br>✖ ${S.de.map(esc).join(' · ')}</p></div>
- <h2>Alineación</h2><p class="small mute">Solo convocados. El color es el reparto de minutos. Recuerda marcar luego los titulares en la app de minutos: el FTMS no la modifica.</p><div class="card">`;
+ <h2>Alineación</h2><p class="small mute">Solo convocados. El color es el reparto de minutos. Recuerda marcar luego los titulares en la app de minutos: Táctica no la modifica.</p><div class="card">`;
  S.lab.forEach((l,i)=>{h+=`<label class="f">${i+1}. ${l}<select data-xi="${i}" class="inp">${optsPl(T,P.xi[i],CG)}</select></label>`});
  if(dup.length)h+=`<p class="small" style="color:var(--red)">Hay un jugador repetido en la alineación.</p>`;
  h+=`</div><h2>Balón parado</h2><div class="card">
@@ -970,14 +980,20 @@ function aniHtml(e){
 }
 
 /* ---- render ---- */
+function teamSel(){
+ const btn=id=>`<button data-a="team" data-id="${id}" class="${ST.team===id?'on':''}">${esc(TEAMS[id].name)}</button>`,cids=[...new Set(Object.values(TEAMS).map(t=>t.club))];
+ if(cids.length<2)return`<div class="teams">${Object.keys(TEAMS).map(btn).join('')}</div>`;
+ return cids.map(cid=>`<div class="clubhd"><img src="${clubImg(cid)}" alt="">${esc(clubName(cid))}</div><div class="teams">${Object.keys(TEAMS).filter(id=>TEAMS[id].club===cid).map(btn).join('')}</div>`).join('');
+}
+addEventListener('online',()=>render());addEventListener('offline',()=>render());
 function render(){
  const T=team(ST.team);
  syncTeams();document.body.dataset.sec=ST.tab;
- const head=`<header class="top"><img src="../crest.jpg" alt="Escudo Club San José del Parque"><div class="grow"><div class="app-kicker">FTMS · Táctica</div><div class="team-t">${TEAMS[ST.team].name}</div><div class="mute small" style="font-weight:600">Club San José del Parque · ${FMT_LBL[TEAMS[ST.team].fmt||'F7']} · ${TEAMS[ST.team].half}×2 min</div></div><a href="../" class="hbtn" aria-label="Abrir la app de minutos">⏱ Minutos</a></header>
- <div class="teams">${Object.keys(TEAMS).map(id=>`<button data-a="team" data-id="${id}" class="${ST.team===id?'on':''}">${TEAMS[id].name}</button>`).join('')}</div>`;
+ const head=`<header class="top"><img src="${clubImg(TEAMS[ST.team].club)}" alt="Escudo ${esc(clubName(TEAMS[ST.team].club))}"><div class="grow"><div class="app-kicker">Banquillo · Táctica</div><div class="team-t">${esc(TEAMS[ST.team].name)}</div><div class="mute small" style="font-weight:600">${esc(clubName(TEAMS[ST.team].club))} · ${FMT_LBL[TEAMS[ST.team].fmt||'F7']} · ${TEAMS[ST.team].half}×2 min</div></div><a href="../" class="hbtn" aria-label="Abrir Minutos">⏱ Minutos</a></header>${navigator.onLine?'':'<div class="offpill">📴 Sin conexión · la app funciona igual y guarda en el móvil</div>'}
+ ${teamSel()}`;
  let v;
  if(ST.tab==='ejer')v=vEjer();
- else if(!T&&ST.tab!=='inicio')v=`<h1>FTMS</h1>`+noData();
+ else if(!T&&ST.tab!=='inicio')v=`<h1>Táctica</h1>`+noData();
  else if(ST.tab==='inicio')v=vInicio(T);
  else if(ST.tab==='post'){const g=SEL&&T.history.find(x=>x.id===SEL);v=g?vPost(T,g):vPostList(T)}
  else if(ST.tab==='plan')v=vPlan(T);
@@ -1071,9 +1087,9 @@ readFile($('#impMin'),d=>{
  ST.imported={at:Date.now(),all};save();render();toast('Copia de la app de minutos importada');
 });
 readFile($('#impFt'),d=>{
- if(!d||d.app!=='ftms'||!d.post){toast('No es una copia del FTMS');return}
- if(!confirm('Se reemplazarán los formularios, planes, umbrales y ejercicios propios del FTMS por la copia. ¿Continuar?'))return;
- ST.post=d.post||{};ST.plans=d.plans||{};if(d.ejer)ST.ejer=Object.assign({fav:[],custom:[]},d.ejer);ST.cfg=Object.assign(ST.cfg,d.cfg||{});save();render();toast('Copia FTMS importada');
+ if(!d||d.app!=='ftms'||!d.post){toast('No es una copia de Táctica');return}
+ if(!confirm('Se reemplazarán los formularios, planes, umbrales y ejercicios propios de Táctica por la copia. ¿Continuar?'))return;
+ ST.post=d.post||{};ST.plans=d.plans||{};if(d.ejer)ST.ejer=Object.assign({fav:[],custom:[]},d.ejer);ST.cfg=Object.assign(ST.cfg,d.cfg||{});save();render();toast('Copia de Táctica importada');
 });
 /* si la app de minutos guarda en otra pestaña, refrescar */
 addEventListener('storage',e=>{if(e.key===SRC_KEY)render()});

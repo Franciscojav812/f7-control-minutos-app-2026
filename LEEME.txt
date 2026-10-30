@@ -1,6 +1,6 @@
-MINUTOS F7 · Club San José del Parque
-Esta carpeta ES la app. Hay que subirla ENTERA (todos los archivos) a un alojamiento web con https
-(Netlify Drop, GitHub Pages, Cloudflare Pages...). Abre la dirección en el móvil y pulsa
-"Añadir a pantalla de inicio". Tras la primera carga funciona sin cobertura.
+BANQUILLO · Minutos y táctica para entrenadores de fútbol base
+Esta carpeta ES la app (Minutos en la raíz y Táctica en /ftms/). Se sube ENTERA a un alojamiento con https
+(ahora mismo Vercel desde GitHub). Abre la dirección en el móvil y pulsa "Añadir a pantalla de inicio".
+Tras la primera carga con conexión, las dos partes (Minutos y Táctica) funcionan sin cobertura.
 Requisitos: iPhone con iOS 16.4 o superior (Safari) / Android con Chrome 111 o superior.
 No abras index.html con doble clic en el ordenador: el modo sin conexión solo funciona desde una dirección https.

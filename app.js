@@ -1,6 +1,6 @@
 /* ---- 01-core.js ---- */
 'use strict';
-/* ===== Minutos F7 · Club San José del Parque · v3 ===== */
+/* ===== Banquillo · Minutos (antes Minutos F7) · v3 ===== */
 const CREST='crest.jpg',KEY='f7minutos.club.v2',BK='f7minutos.bak';
 /* Equipos base (no cambian: su prefijo y sus archivos son el contrato con los Excel maestros) */
 const BASE_TEAMS={
@@ -12,10 +12,16 @@ let TEAMS={};
 /* equipos = base (con sus ajustes editables) + equipos creados desde la app (ALL.cfgTeams) */
 function buildTeams(a){
   const cfg=(a&&a.cfgTeams)||{},T={};
-  Object.keys(BASE_TEAMS).forEach(id=>{const o=cfg[id]||{};T[id]=Object.assign({},BASE_TEAMS[id],{name:o.name||BASE_TEAMS[id].name,half:o.half||BASE_TEAMS[id].half,cat:o.cat||BASE_TEAMS[id].cat})});
+  Object.keys(BASE_TEAMS).forEach(id=>{const o=cfg[id]||{};T[id]=Object.assign({},BASE_TEAMS[id],{name:o.name||BASE_TEAMS[id].name,half:o.half||BASE_TEAMS[id].half,cat:o.cat||BASE_TEAMS[id].cat,club:o.club||'sjp'})});
   Object.keys(cfg).forEach(id=>{if(!T[id]&&cfg[id]&&cfg[id].fmt)T[id]=Object.assign({},cfg[id],{n:FMTS[cfg[id].fmt].n})});
+  const cl=(a&&a.clubs)||CLUBS0(),c0=Object.keys(cl)[0];Object.values(T).forEach(t=>{if(!cl[t.club])t.club=c0});
   TEAMS=T;
 }
+/* clubs: cada equipo pertenece a un club (nombre + escudo opcional). Solo se guardan en la app, no cambian los Excel */
+const CLUBS0=()=>({sjp:{name:'Club San José del Parque',crest:''}});
+function normCfg(a){a.cfgTeams=a.cfgTeams||{};if(!a.clubs||!Object.keys(a.clubs).length)a.clubs=CLUBS0();buildTeams(a)}
+const clubOf=id=>(ALL.clubs||{})[(TEAMS[id]||{}).club]||{name:'',crest:''};
+const clubImg=cid=>{const c=(ALL.clubs||{})[cid];return c&&c.crest?c.crest:(cid==='sjp'?CREST:'icon.svg')};
 const teamFmt=()=>TEAMS[ALL.cur].fmt||'F7',NF=()=>TEAMS[ALL.cur].n||7;
 const DEF={
  pre:{n:['Rodrigo Marín','Cayetano Aragonés','Gonzalo Barquín','Alfredo González','Antonio Herráiz','Arturo Marqués','Alfredo Martín','Pietro Mónaco','Adrián Otero','Gabriel Olarte','Matteo Soria','Hugo Louzao','Maverick Pinto','Platón Kudishin','Tomás Antoranz'],
@@ -84,7 +90,7 @@ function fixTeam(t,id){
 function load(){
   let a=null;try{a=JSON.parse(localStorage.getItem(KEY))}catch(e){}
   if(!a||!a.teams)a={cur:'pre',tab:'setup',teams:{}};
-  a.cfgTeams=a.cfgTeams||{};buildTeams(a);if(!TEAMS[a.cur])a.cur='pre';
+  normCfg(a);if(!TEAMS[a.cur])a.cur='pre';
   Object.keys(TEAMS).forEach(id=>{
     if(!a.teams[id]){let t=null;const lk={pre:'f7minutos.v1',ale:'f7minutos.alevinb.v1'}[id];try{if(lk)t=JSON.parse(localStorage.getItem(lk))}catch(e){}
       a.teams[id]=t&&t.players?t:newTeam(id)}
@@ -110,7 +116,7 @@ function listBak(){
     return{i,at:o.at,why:o.why,n:Object.values(a.teams).reduce((s,t)=>s+(t.history||[]).length,0)}}catch(e){return null}}).filter(Boolean);
 }
 function restoreBak(rawItem){
-  const o=JSON.parse(rawItem);ALL=JSON.parse(o.raw);ALL.cfgTeams=ALL.cfgTeams||{};buildTeams(ALL);
+  const o=JSON.parse(rawItem);ALL=JSON.parse(o.raw);normCfg(ALL);
   Object.keys(TEAMS).forEach(id=>{if(!ALL.teams[id])ALL.teams[id]=newTeam(id);fixTeam(ALL.teams[id],id)});
   ALL.set=Object.assign({auto:true,lastBak:0},ALL.set||{});setTeam(TEAMS[ALL.cur]?ALL.cur:'pre');ALL.tab='hist';
 }
@@ -310,6 +316,7 @@ function vSetup(){
   const TT=TEAMS[ALL.cur],hasH=S.history.length>0;
   h+=`<div class="bg-panel border border-line rounded-2xl p-3 mt-3 space-y-2"><h2 class="font-disp text-2xl font-bold italic">Equipo</h2>
    <label class="flex items-center gap-2"><span class="w-32 text-sm">Nombre</span><input data-a="tname" value="${esc(TT.name)}" maxlength="30" class="min-w-0 flex-1 h-11 rounded-lg bg-ink px-2 border border-line"></label>
+   <label class="flex items-center gap-2"><span class="w-32 text-sm">Club</span><select data-a="tclub" class="min-w-0 flex-1 h-11 rounded-lg bg-ink px-2">${Object.entries(ALL.clubs).map(([k,c])=>`<option value="${k}" ${TT.club===k?'selected':''}>${esc(c.name)}</option>`).join('')}<option value="__new">＋ Nuevo club…</option></select><button data-a="clubedit" class="shrink-0 h-11 px-3 rounded-lg bg-bench font-bold text-sm">Editar</button></label>
    <label class="flex items-center gap-2"><span class="w-32 text-sm">Categoría</span><select data-a="tcat" class="flex-1 h-11 rounded-lg bg-ink px-2">${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${TT.cat===k?'selected':''}>${v}</option>`).join('')}</select></label>
    <label class="flex items-center gap-2"><span class="w-32 text-sm">Minutos por parte</span><input data-a="thalf" type="number" min="5" max="60" inputmode="numeric" value="${TT.half}" ${m?'disabled':''} class="w-24 h-11 rounded-lg bg-ink px-2 border border-line text-center"></label>
    <p class="text-sm text-mute">${FMTS[TT.fmt||'F7'].lbl} · ${TT.n} en el campo${TT.base?' · equipo original (su formato y sus archivos no cambian)':''}</p>
@@ -417,8 +424,15 @@ function vDlg(){
       <button data-a="vneg" data-id="${id}" class="w-20 h-12 rounded-xl bg-red-500/80 text-ink font-bold text-lg">－ ${vn}</button><button data-a="vpos" data-id="${id}" class="w-20 h-12 rounded-xl bg-turf text-ink font-bold text-lg">＋ ${vp}</button></div>`}).join('')}</div>
     <button data-a="dcancel" class="w-full mt-4 ${btn2}">Cerrar</button>`)}
   if(d.k==='edit')return vEdit();
+  if(d.k==='club'){const c=d.id?ALL.clubs[d.id]:{name:'',crest:''},cr=d.crest!==undefined?d.crest:c.crest,img=cr||(d.id==='sjp'?CREST:'icon.svg'),uses=d.id?Object.values(TEAMS).filter(t=>t.club===d.id).length:0;
+   return sheet(`<h2 class="font-disp text-3xl font-bold italic mb-3">${d.id?'Editar club':'Nuevo club'}</h2>
+    <label class="block text-mute text-sm mb-1">Nombre del club<input id="cn" class="${inp}" maxlength="40" value="${esc(d.name!==undefined?d.name:c.name)}" placeholder="Ej.: CD Ejemplo"></label>
+    <div class="crestrow"><img src="${img}" alt="Escudo" class="crestprev"><div class="grow"><label class="crestbtn">${cr?'Cambiar escudo':'Subir escudo'}<input id="cf" type="file" accept="image/*" hidden></label>${cr?'<button data-a="crestdel" class="crestdel">Quitar escudo</button>':''}<p class="text-mute text-sm mt-1">Foto o imagen del escudo. Se recorta en cuadrado y se guarda solo en este móvil.</p></div></div>
+    ${d.id&&!uses&&Object.keys(ALL.clubs).length>1?'<button data-a="clubdel" class="w-full mt-3 min-h-12 rounded-xl bg-red-500/20 text-red-300 font-bold">Borrar club (no tiene equipos)</button>':''}
+    <div class="grid grid-cols-2 gap-2 mt-4"><button data-a="dcancel" class="${btn2}">Cancelar</button><button data-a="clubsave" class="min-h-14 rounded-2xl bg-turf text-ink font-bold">Guardar</button></div>`)}
   if(d.k==='team')return sheet(`<h2 class="font-disp text-3xl font-bold italic mb-3">Nuevo equipo</h2>
     <label class="block text-mute text-sm mb-1">Nombre<input id="tn" class="${inp}" maxlength="30" placeholder="Ej.: Infantil A"></label>
+    <label class="block text-mute text-sm mb-1">Club<select id="tcl" class="${inp}">${Object.entries(ALL.clubs).map(([k,c])=>`<option value="${k}" ${TEAMS[ALL.cur].club===k?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>
     <div class="grid grid-cols-2 gap-2"><label class="text-mute text-sm">Categoría<select id="tc" class="${inp}">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
     <label class="text-mute text-sm">Formato<select id="tf" class="${inp}">${Object.entries(FMTS).map(([k,v])=>`<option value="${k}">${v.lbl} (${v.n})</option>`).join('')}</select></label>
     <label class="text-mute text-sm">Minutos por parte<input id="th" type="number" min="5" max="60" inputmode="numeric" value="25" class="${inp} text-center"></label>
@@ -516,13 +530,19 @@ function vAna(){
   h+=`<h2 class="font-disp text-3xl font-bold italic mb-1">Equilibrio de minutos por partido</h2><p class="text-mute text-sm mb-2">Desviación típica de los minutos de los jugadores de campo: cuanto más baja, más repartido.</p><div class="space-y-1 mb-4">`+A.dev.map(d=>`<div class="bg-panel rounded-xl px-3 py-2 flex justify-between text-sm"><span class="truncate">P${d.n} ${esc(d.rival||'')}</span><span class="num">σ ${d.sd.toFixed(1)}' · de ${d.mn.toFixed(0)}' a ${d.mx.toFixed(0)}'</span></div>`).join('')+`</div>`;
   return h;
 }
+function teamSel(){
+  const btn=id=>{const t=TEAMS[id],run=ALL.teams[id].match&&ALL.teams[id].match.running;
+    return`<button data-a="team" data-id="${id}" class="min-h-12 rounded-2xl font-bold ${ALL.cur===id?'bg-turf text-ink':'bg-bench text-benchl'}">${esc(t.name)}${run?' ●':''}</button>`};
+  const cids=[...new Set(Object.values(TEAMS).map(t=>t.club))];
+  if(cids.length<2)return`<div class="teamsel">${Object.keys(TEAMS).map(btn).join('')}</div>`;
+  return cids.map(cid=>`<div class="clubhd"><img src="${clubImg(cid)}" alt="">${esc(ALL.clubs[cid].name)}</div><div class="teamsel">${Object.keys(TEAMS).filter(id=>TEAMS[id].club===cid).map(btn).join('')}</div>`).join('');
+}
 function render(){
   document.body.dataset.sec=ALL.tab;
   const T=TEAMS[ALL.cur],v={setup:vSetup,match:vMatch,hist:vHist,ana:vAna}[ALL.tab]();
   const keep=$('#newp')?$('#newp').value:'';
-  $('#app').innerHTML=`<header class="flex items-center gap-3 mb-3"><img src="${CREST}" alt="Escudo Club San José del Parque" class="w-14 h-14 rounded-full shrink-0 ring-2 ring-turf"><div class="leading-tight min-w-0"><div class="app-kicker">Minutos F7</div><div class="font-disp text-3xl font-bold italic">${T.name}</div><div class="text-mute text-sm font-semibold">Club San José del Parque · ${FMTS[T.fmt||'F7'].lbl} · ${T.half}×2 min</div></div><a href="ftms/" data-a="ftms" class="ml-auto shrink-0 h-11 px-3 rounded-xl bg-bench border border-line font-bold text-sm text-benchl flex items-center gap-1" aria-label="Abrir FTMS (suite táctica)">📋 FTMS</a></header>
-  <div class="teamsel">`+Object.keys(TEAMS).map(id=>{const t=TEAMS[id],run=ALL.teams[id].match&&ALL.teams[id].match.running;
-    return`<button data-a="team" data-id="${id}" class="min-h-12 rounded-2xl font-bold ${ALL.cur===id?'bg-turf text-ink':'bg-bench text-benchl'}">${t.name}${run?' ●':''}</button>`}).join('')+`</div>`+v+(DLG&&(S.match||DLG.k==='edit'||DLG.k==='team')?vDlg():'');
+  $('#app').innerHTML=`<header class="flex items-center gap-3 mb-3"><img src="${clubImg(T.club)}" alt="Escudo ${esc(clubOf(ALL.cur).name)}" class="w-14 h-14 rounded-full shrink-0 ring-2 ring-turf"><div class="leading-tight min-w-0"><div class="app-kicker">Banquillo · Minutos</div><div class="font-disp text-3xl font-bold italic">${T.name}</div><div class="text-mute text-sm font-semibold">${esc(clubOf(ALL.cur).name)} · ${FMTS[T.fmt||'F7'].lbl} · ${T.half}×2 min</div></div><a href="ftms/" data-a="ftms" class="ml-auto shrink-0 h-11 px-3 rounded-xl bg-bench border border-line font-bold text-sm text-benchl flex items-center gap-1" aria-label="Abrir Táctica (game plan, post-partido y ejercicios)">📋 Táctica</a></header>${navigator.onLine?'':'<div class="offpill">📴 Sin conexión · la app funciona igual y guarda en el móvil</div>'}
+  `+teamSel()+v+(DLG&&(S.match||DLG.k==='edit'||DLG.k==='team'||DLG.k==='club')?vDlg():'');
   if($('#newp'))$('#newp').value=keep;
   $('#nav').innerHTML=[['setup','📋','Plantilla'],['match','⚽','Partido'],['hist','🏆','Historial'],['ana','📊','Análisis']].map(([id,i,l])=>
     `<button data-a="tab" data-id="${id}" class="min-h-16 font-bold text-sm ${ALL.tab===id?'text-turf':'text-mute'}"><span class="block text-xl leading-none">${i}</span>${l}${id==='match'&&S.match&&S.match.running?' ●':''}</button>`).join('');
@@ -711,7 +731,7 @@ document.getElementById('imp').addEventListener('change',e=>{
     if((d.version===2||d.version===3)&&d.all&&d.all.teams){
       if(!confirm('Se reemplazarán las plantillas y los historiales de LOS DOS equipos por la copia. ¿Continuar?'))return;
       bak('antes de importar');
-      ALL=d.all;ALL.cfgTeams=ALL.cfgTeams||{};buildTeams(ALL);Object.keys(TEAMS).forEach(id=>{if(!ALL.teams[id])ALL.teams[id]=newTeam(id);fixTeam(ALL.teams[id],id)});
+      ALL=d.all;normCfg(ALL);Object.keys(TEAMS).forEach(id=>{if(!ALL.teams[id])ALL.teams[id]=newTeam(id);fixTeam(ALL.teams[id],id)});
       ALL.set=Object.assign({auto:true,lastBak:0},ALL.set||{});setTeam(TEAMS[ALL.cur]?ALL.cur:'pre');
     }else if(Array.isArray(d.players)&&Array.isArray(d.history)){
       if(S.match){toast('Termina el partido en curso antes de importar');return}
@@ -760,18 +780,26 @@ function applyEdit(el_){
 document.addEventListener('click',ev=>{
   const b=ev.target.closest('[data-a]');if(!b||b.disabled||/^(INPUT|SELECT)$/.test(b.tagName))return;
   const a=b.dataset.a,id=b.dataset.id,m=S.match;
-  if(a==='ftms'){ev.preventDefault();if(Object.values(ALL.teams).some(t=>t.match&&t.match.running)&&!confirm('Hay un partido en marcha. El reloj sigue contando aunque salgas. ¿Abrir el FTMS?'))return;save();location.href='ftms/';return}
+  if(a==='ftms'){ev.preventDefault();if(Object.values(ALL.teams).some(t=>t.match&&t.match.running)&&!confirm('Hay un partido en marcha. El reloj sigue contando aunque salgas. ¿Abrir Táctica?'))return;save();location.href='ftms/';return}
   if(m)m.last=null;
   if(a==='tab'){ALL.tab=id;DLG=null}
   else if(a==='team'){setTeam(id);DLG=null}
   else if(a==='tnew'){DLG={k:'team'}}
+  else if(a==='clubedit'){DLG={k:'club',id:TEAMS[ALL.cur].club}}
+  else if(a==='crestdel'){const cn=$('#cn');if(cn)DLG.name=cn.value;DLG.crest=''}
+  else if(a==='clubdel'){if(!confirm('¿Borrar el club '+ALL.clubs[DLG.id].name+'?'))return;delete ALL.clubs[DLG.id];DLG=null}
+  else if(a==='clubsave'){const name=($('#cn').value||'').trim();if(!name){toast('Escribe el nombre del club');return}
+    if(Object.entries(ALL.clubs).some(([k,c])=>k!==DLG.id&&c.name.toLowerCase()===name.toLowerCase())){toast('Ya hay un club con ese nombre');return}
+    const id=DLG.id||('c'+Date.now().toString(36)),old=ALL.clubs[id]||{};ALL.clubs[id]={name,crest:DLG.crest!==undefined?DLG.crest:(old.crest||'')};
+    if(DLG.forTeam){const c=ALL.cfgTeams[DLG.forTeam]=ALL.cfgTeams[DLG.forTeam]||{};c.club=id}
+    buildTeams(ALL);DLG=null;toast(old.name?'Club guardado':'Club creado')}
   else if(a==='tsave'){
     const name=($('#tn').value||'').trim(),cat=$('#tc').value,fmt_=$('#tf').value,half=Math.max(5,Math.min(60,parseInt($('#th').value,10)||25));
     const code=($('#tp').value||name.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g,'').slice(0,4)).toLowerCase();
     if(!name){toast('Escribe el nombre del equipo');return}
     if(!/^[a-z0-9]{2,6}$/.test(code)){toast('El código debe tener 2-6 letras o números, sin espacios');return}
     if(TEAMS[code]||ALL.teams[code]){toast('Ya existe un equipo con ese código');return}
-    ALL.cfgTeams[code]={name,cat,fmt:fmt_,half,pfx:code,x:`minutos-${code}.xlsx`,c:`minutos-${code}-csv.zip`,j:`minutos-copia-${code}.json`};
+    ALL.cfgTeams[code]={name,cat,fmt:fmt_,half,club:$('#tcl').value,pfx:code,x:`minutos-${code}.xlsx`,c:`minutos-${code}-csv.zip`,j:`minutos-copia-${code}.json`};
     buildTeams(ALL);ALL.teams[code]=newTeam(code);fixTeam(ALL.teams[code],code);setTeam(code);DLG=null;ALL.tab='setup';bak('al crear equipo');toast('Equipo creado: añade su plantilla');
   }
   else if(a==='tdel'){const T=TEAMS[ALL.cur];if(T.base)return;
@@ -840,9 +868,12 @@ document.addEventListener('click',ev=>{
 document.addEventListener('change',ev=>{
   const i=ev.target;
   if(i.dataset.e&&DLG&&DLG.k==='edit'){applyEdit(i);return}
+  if(i.id==='cf'&&DLG&&DLG.k==='club'){const f=i.files[0];if(!f)return;const cn=$('#cn');if(cn)DLG.name=cn.value;crestFrom(f).then(u=>{DLG.crest=u;render()}).catch(()=>toast('No se pudo leer la imagen'));return}
   const a=i.dataset.a;if(!a)return;
   if(a==='form'){if(S.match&&ALL.tab==='match')changeForm(S.match,i.value);else S.form=i.value;save();render();return}
   if(a==='runmin'){S.runMin=+i.value;save();return}
+  if(a==='tclub'){if(i.value==='__new'){DLG={k:'club',id:null,forTeam:ALL.cur};render();return}
+    const c=ALL.cfgTeams[ALL.cur]=ALL.cfgTeams[ALL.cur]||{};c.club=i.value;buildTeams(ALL);save();render();return}
   if(a==='tname'||a==='tcat'||a==='thalf'){const c=ALL.cfgTeams[ALL.cur]=ALL.cfgTeams[ALL.cur]||{},T=TEAMS[ALL.cur];
     if(a==='tname'){const v=i.value.trim();if(!v){i.value=T.name;return}c.name=v}
     else if(a==='tcat')c.cat=i.value;
@@ -855,6 +886,13 @@ document.addEventListener('change',ev=>{
   else if(a==='pos'){p.pos=i.value;save()}
 });
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='newp')document.querySelector('[data-a=add]').click()});
+/* escudo: se recorta en cuadrado y se reduce a 160 px para que ocupe poco en el móvil */
+function crestFrom(f){return new Promise((ok,ko)=>{const u=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{const s=Math.min(im.width,im.height),cv=document.createElement('canvas');cv.width=cv.height=160;
+    cv.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,160,160);URL.revokeObjectURL(u);ok(cv.toDataURL('image/png'))};
+  im.onerror=()=>{URL.revokeObjectURL(u);ko()};im.src=u})}
+/* aviso de sin conexión */
+addEventListener('online',()=>render());addEventListener('offline',()=>render());
 /* ---- PWA: service worker ---- */
 if('serviceWorker' in navigator&&location.protocol!=='file:'){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 if(S.match&&ALL.tab==='setup')ALL.tab='match';

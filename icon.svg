@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#26328a"/><stop offset="1" stop-color="#0b0b12"/></linearGradient>
+ <linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fae63"/><stop offset="1" stop-color="#1b7a43"/></linearGradient>
+ <clipPath id="dial"><circle cx="256" cy="282" r="138"/></clipPath>
+</defs>
+<rect width="512" height="512" rx="114" fill="url(#bg)"/>
+<g transform="translate(256 256) scale(1.0) translate(-256 -256)">
+ <rect x="222" y="86" width="68" height="34" rx="12" fill="#fff"/>
+ <rect x="244" y="112" width="24" height="30" fill="#fff"/>
+ <rect x="358" y="146" width="44" height="26" rx="9" fill="#ec2f93" transform="rotate(45 380 159)"/>
+ <circle cx="256" cy="282" r="138" fill="url(#gr)"/>
+ <g clip-path="url(#dial)" fill="#000" opacity=".09">
+  <rect x="100" y="150" width="320" height="30"/><rect x="100" y="210" width="320" height="30"/><rect x="100" y="270" width="320" height="30"/><rect x="100" y="330" width="320" height="30"/><rect x="100" y="390" width="320" height="30"/>
+ </g>
+ <g clip-path="url(#dial)" stroke="#fff" stroke-width="9" fill="none" opacity=".95">
+  <line x1="110" y1="282" x2="402" y2="282"/>
+  <circle cx="256" cy="282" r="44"/>
+  <rect x="196" y="122" width="120" height="44"/>
+  <rect x="196" y="398" width="120" height="44"/>
+ </g>
+ <circle cx="256" cy="282" r="9" fill="#fff"/>
+ <circle cx="256" cy="282" r="150" fill="none" stroke="#fff" stroke-width="26"/>
+ <path d="M256 132 A150 150 0 0 1 385.9 357" fill="none" stroke="#ec2f93" stroke-width="26" stroke-linecap="round"/>
+</g>
+</svg>

@@ -23,7 +23,7 @@ for f in archivos:
     r = subprocess.run(['node', '--check', f], capture_output=True, text=True)
     paso('node --check ' + os.path.relpath(f, R) if f.startswith(R) else 'node --check ftms/index.html (' + os.path.basename(f) + ')', r.returncode == 0, r.stderr)
 
-for t in ['test_ftms.py', 'test_navegacion.py', 'test_ejercicios.py', 'test_sugerencia.py', 'test_equipos.py']:
+for t in ['test_ftms.py', 'test_navegacion.py', 'test_ejercicios.py', 'test_sugerencia.py', 'test_equipos.py', 'test_clubes_offline.py']:
     print('\n== ' + t)
     r = subprocess.run([sys.executable, os.path.join(T, t)], capture_output=True, text=True)
     print(r.stdout.strip()[-6000:])
