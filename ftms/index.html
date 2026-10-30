@@ -42,7 +42,8 @@ h3{font-size:1.35rem;margin:14px 0 6px}
 p{margin:6px 0}
 .mute{color:var(--mute)}.small{font-size:.875rem}.xs{font-size:.75rem}.b{font-weight:700}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;margin:8px 0}
-.row{display:flex;align-items:center;gap:8px}.wrap{flex-wrap:wrap}.grow{flex:1;min-width:0}
+.row{display:flex;align-items:center;gap:8px}
+.anibar{display:flex;gap:8px;margin-top:10px}.anibar .btn{min-height:46px;padding:0 12px}.anidots{display:flex;gap:5px;justify-content:center;margin:10px 0 4px}.anidots i{width:22px;height:5px;border-radius:5px;background:var(--line)}.anidots i.on{background:var(--acc)}.anidots i.cur{background:var(--chalk)}.anicap{text-align:center;font-weight:600;min-height:2.6em;margin:4px 0}.wrap{flex-wrap:wrap}.grow{flex:1;min-width:0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .btn{min-height:52px;border-radius:16px;padding:0 14px;background:var(--bench);font-weight:700}
 .btn.pri{background:var(--turf);color:var(--ink)}
@@ -638,6 +639,92 @@ const EJ=[
  dg:{t:'campo',Z:[[18,4,18,96],[82,4,82,96]],J:[[50,90,'p','P'],[50,10,'p','P'],[10,50,'a',''],[40,62,'a',''],[60,46,'a',''],[90,40,'a',''],[34,40,'d',''],[56,30,'d',''],[66,58,'d','']],B:[[16,50]],F:[[10,44,10,22,'c'],[13,20,46,18,'p']]}}
 ];
 
+/* ---- Ampliación de la biblioteca: ideas de fuentes externas, redactadas con palabras propias y adaptadas a F7 ---- */
+FUND.velocidad='Velocidad de reacción';FUND.fisico='Físico (infantil+)';
+const SRC={bf7:['bcoach · 12 tareas de fútbol 7 para benjamines y alevines','https://bcoach.app/ejercicios-futbol-7-tareas-benjamines-alevines/'],
+ bco:['bcoach · coordinación en fútbol base por edades','https://bcoach.app/ejercicios-coordinacion-futbol-base/'],
+ bro:['bcoach · rondos: tipos, reglas y ejercicios','https://bcoach.app/rondos-futbol-tipos-reglas/'],
+ fcb:['Barça Innovation Hub · entrenamiento físico en fútbol','https://barcainnovationhub.fcbarcelona.com/es/blog/entrenamiento-fisico-en-futbol-los-ejercicios-mas-importantes/'],
+ pdf:['Idea adaptada del PDF «50 ejercicios físicos con balón» (aportado por el entrenador)',''],
+ uefa:['Formación UEFA C (RFEF)','']};
+EJ.push(
+/* ---------- bcoach · fútbol 7 ---------- */
+{id:'b1',f:'pase',n:3,dur:8,ser:2,cat:['ale'],src:'bf7',tit:'Rondo 4c2 con cambio de cuadro',desc:'Rondo en un cuadro que, tras varios pases, se traslada al cuadro de al lado a través de un comodín.',obj:'Atraer a la presión en un lado y encontrar el espacio libre en el otro.',org:['Dos cuadros contiguos de 9x12 m','4 atacantes y 2 defensores en el primer cuadro','Un comodín esperando en el segundo cuadro'],eje:['Los cuatro atacantes se pasan el balón en el primer cuadro','Tras 4 pases seguidos, se juega al comodín del otro cuadro','Dos atacantes y un defensor se cambian de cuadro y el rondo sigue allí'],con:['Juntar a los defensores antes de cambiar','Perfil abierto para ver el otro cuadro','Moverse rápido al cuadro nuevo'],fac:'Toques libres.',dif:'Máximo 2 toques; si los defensores roban, pueden marcar en una miniportería exterior.',est:'Conservación',sit:'Intersectorial · jugadores',
+ dg:{t:'cuadro',Z:[[50,6,50,94]],J:[[12,24,'a',''],[38,22,'a',''],[12,74,'a',''],[38,76,'a',''],[22,46,'d','X'],[30,56,'d','X'],[76,50,'c','C']],B:[[16,24]],F:[[18,24,32,22,'p'],[38,30,38,68,'p'],[42,74,70,54,'p'],[38,70,62,40,'m'],[26,50,62,60,'m']]}},
+{id:'b2',f:'pase',n:2,dur:8,ser:2,cat:['pre','ale'],src:'bf7',tit:'Posesión 3c3 con dos comodines',desc:'Tres contra tres dentro de un cuadrado, con un comodín en cada banda que juega con el equipo que tiene el balón.',obj:'Ofrecer apoyos con amplitud y recibir orientado.',org:['Cuadrado de 15x15 m','3c3 dentro y 2 comodines fuera, en bandas opuestas','Petos de tres colores'],eje:['El equipo con balón lo conserva apoyándose en los comodines','El comodín devuelve de cara','Si roba el rival, se cambian los papeles'],con:['Abrirse para dar línea de pase','Recibir con el cuerpo orientado al juego','Usar al comodín para salir de la presión'],fac:'Comodín con toques libres.',dif:'El balón debe pasar por los dos comodines para sumar punto.',est:'Conservación',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[30,30,'a',''],[70,36,'a',''],[46,72,'a',''],[46,40,'d',''],[58,58,'d',''],[34,56,'d',''],[4,50,'c','C'],[96,50,'c','C']],B:[[36,30]],F:[[34,34,9,48,'p'],[9,53,42,68,'p'],[50,68,66,42,'p'],[74,40,91,48,'p']]}},
+{id:'b3',f:'juego',n:3,dur:8,ser:2,cat:['ale'],src:'bf7',tit:'Romper líneas en tres zonas',desc:'Tras dar pases en la primera zona, hay que filtrar un pase raso que cruce la zona central hasta la tercera.',obj:'Romper líneas de presión con pases filtrados.',org:['Tres zonas seguidas: A (10x15 m), B (5x15 m) y C (10x15 m)','3 atacantes y 1 defensor en A, 2 defensores en B, 1 receptor en C'],eje:['En la zona A se dan 3 pases','Pase raso que atraviesa la zona B hasta el receptor de C','Si llega, dos atacantes de A pasan a C y se juega allí'],con:['Fijar al defensor antes de filtrar','Pase raso y tenso','El receptor se mueve para quedar libre entre los defensores'],fac:'Un solo defensor en B.',dif:'Un defensor de B puede presionar en A tras 3 segundos.',est:'Conservación',sit:'Intersectorial · jugadores',
+ dg:{t:'cuadro',Z:[[6,40,94,40],[6,60,94,60]],J:[[24,82,'a',''],[50,72,'a',''],[76,82,'a',''],[52,84,'d','X'],[36,50,'d','X'],[64,50,'d','X'],[52,20,'a','R']],B:[[30,82]],F:[[30,80,44,74,'p'],[56,72,70,80,'p'],[74,76,54,26,'p'],[24,76,34,30,'m']]}},
+{id:'b4',f:'juego',n:2,dur:8,ser:2,cat:['pre','ale'],src:'bf7',tit:'2c1 que se convierte en 3c2',desc:'Ataque 2c1 hacia una portería; al acabar, el defensor sale con dos compañeros en 3c2 hacia la otra.',obj:'Acelerar el contraataque y volver rápido a defender.',org:['Campo de 30x20 m con dos porterías y porteros','Columnas de jugadores en cada fondo'],eje:['Dos atacantes contra un defensor hacia la portería de arriba','Al terminar, el defensor y dos compañeros del fondo atacan la otra portería','Los dos atacantes anteriores vuelven a defender'],con:['En el 2c1: fijar al defensor y pasar','Al perder, volver rápido por dentro','Contraataque con pocos pases'],fac:'Sin límite de tiempo.',dif:'El contraataque debe acabar en 8 segundos.',est:'Oleada',sit:'Sectorial · jugadores',
+ dg:{t:'campo',J:[[36,62,'a',''],[64,62,'a',''],[50,36,'d','X'],[50,9,'p','P'],[50,91,'p','P']],B:[[40,60]],F:[[40,58,46,42,'c'],[64,58,62,34,'m'],[48,40,59,33,'p'],[62,30,56,8,'p']]}},
+{id:'b5',f:'defensa',n:3,dur:8,ser:2,cat:['ale'],src:'bf7',tit:'Presión tras pérdida 4c4',desc:'Partido 4c4 en el que, al perder el balón en campo rival, hay 5 segundos para recuperarlo.',obj:'Presionar de inmediato tras perder el balón.',org:['Campo de 35x25 m con línea central','4c4 y dos porteros'],eje:['Partido normal','Si un equipo pierde en campo rival, tiene 5 segundos para recuperar','Gol tras recuperar en esos 5 segundos: vale triple'],con:['Presiona el más cercano al balón','Los demás cierran las líneas de pase cercanas','Si no se recupera, volver a la propia mitad'],fac:'8 segundos para recuperar.',dif:'Si el rival da 3 pases seguidos, el equipo que presionaba vuelve a su área antes de presionar de nuevo.',est:'Partido',sit:'Completa · equipo',
+ dg:{t:'campo',J:[[50,9,'p','P'],[50,91,'p','P'],[30,30,'d',''],[60,24,'d',''],[70,40,'d',''],[40,44,'d',''],[48,22,'a',''],[24,40,'a',''],[64,58,'a',''],[38,66,'a','']],B:[[52,26]],F:[[30,30,44,24,'m'],[60,24,52,26,'m'],[70,40,60,30,'m']]}},
+{id:'b6',f:'regate',n:2,dur:10,ser:1,cat:['pre','ale'],src:'bf7',tit:'1c1 que se convierte en 2c2',desc:'Duelo 1c1; si el atacante supera una línea, entran un compañero y un rival y se juega 2c2.',obj:'Regatear y aprovechar la ayuda tras superar al rival.',org:['Campo de 20x15 m con dos miniporterías','Línea marcada a 10 m','Columnas a los lados'],eje:['El atacante encara al defensor','Si cruza la línea, entran un segundo atacante y un segundo defensor','Se termina en 2c2 hacia la miniportería'],con:['Atacar con decisión el 1c1','Tras superar, levantar la cabeza para ver al compañero','El que entra se ofrece por el lado libre'],fac:'El segundo defensor entra con retraso.',dif:'Si el defensor roba, ataca la otra miniportería.',est:'Oleada',sit:'Individual · jugador',
+ dg:{t:'cuadro',Z:[[6,50,94,50]],M:[[50,8,16],[50,92,16]],J:[[50,80,'a','A'],[50,60,'d','X'],[10,44,'a','B'],[90,40,'d','X']],B:[[50,74]],F:[[50,72,64,44,'c'],[10,44,34,30,'m'],[64,40,38,30,'p'],[90,40,60,28,'m'],[36,26,48,10,'p']]}},
+{id:'b7',f:'remate',n:3,dur:8,ser:2,cat:['ale'],src:'bf7',tit:'Centro y remate 3c2',desc:'El medio abre a banda, el extremo centra y dentro dos delanteros y un tercero que llega atacan el balón contra dos defensores.',obj:'Mejorar el remate en el área y los desmarques al primer y segundo palo.',org:['Área ampliada de 25x25 m','Medio, extremo, 2 delanteros, 1 que llega de segunda línea','2 defensores y portero'],eje:['El medio abre al extremo','El extremo encara y centra desde cerca de la línea de fondo','Un delantero ataca el primer palo, otro el segundo y el tercero espera el rechace'],con:['Desmarques cruzados al primer y segundo palo','No llegar antes que el balón','El tercero, atento al rechace en la frontal'],fac:'Sin defensores.',dif:'Centro raso o alto según diga el entrenador.',est:'Oleada',sit:'Sectorial · jugadores',
+ dg:{t:'area',J:[[50,82,'a','M'],[86,62,'a','E'],[40,48,'a',''],[60,46,'a',''],[50,66,'a',''],[44,34,'d','X'],[58,32,'d','X'],[50,9,'p','P']],B:[[50,76]],F:[[54,78,82,64,'p'],[86,56,86,24,'c'],[84,22,46,22,'p'],[40,44,40,20,'m'],[60,42,62,16,'m']]}},
+{id:'b8',f:'remate',n:2,dur:12,ser:1,cat:['pre','ale'],src:'bf7',tit:'Pared de cara y tiro',desc:'Pase al punta, que descarga de cara, y tiro desde fuera del área.',obj:'Mejorar la combinación rápida y el tiro de media distancia.',org:['Zona frontal al área, a 12-15 m','Un pasador, un punta de apoyo y portero','Una pica simula un defensor'],eje:['A pasa al punta B','B devuelve de cara a A','A controla esquivando la pica y tira antes de entrar al área'],con:['Pase fuerte y raso al punta','El punta descarga con el interior, de cara','Tirar con el primer o segundo toque'],fac:'Tiro tras control libre.',dif:'Un defensor pasivo presiona la devolución.',est:'Rueda de pase',sit:'Sectorial · jugadores',
+ dg:{t:'area',K:[[42,46]],J:[[50,84,'a','A'],[50,40,'a','B'],[50,9,'p','P']],B:[[50,78]],F:[[50,76,50,46,'p'],[48,46,46,64,'p'],[48,68,36,56,'c'],[36,52,42,7,'p']]}},
+{id:'b9',f:'juego',n:3,dur:10,ser:2,cat:['ale'],src:'bf7',tit:'Ataque 5c4 con contraataque',desc:'Cinco atacan una portería contra cuatro defensores; si roban, contraatacan a dos miniporterías.',obj:'Crear superioridad por dentro y buscar la amplitud.',org:['Medio campo de F7','Portería con portero y dos miniporterías en la línea central','5 atacantes, 4 defensores'],eje:['Los cinco atacantes buscan el gol','Los defensores intentan robar','Si roban, tienen 10 segundos para marcar en una miniportería'],con:['Fijar por dentro para abrir por fuera','Ocupar las bandas para dar amplitud','Al perder, presionar enseguida'],fac:'Toques libres.',dif:'Máximo 3 toques fuera del área.',est:'Partido',sit:'Intersectorial · jugadores',
+ dg:{t:'area',M:[[30,94,14],[70,94,14]],J:[[50,70,'a',''],[16,52,'a',''],[84,50,'a',''],[38,40,'a',''],[62,38,'a',''],[40,28,'d',''],[60,26,'d',''],[30,54,'d',''],[68,54,'d',''],[50,9,'p','P']],B:[[50,64]],F:[[46,64,22,54,'p'],[16,46,16,24,'c'],[18,22,46,18,'p']]}},
+{id:'b10',f:'juego',n:3,dur:10,ser:2,cat:['ale'],src:'bf7',tit:'Partido por franjas',desc:'Partido 7c7 con el campo dividido en tres franjas: nadie avanza a la siguiente hasta que entra el balón.',obj:'Entender las coberturas y el equilibrio entre líneas.',org:['Campo de F7 dividido en tres franjas horizontales','7c7 con porteros'],eje:['Partido normal','Solo se pasa a la franja siguiente cuando el balón ya está en ella','Un defensor siempre queda atrás para cubrir'],con:['Avanzar juntos como un bloque','Siempre uno vigilando por detrás','Acompañar el balón sin adelantarse'],fac:'Sin defensor fijo atrás.',dif:'En la última franja se liberan las zonas.',est:'Partido',sit:'Completa · equipo',
+ dg:{t:'campo',Z:[[4,34,96,34],[4,66,96,66]],J:[[50,91,'p','P'],[30,76,'a',''],[70,76,'a',''],[50,56,'a',''],[24,48,'a',''],[76,46,'a',''],[50,40,'a','']],B:[[50,52]],F:[[50,52,72,46,'p'],[76,42,76,28,'c'],[50,40,48,24,'m'],[30,76,34,58,'m']]}},
+/* ---------- bcoach · coordinación por edades ---------- */
+{id:'k3',f:'coord',n:1,dur:10,ser:1,cat:['pre'],src:'bco',tit:'Cazador de colores',desc:'Todos conducen; al oír un color, van a una seta de ese color, paran el balón encima y saltan a la pata coja.',obj:'Mejorar la conducción y la reacción a estímulos.',org:['Cuadrado de 15x15 m','Setas de cuatro colores repartidas','Un balón por jugador'],eje:['Conducción libre por el cuadrado','El entrenador dice un color','Cada uno va a una seta de ese color, para el balón con la planta y salta a la pata coja'],con:['Cabeza arriba para ver las setas','Frenar con la planta','Equilibrio al saltar'],fac:'Solo dos colores.',dif:'Un cazador sin balón persigue a quien tarde más de 3 segundos.',est:'Juego adaptado al fútbol',sit:'—',
+ dg:{t:'cuadro',K:[[20,20],[80,20],[20,80],[80,80],[50,50]],J:[[34,36,'a',''],[64,62,'a',''],[40,70,'a','']],B:[[38,38],[60,60],[44,68]],F:[[38,40,24,24,'c'],[60,58,76,24,'c'],[44,72,24,78,'c']]}},
+{id:'k4',f:'coord',n:1,dur:10,ser:1,cat:['pre','ale'],src:'bco',tit:'Escalera y devolución',desc:'Recorrer una escalera de agilidad y, al salir, devolver un pase con el pie menos hábil.',obj:'Mejorar los apoyos y el pase tras un esfuerzo coordinativo.',org:['Una escalera (o picas en el suelo)','El entrenador o un compañero con balones a 6 m de la salida'],eje:['Un apoyo en cada hueco de la escalera','Al salir, recibir un balón rodado','Devolverlo con el interior del pie menos hábil'],con:['Apoyos cortos y de puntillas','Mirar al pasador antes de salir de la escalera','Interior del pie y balón raso'],fac:'Devolver con cualquier pie.',dif:'El pasador enseña un color y el jugador lo dice antes de devolver.',est:'Circuito',sit:'Individual · jugador',
+ dg:{t:'cuadro',Z:[[20,40,20,76],[28,40,28,76]],K:[[24,36],[24,80]],J:[[24,88,'a','A'],[64,26,'c','E']],B:[[60,28]],F:[[24,84,24,40,'m'],[24,36,34,30,'m'],[58,28,38,30,'p'],[38,32,58,32,'p']]}},
+{id:'k5',f:'coord',n:2,dur:10,ser:1,cat:['ale'],src:'bco',tit:'Circuito con duelo final',desc:'Dos jugadores hacen un circuito de apoyos y saltos en paralelo y terminan disputando un balón 1c1.',obj:'Unir la coordinación con una situación real de juego.',org:['Dos circuitos iguales enfrentados: escalera, dos vallas bajas','Balón en el centro y dos miniporterías'],eje:['Escalera a máxima frecuencia','Saltar dos vallas bajas y caer a una pierna aguantando un segundo','Sprint al balón y 1c1 hacia la miniportería contraria'],con:['Caer suave y equilibrado','Primer toque hacia el espacio libre','No frenar antes de llegar al balón'],fac:'Sin vallas.',dif:'El entrenador lanza el balón a un lado distinto cada vez.',est:'Circuito',sit:'Individual · jugador',
+ dg:{t:'cuadro',M:[[50,8,16],[50,92,16]],K:[[12,30],[12,40],[88,60],[88,70]],J:[[12,16,'a','A'],[88,84,'d','B']],B:[[50,50]],F:[[12,20,12,44,'m'],[12,46,44,50,'m'],[88,80,88,56,'m'],[88,54,56,50,'m'],[46,52,50,90,'c']]}},
+{id:'k6',f:'coord',n:3,dur:8,ser:2,cat:['ale'],src:'bco',tit:'Rondo de doble tarea',desc:'Rondo 4c1 en el que, además del balón con los pies, los de fuera se pasan una pelota de tenis con las manos.',obj:'Automatizar el pase prestando atención a dos cosas a la vez.',org:['Cuadrado de 10x10 m','4 jugadores fuera y 1 dentro','Un balón y una pelota de tenis'],eje:['El balón circula con los pies en un sentido','La pelota de tenis circula con las manos en el sentido contrario','Si se cae la pelota o roban el balón, cambio de defensor'],con:['Mirar antes de recibir cualquiera de las dos','Pase raso y seguro','Hablar para avisar de la pelota'],fac:'Sin defensor.',dif:'Las dos en el mismo sentido y cambio a la señal.',est:'Conservación',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[20,20,'a','A'],[80,20,'a','B'],[80,80,'a','C'],[20,80,'a','D'],[50,50,'d','X']],B:[[26,20]],F:[[28,20,72,20,'p'],[80,28,80,72,'p'],[24,74,24,28,'m']]}},
+/* ---------- bcoach · rondos ---------- */
+{id:'ro1',f:'pase',n:2,dur:8,ser:2,cat:['ale'],src:'bro',tit:'Rondo 5c2 con jugador central',desc:'Cuatro jugadores en los lados y uno en el centro mantienen el balón ante dos defensores.',obj:'Usar al jugador central para cambiar el balón de lado.',org:['Cuadrado de 10x10 m','4 en los lados, 1 en el centro y 2 defensores'],eje:['Circulación por fuera','Cuando se abre el pasillo, se busca al central','El central gira o descarga al lado contrario'],con:['El central se mueve para quedar entre los defensores','Pase al central solo si está libre','El central mira antes de recibir'],fac:'Un solo defensor.',dif:'El central juega a un toque.',est:'Conservación',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[50,10,'a',''],[10,50,'a',''],[90,50,'a',''],[50,90,'a',''],[50,50,'a','C'],[36,36,'d','X'],[64,64,'d','X']],B:[[16,50]],F:[[16,48,44,50,'p'],[56,50,84,50,'p']]}},
+{id:'ro2',f:'pase',n:3,dur:8,ser:2,cat:['ale'],src:'bro',tit:'Rondo 6c3 con cambio de orientación',desc:'Seis atacantes en un espacio dividido en dos mitades: se atrae en una y se cambia a la otra.',obj:'Atraer a los defensores en un lado para liberar el otro.',org:['Rectángulo de 16x10 m en dos mitades','6 atacantes y 3 defensores'],eje:['Pases en una mitad hasta juntar a los defensores','Pase largo al compañero libre de la otra mitad','Los defensores basculan al nuevo lado'],con:['Juntar a la presión antes de cambiar','Cambio de orientación tenso y raso','El receptor, perfilado para seguir jugando'],fac:'Dos defensores.',dif:'Mínimo 4 pases antes de cambiar.',est:'Conservación',sit:'Intersectorial · jugadores',
+ dg:{t:'cuadro',Z:[[50,10,50,90]],J:[[14,30,'a',''],[36,18,'a',''],[30,72,'a',''],[70,30,'a',''],[86,70,'a',''],[64,82,'a',''],[24,44,'d','X'],[32,40,'d','X'],[62,56,'d','X']],B:[[18,30]],F:[[18,30,32,20,'p'],[36,24,32,66,'p'],[34,72,82,70,'p']]}},
+{id:'ro3',f:'pase',n:3,dur:8,ser:2,cat:['ale'],src:'bro',tit:'Rondo del tercer hombre',desc:'Rondo en el que, si la línea directa está tapada, el balón va al jugador central y este lo da al compañero libre.',obj:'Encontrar al tercer hombre cuando el pase directo no es posible.',org:['Cuadrado de 12x12 m','3 por fuera, 1 central y 3 defensores'],eje:['El pase directo entre jugadores de lados contiguos está tapado','El balón va al central','El central descarga al compañero libre'],con:['Perfil para ver al receptor final antes de recibir','El central se coloca entre líneas','Pase al pie del compañero libre'],fac:'Dos defensores.',dif:'A un toque.',est:'Conservación',sit:'Intersectorial · jugadores',
+ dg:{t:'cuadro',J:[[14,24,'a','A'],[86,24,'a','B'],[50,86,'a','D'],[50,50,'c','C'],[50,28,'d','X'],[30,62,'d','X'],[70,62,'d','X']],B:[[18,26]],F:[[20,28,44,46,'p'],[56,46,80,28,'p']]}},
+{id:'ro4',f:'velocidad',n:2,dur:8,ser:2,cat:['ale'],src:'bro',tit:'Rondo con reglas que cambian',desc:'Rondo 5c2 en el que el entrenador cambia las reglas (toques, sentido) con una señal.',obj:'Adaptarse rápido a cambios y mantener la concentración.',org:['Cuadrado de 10x10 m','5 atacantes y 2 defensores','Conos de colores en la mano del entrenador'],eje:['Rojo: un toque; amarillo: dos toques; verde: libre','Si se levanta un cono azul, se cambia el sentido de circulación','Quien no se adapta en el siguiente pase pasa a defender'],con:['Mirar al entrenador cada pocos pases','Avisar en voz alta del cambio','Mantener la calidad del pase'],fac:'Solo dos colores.',dif:'Cambios cada pocos segundos.',est:'Conservación',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[50,10,'a',''],[12,40,'a',''],[88,40,'a',''],[26,88,'a',''],[74,88,'a',''],[42,50,'d','X'],[58,58,'d','X']],K:[[96,96]],B:[[18,40]],F:[[18,38,44,14,'p'],[56,12,82,36,'p'],[86,46,78,82,'p']]}},
+/* ---------- ideas adaptadas del PDF (solo juegos aptos para estas edades) ---------- */
+{id:'x1',f:'pase',n:2,dur:6,ser:2,cat:['ale'],src:'pdf',tit:'Pasa y cambia de columna',desc:'Varias columnas alrededor de un cuadrado: se pasa a cualquiera y se corre a otra columna; el receptor juega donde se le pide.',obj:'Pasar mirando y leer el movimiento de los compañeros.',org:['Cuadrado de 15x15 m con 4 columnas en los lados','8 jugadores, un balón'],eje:['El jugador pasa a una columna y corre hacia otra distinta','El receptor observa la carrera mientras llega el balón','Pasa a la columna donde se ha ido el compañero'],con:['Mirar antes de recibir','Pedir el balón señalando dónde','Pase raso y al pie'],fac:'Siempre al mismo sentido.',dif:'Dos balones a la vez.',est:'Rueda de pase',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[10,50,'a','A'],[50,10,'a','B'],[90,50,'a','C'],[50,90,'a','D']],B:[[16,50]],F:[[16,48,46,16,'p'],[12,56,46,86,'m'],[52,16,86,46,'p']]}},
+{id:'x2',f:'control',n:2,dur:10,ser:1,cat:['ale'],src:'pdf',tit:'Fútbol-tenis',desc:'Dos equipos separados por una línea o red baja se pasan el balón al campo contrario con un bote permitido.',obj:'Mejorar el control y el golpeo de balones aéreos.',org:['Campo de 12x8 m dividido por una cuerda baja o conos','Equipos de 2 o 3'],eje:['Se saca con el pie al campo contrario','Se permite un bote y hasta 3 toques por equipo','Punto si el balón bota dos veces o sale'],con:['Amortiguar con superficies grandes: muslo, pecho','Orientar el control hacia el compañero','Golpear al espacio libre del rival'],fac:'Dos botes permitidos.',dif:'Sin bote.',est:'Juego adaptado al fútbol',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',Z:[[6,50,94,50]],J:[[30,24,'a',''],[70,30,'a',''],[34,74,'d',''],[66,70,'d','']],B:[[34,72]],F:[[34,70,60,30,'p'],[66,32,34,24,'p'],[30,28,64,66,'p']]}},
+{id:'x3',f:'pase',n:1,dur:10,ser:1,cat:['pre','ale'],src:'pdf',tit:'Circuito de puntería',desc:'Estaciones de precisión: derribar un cono, dejar el balón lo más cerca posible de una pica y pasar entre dos conos.',obj:'Mejorar la precisión del golpeo.',org:['Tres estaciones a 6-10 m','Un balón por jugador, conos y picas'],eje:['Estación 1: derribar el cono','Estación 2: dejar el balón lo más cerca de la pica, como en la petanca','Estación 3: pasar por una puerta estrecha'],con:['Pie de apoyo al lado del balón','Golpeo suave y controlado','Mirar el objetivo antes de golpear'],fac:'Objetivos más cerca.',dif:'Solo con el pie menos hábil.',est:'Circuito',sit:'Individual · jugador',
+ dg:{t:'cuadro',K:[[20,20],[50,16],[78,18],[86,18]],J:[[20,70,'a','A'],[50,72,'a','B'],[82,70,'a','C']],B:[[20,64],[50,66],[82,64]],F:[[20,62,20,24,'p'],[50,64,50,22,'p'],[82,62,82,22,'p']]}},
+{id:'v1',f:'velocidad',n:1,dur:10,ser:1,cat:['pre','ale'],src:'pdf',tit:'Carrera de colores',desc:'Los jugadores salen corriendo y, a mitad de carrera, el entrenador dice un color: hay que ir a ese cono lo antes posible.',obj:'Mejorar la velocidad de reacción y el cambio de dirección.',org:['Línea de salida y conos de 3 colores a 10-15 m','Grupos de 3-4 jugadores'],eje:['Salida suave en línea recta','El entrenador dice un color en cualquier momento','Cambio de dirección hacia el cono de ese color'],con:['Frenar con pasos cortos','Apoyo de puntillas en el cambio','Mirar al frente, no al suelo'],fac:'El color se dice antes de salir.',dif:'Con balón conduciendo.',est:'Juego adaptado al fútbol',sit:'—',
+ dg:{t:'cuadro',K:[[20,18],[50,12],[80,18]],J:[[50,88,'a','A']],F:[[50,84,50,50,'m'],[50,48,22,22,'m']]}},
+{id:'v2',f:'velocidad',n:2,dur:10,ser:1,cat:['pre','ale'],src:'pdf',tit:'Duelo de colores',desc:'Dos jugadores, cada uno en un cuadrado de lados de colores. Al decir un color, tocan ese lado y corren a disputar un balón.',obj:'Mejorar la reacción y la disputa del balón.',org:['Dos cuadrados pequeños de 2x2 m con conos de 4 colores','Un balón en el centro y dos miniporterías'],eje:['Ambos se mueven dentro de su cuadrado','Al decir un color, tocan ese cono con el pie','Sprint al balón y 1c1 a la miniportería contraria'],con:['Estar siempre activo, de puntillas','Primer apoyo hacia el color','Proteger el balón al llegar'],fac:'Sin 1c1: gana quien toca primero el balón.',dif:'Se dicen dos colores seguidos.',est:'Juego adaptado al fútbol',sit:'Individual · jugador',
+ dg:{t:'cuadro',M:[[50,8,16],[50,92,16]],K:[[16,46],[24,46],[16,54],[24,54],[76,46],[84,46],[76,54],[84,54]],J:[[20,50,'a','A'],[80,50,'d','B']],B:[[50,50]],F:[[20,50,24,46,'m'],[24,46,46,50,'m'],[80,50,56,50,'m'],[48,52,50,90,'c']]}},
+{id:'v3',f:'velocidad',n:1,dur:10,ser:1,cat:['pre','ale'],src:'pdf',tit:'Números al balón',desc:'Dos equipos con un número cada jugador. El entrenador dice un número y los dos con ese número salen a por el balón.',obj:'Reaccionar rápido y resolver el 1c1.',org:['Campo de 20x20 m con dos miniporterías','Dos equipos en fila a los lados','Balón en el centro'],eje:['Cada jugador tiene un número','El entrenador dice uno (o dos)','Los nombrados salen y juegan 1c1 (o 2c2)'],con:['Salida rápida al oír el número','Si llegas segundo, defiende: no te rindas','Mirar la portería antes de tirar'],fac:'El entrenador pasa el balón a uno de los dos.',dif:'Dos números a la vez: 2c2.',est:'Juego adaptado al fútbol',sit:'Individual · jugador',
+ dg:{t:'cuadro',M:[[50,8,16],[50,92,16]],J:[[6,30,'a','1'],[6,50,'a','2'],[6,70,'a','3'],[94,30,'d','1'],[94,50,'d','2'],[94,70,'d','3']],B:[[50,50]],F:[[10,50,44,50,'m'],[90,50,56,50,'m'],[46,48,50,10,'c']]}},
+{id:'v4',f:'conduccion',n:2,dur:10,ser:1,cat:['pre','ale'],src:'pdf',tit:'Eslalon y persecución',desc:'Dos jugadores hacen un eslalon con balón; al acabar, uno de ellos (elegido antes) pasa a defender.',obj:'Conducir rápido y reaccionar al cambio de papel.',org:['Dos filas de conos en paralelo','Una miniportería al fondo','Parejas'],eje:['Eslalon en paralelo con balón','Al final, uno deja su balón y defiende','El otro intenta marcar en la miniportería'],con:['Toques cortos en el eslalon','Al acabar, cabeza arriba','El defensor corta el camino a portería'],fac:'Sin defensor.',dif:'El entrenador dice quién defiende al final del eslalon.',est:'Oleada',sit:'Individual · jugador',
+ dg:{t:'cuadro',M:[[50,8,16]],K:[[32,80],[32,66],[32,52],[68,80],[68,66],[68,52]],J:[[32,92,'a','A'],[68,92,'d','B']],B:[[36,90],[64,90]],F:[[34,88,34,46,'c'],[66,88,62,46,'c'],[36,42,48,12,'c']]}},
+{id:'j5',f:'juego',n:2,dur:6,ser:3,cat:['pre','ale'],src:'pdf',tit:'4c4 con tres equipos',desc:'Partido reducido 4c4 con porterías cercanas; un tercer equipo espera y entra cada 2 minutos o tras gol.',obj:'Jugar con intensidad en espacio reducido.',org:['Campo de 25x20 m con dos porterías pequeñas','3 equipos de 4'],eje:['Juegan dos equipos y el tercero descansa fuera','Cada 2 minutos (o tras gol) entra el equipo que espera','Se cuentan los goles por equipo'],con:['Tirar en cuanto haya opción','Volver rápido a defender','Animar desde fuera al equipo que espera'],fac:'Porterías más grandes.',dif:'Partidos de 90 segundos.',est:'Partido',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',M:[[50,8,18],[50,92,18]],J:[[30,70,'a',''],[70,70,'a',''],[40,52,'a',''],[60,40,'a',''],[30,30,'d',''],[70,30,'d',''],[46,22,'d',''],[56,62,'d',''],[98,20,'c',''],[98,36,'c','']],B:[[44,52]],F:[[44,50,56,42,'p'],[60,36,52,12,'p']]}},
+{id:'r4',f:'regate',n:2,dur:6,ser:3,cat:['ale'],src:'pdf',tit:'Torneo 1c1 sube y baja',desc:'Varios campos de 1c1 en paralelo; el que gana sube de campo y el que pierde baja.',obj:'Mejorar el 1c1 con competición sana.',org:['Varios minicampos de 15x10 m con miniporterías','Parejas en cada campo'],eje:['Partidos de 1 minuto con descanso de 1 minuto','El ganador sube al campo de arriba, el perdedor baja','El objetivo es llegar al campo 1'],con:['Encarar con decisión','Proteger el balón con el cuerpo','Defender de lado, sin tirarse'],fac:'Partidos de 40 segundos.',dif:'Gol solo tras regate.',est:'Partido',sit:'Individual · jugador',
+ dg:{t:'cuadro',Z:[[6,50,94,50]],M:[[6,26,8],[94,26,8],[6,74,8],[94,74,8]],J:[[40,26,'a',''],[60,26,'d',''],[40,74,'a',''],[60,74,'d','']],B:[[44,26],[44,74]],F:[[44,30,88,26,'c'],[40,70,12,74,'c']]}},
+/* ---------- portero (ideas adaptadas del PDF) ---------- */
+{id:'g3',f:'portero',n:2,dur:10,ser:1,cat:['ale'],src:'pdf',tit:'Toca el poste y para',desc:'El portero toca el poste que dice el entrenador y reacciona para parar un tiro inmediato.',obj:'Mejorar la reacción y la colocación del portero.',org:['Portería y tirador a 9-11 m','Balones preparados'],eje:['El entrenador dice "derecho" o "izquierdo"','El portero toca ese poste con la mano','Vuelve al centro y para el tiro'],con:['Desplazamientos laterales cortos','Posición básica antes del tiro','Blocar o desviar fuera'],fac:'Tiro con la mano.',dif:'El tiro sale antes de que llegue al centro.',est:'Oleada',sit:'Individual · jugador',
+ dg:{t:'area',J:[[50,11,'p','P'],[50,52,'a','A']],B:[[50,46]],F:[[48,12,42,8,'m'],[42,8,50,12,'m'],[50,44,56,10,'p']]}},
+{id:'g4',f:'portero',n:2,dur:10,ser:1,cat:['ale'],src:'pdf',tit:'Valla baja y estirada',desc:'El portero salta una valla baja lateralmente y se estira para parar un balón al lado contrario.',obj:'Mejorar el apoyo y la estirada.',org:['Una valla baja (o cono alto) en la portería','Lanzador a 6-8 m'],eje:['Salto lateral sobre la valla','Al caer, el lanzador envía el balón al otro lado','Estirada para blocar o desviar'],con:['Caer equilibrado y listo para salir','Empujar con la pierna cercana al balón','Caer de lado, protegiendo el cuerpo'],fac:'Sin valla.',dif:'Dos saltos antes del lanzamiento.',est:'Circuito',sit:'Individual · jugador',
+ dg:{t:'area',K:[[46,14]],J:[[40,14,'p','P'],[50,48,'a','A']],B:[[50,42]],F:[[40,14,54,14,'m'],[50,40,62,10,'p']]}},
+/* ---------- prevención (apto para todas las edades) ---------- */
+{id:'k7',f:'coord',n:1,dur:15,ser:1,cat:['pre','ale'],src:'fcb',tit:'Calentamiento preventivo (tipo FIFA 11+ Kids)',desc:'Calentamiento estructurado de carrera, saltos, equilibrio, fuerza ligera y caídas controladas, al estilo de los programas preventivos de la FIFA.',obj:'Prevenir lesiones mejorando el control del cuerpo.',org:['Dos filas de conos a 10 m','Todo el equipo, sin balón al principio'],eje:['Carrera con cambios de ritmo y de dirección','Saltos sobre una línea y aterrizaje suave','Equilibrio a una pierna pasando un balón al compañero','Plancha corta y caídas controladas de lado'],con:['Rodillas alineadas con los pies al caer','Aterrizar de puntillas y flexionando','Calidad antes que velocidad'],fac:'Menos repeticiones.',dif:'Equilibrio con los ojos cerrados un instante.',est:'Circuito',sit:'—',
+ dg:{t:'cuadro',K:[[20,14],[20,38],[20,62],[20,86],[80,14],[80,38],[80,62],[80,86]],J:[[20,92,'a',''],[50,92,'a',''],[80,92,'a','']],F:[[20,88,20,18,'m'],[50,88,50,18,'m'],[80,88,80,18,'m']]}},
+/* ---------- físico: solo infantil en adelante ---------- */
+{id:'f1',f:'fisico',n:2,dur:4,ser:4,cat:['inf'],src:'fcb',tit:'Intervalos 4x4 con balón',desc:'Juego reducido muy intenso de 4 minutos con pausas activas, para mejorar la resistencia con balón.',obj:'Mejorar la resistencia específica sin dejar el balón.',org:['Campo de 30x25 m','4c4 con porteros o miniporterías'],eje:['4 minutos de juego a máxima intensidad','3 minutos de recuperación activa con pases suaves','4 series'],con:['Presión constante tras pérdida','Moverse siempre para dar opción de pase','Hidratarse en la pausa'],fac:'3 series.',dif:'Espacio mayor.',est:'Partido',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',M:[[50,8,16],[50,92,16]],J:[[30,70,'a',''],[70,66,'a',''],[50,52,'a',''],[40,34,'a',''],[34,44,'d',''],[64,40,'d',''],[50,26,'d',''],[60,72,'d','']],B:[[50,58]],F:[[50,54,44,38,'p'],[40,30,48,10,'p']]}},
+{id:'f2',f:'fisico',n:2,dur:10,ser:2,cat:['inf'],src:'fcb',tit:'Fuerza con autocarga y juego',desc:'Estaciones cortas de fuerza con el propio peso alternadas con un juego reducido.',obj:'Mejorar la fuerza de piernas y tronco de forma segura.',org:['3 estaciones: zancadas, saltos verticales, plancha','Al lado, un campo de 3c3'],eje:['30 segundos por estación','El grupo pasa después 2 minutos al 3c3','Rotación de grupos'],con:['Técnica antes que velocidad','Rodilla en línea con el pie','Espalda recta en la plancha'],fac:'Menos tiempo por estación.',dif:'Saltos a una pierna.',est:'Circuito',sit:'—',
+ dg:{t:'cuadro',Z:[[50,6,50,94]],K:[[20,20],[20,50],[20,80]],M:[[75,10,12],[75,90,12]],J:[[20,26,'a',''],[20,56,'a',''],[20,86,'a',''],[66,60,'a',''],[84,40,'d','']],B:[[70,58]],F:[[68,56,76,14,'c'],[20,30,20,44,'m']]}},
+{id:'f3',f:'fisico',n:3,dur:8,ser:2,cat:['inf'],src:'fcb',tit:'Sprints cortos con balón',desc:'Arrancadas máximas de 10-20 metros que terminan en conducción y tiro, con descanso largo.',obj:'Mejorar la aceleración.',org:['Salida a 25 m de portería','Portero','Un balón por jugador'],eje:['Sprint de 10 m sin balón','Recoger el balón, conducir y tirar','Descanso de al menos 1 minuto entre repeticiones'],con:['Primeros pasos cortos y explosivos','Brazos activos','Calidad máxima: si baja, se para'],fac:'Sprints de 5 m.',dif:'Salida tras una señal visual.',est:'Oleada',sit:'Individual · jugador',
+ dg:{t:'area',J:[[50,94,'a','A'],[50,9,'p','P']],B:[[50,64]],F:[[50,90,50,68,'m'],[50,62,50,34,'c'],[50,30,58,7,'p']]}},
+{id:'f4',f:'fisico',n:2,dur:10,ser:1,cat:['inf'],src:'fcb',tit:'Prevención de isquios y aductores',desc:'Ejercicios de fuerza excéntrica por parejas (curl nórdico asistido y aductor tipo Copenhague) para prevenir lesiones.',obj:'Reducir el riesgo de lesiones musculares.',org:['Por parejas, en césped o colchoneta','Al final del calentamiento o de la sesión'],eje:['Curl nórdico: el compañero sujeta los tobillos y se baja despacio hacia delante','Aductor: apoyo lateral con la pierna de arriba sobre el compañero','2-3 series cortas'],con:['Bajar despacio y controlando','Cuerpo recto de rodillas a cabeza','Parar si hay dolor'],fac:'Recorrido corto o con apoyo de manos.',dif:'Más repeticiones de forma progresiva.',est:'Circuito',sit:'—',
+ dg:null}
+);
+
 /* ---- Ejercicios: estado de la vista, dibujo, lista, ficha, cronómetro y editor ---- */
 let EJS={f:'',n:0,fav:false,cat:true,q:'',sel:null,edit:null},TMR=null;
 const EST=['Juego adaptado al fútbol','Circuito','Rueda de pase','Oleada','Conservación','Partido'];
@@ -646,7 +733,7 @@ const allEj=()=>[...EJ,...(ST.ejer.custom||[])];
 const ejById=id=>allEj().find(e=>e.id===id);
 const isFav=id=>(ST.ejer.fav||[]).includes(id);
 const durTxt=e=>(+e.ser||1)>1?`${e.ser}×${e.dur}'`:`${e.dur}'`;
-const catTxt=e=>(e.cat||[]).map(c=>c==='pre'?'Prebenjamín':'Alevín').join(' · ');
+const catTxt=e=>(e.cat||[]).map(c=>({pre:'Prebenjamín',ale:'Alevín',inf:'Infantil en adelante'})[c]||c).join(' · ');
 const mmss=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')};
 function wavy(x1,y1,x2,y2){
  const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1,n=Math.max(2,Math.round(len/7)),px=-dy/len,py=dx/len;let d=`M${x1} ${y1}`;
@@ -660,20 +747,21 @@ function pitchSvg(dg,uid,small){
  const mk=(k,c)=>`<marker id="m${k}${uidS}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="${c}"/></marker>`;
  const ln=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${L}" stroke-width="${sw}"/>`;
  const goal=(y)=>`<rect x="40" y="${y}" width="20" height="3" fill="none" stroke="#fff" stroke-width="${sw}"/>`;
- let s=`<svg viewBox="0 0 100 100" class="${cls}" role="img" aria-label="Dibujo del ejercicio"><defs>${mk('p','#fff')}${mk('c','#fff')}${mk('m','#ffe08a')}</defs><rect width="100" height="100" fill="#1e8f4d"/>`+[0,1,2,3,4].map(i=>`<rect y="${i*20+10}" width="100" height="10" fill="#198044"/>`).join('');
+ let s=`<svg viewBox="0 0 100 100" class="${cls}"${small?'':' id="anisvg"'} role="img" aria-label="Dibujo del ejercicio"><defs>${mk('p','#fff')}${mk('c','#fff')}${mk('m','#ffe08a')}</defs><rect width="100" height="100" fill="#1e8f4d"/>`+[0,1,2,3,4].map(i=>`<rect y="${i*20+10}" width="100" height="10" fill="#198044"/>`).join('');
  if(dg.t==='area')s+=ln(4,4,92,92)+ln(22,4,56,22)+ln(36,4,28,8)+goal(1)+`<circle cx="50" cy="18" r=".9" fill="${L}"/>`;
  else if(dg.t==='campo')s+=ln(4,4,92,92)+`<line x1="4" y1="50" x2="96" y2="50" stroke="${L}" stroke-width="${sw}"/><circle cx="50" cy="50" r="10" fill="none" stroke="${L}" stroke-width="${sw}"/>`+ln(25,4,50,16)+ln(25,80,50,16)+goal(1)+goal(96);
  else s+=ln(6,6,88,88);
  (dg.Z||[]).forEach(([a,b,c,d])=>{s+=`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="${L}" stroke-width="${sw}" stroke-dasharray="2 2"/>`});
  (dg.M||[]).forEach(([x,y,w])=>{s+=`<rect x="${x-w/2}" y="${y-1.6}" width="${w}" height="3.2" fill="none" stroke="#fff" stroke-width="${small?1.6:1}"/>`});
  (dg.K||[]).forEach(([x,y])=>{s+=`<path d="M${x-2.2} ${y+2}L${x} ${y-2.6}L${x+2.2} ${y+2}z" fill="#ff8a3d"/>`});
- (dg.F||[]).forEach(([x1,y1,x2,y2,k])=>{const c=k==='m'?'#ffe08a':'#fff',w=small?1.3:.9;
+ (dg.F||[]).forEach(([x1,y1,x2,y2,k],i)=>{const c=k==='m'?'#ffe08a':'#fff',w=small?1.3:.9;s+=`<g id="${uidS}f${i}">`;
   s+=k==='c'?`<path d="${wavy(x1,y1,x2,y2)}" fill="none" stroke="${c}" stroke-width="${w}" marker-end="url(#mc${uidS})"/>`
-   :`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}"${k==='p'?' stroke-dasharray="2.4 1.8"':''} marker-end="url(#m${k==='m'?'m':'p'}${uidS})"/>`});
- (dg.B||[]).forEach(([x,y])=>{s+=`<circle cx="${x}" cy="${y}" r="1.9" fill="#fff" stroke="#111" stroke-width=".5"/>`});
+   :`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}"${k==='p'?' stroke-dasharray="2.4 1.8"':''} marker-end="url(#m${k==='m'?'m':'p'}${uidS})"/>`;s+='</g>'});
+ const balls=(dg.B||[]).slice();if(!balls.length){const f=(dg.F||[]).find(f=>f[4]!=='m');if(f)balls.push([f[0],f[1]])}
  const PC={a:['#ec2f93','#fff'],d:['#f4b53f','#0b0b12'],p:['#3ddc97','#0b0b12'],c:['#8da0f0','#0b0b12']};
- (dg.J||[]).forEach(([x,y,t,l])=>{const[f,tc]=PC[t]||PC.a;
-  s+=`<circle cx="${x}" cy="${y}" r="${small?5.5:4.6}" fill="${f}" stroke="#fff" stroke-width="${small?1.2:.8}"/>`+(l&&!small?`<text x="${x}" y="${y+1.8}" text-anchor="middle" font-size="5" font-weight="700" fill="${tc}" font-family="Barlow,sans-serif">${esc(l)}</text>`:'')});
+ (dg.J||[]).forEach(([x,y,t,l],i)=>{const[f,tc]=PC[t]||PC.a;
+  s+=`<g id="${uidS}j${i}" transform="translate(${x} ${y})"><circle r="${small?5.5:4.6}" fill="${f}" stroke="#fff" stroke-width="${small?1.2:.8}"/>`+(l&&!small?`<text y="1.8" text-anchor="middle" font-size="5" font-weight="700" fill="${tc}" font-family="Barlow,sans-serif">${esc(l)}</text>`:'')+'</g>'});
+ balls.forEach(([x,y],i)=>{s+=`<g id="${uidS}b${i}" transform="translate(${x} ${y})"><circle r="1.9" fill="#fff" stroke="#111" stroke-width=".5"/></g>`});
  return s+'</svg>';
 }
 const LEYENDA=`<div class="legend"><span><i class="lg" style="background:#ec2f93"></i>Ataca</span><span><i class="lg" style="background:#f4b53f"></i>Defiende</span><span><i class="lg" style="background:#3ddc97"></i>Portero</span><span><i class="lg" style="background:#8da0f0"></i>Comodín</span><span>╌▸ Pase o tiro</span><span>∿▸ Conducción</span><span style="color:#ffe08a">—▸ Movimiento</span><span style="color:#ff8a3d">▲ Cono</span></div>`;
@@ -710,13 +798,15 @@ function vEjDet(e){
  <h1 style="margin-top:14px">${esc(e.tit)}</h1>
  <div class="row wrap" style="margin:8px 0"><span class="lvl l${e.n}">${NIV[e.n]||''}</span><span class="small mute">${durTxt(e)} · ${esc(FUND[e.f]||'')}${catTxt(e)?' · '+catTxt(e):''}${e.custom?' · propio':''}</span></div>
  ${e.desc?`<p class="mute">${esc(e.desc)}</p>`:''}
- <div style="margin-top:10px">${pitchSvg(e.dg,e.id+'d',false)}</div>${e.dg?LEYENDA:''}
+ ${(e.cat||[]).includes('inf')?`<div class="card" style="border-color:var(--amber)"><b style="color:var(--amber)">⚠ Infantil en adelante</b><p class="small">Según la formación UEFA C, la condición física no se entrena de forma específica antes de infantil. No lo uses con Prebenjamín ni Alevín.</p></div>`:''}
+ <div style="margin-top:10px">${pitchSvg(e.dg,e.id+'d',false)}</div>${aniHtml(e)}${e.dg?LEYENDA:''}
  ${tmHtml(e)}
  ${box('🎯','Objetivo',`<p>${esc(e.obj||'—')}</p>`)}
  ${(e.org||[]).length?box('👥','Organización',li(e.org)):''}
  ${(e.eje||[]).length?box('▶️','Ejecución',li(e.eje)):''}
  ${(e.con||[]).length?box('💬','Consignas',li(e.con)):''}
  ${(e.fac||e.dif)?box('🔁','Variantes',`${e.fac?`<p><b>Más fácil:</b> ${esc(e.fac)}</p>`:''}${e.dif?`<p><b>Más difícil:</b> ${esc(e.dif)}</p>`:''}`):''}
+ ${e.src&&SRC[e.src]?box('📚','Fuente',`<p class="small">${SRC[e.src][1]?`Inspirado en <a href="${SRC[e.src][1]}" target="_blank" rel="noopener">${esc(SRC[e.src][0])}</a>`:esc(SRC[e.src][0])}. Texto y dibujo propios, adaptados a fútbol 7.</p>`):''}
  ${box('📋','Ficha RFEF',`<p>Estrategia didáctica: <b>${esc(e.est||'—')}</b><br>Situación de juego: <b>${esc(e.sit||'—')}</b></p>`)}
  <div class="grid2" style="margin-top:8px">${e.custom?`<button data-a="ejedit" data-id="${esc(e.id)}" class="btn">Editar</button><button data-a="ejdel" data-id="${esc(e.id)}" class="btn" style="color:var(--red)">Borrar</button>`:`<button data-a="ejdup" data-id="${esc(e.id)}" class="btn" style="grid-column:span 2">Duplicar y editar como ejercicio propio</button>`}</div>`;
 }
@@ -728,7 +818,7 @@ function vEjEdit(){
  <div class="card"><label class="f">Título<input data-ef="tit" class="inp" value="${esc(e.tit||'')}" maxlength="60"></label>
  <div class="grid2"><label class="f">Fundamento<select data-ef="f" class="inp">${opt(Object.entries(FUND),e.f)}</select></label><label class="f">Nivel<select data-ef="n" class="inp">${opt([[1,NIV[1]],[2,NIV[2]],[3,NIV[3]]],e.n)}</select></label>
  <label class="f">Minutos por serie<input data-ef="dur" type="number" min="1" max="60" inputmode="numeric" class="inp" value="${esc(e.dur||10)}"></label><label class="f">Series<input data-ef="ser" type="number" min="1" max="6" inputmode="numeric" class="inp" value="${esc(e.ser||1)}"></label></div>
- <div class="small mute" style="margin-top:8px">Categorías</div><div class="row"><label class="chk"><input type="checkbox" data-ef="cat_pre" ${(e.cat||[]).includes('pre')?'checked':''}> Prebenjamín</label><label class="chk"><input type="checkbox" data-ef="cat_ale" ${(e.cat||[]).includes('ale')?'checked':''}> Alevín</label></div>
+ <div class="small mute" style="margin-top:8px">Categorías</div><div class="row"><label class="chk"><input type="checkbox" data-ef="cat_pre" ${(e.cat||[]).includes('pre')?'checked':''}> Prebenjamín</label><label class="chk"><input type="checkbox" data-ef="cat_ale" ${(e.cat||[]).includes('ale')?'checked':''}> Alevín</label><label class="chk"><input type="checkbox" data-ef="cat_inf" ${(e.cat||[]).includes('inf')?'checked':''}> Infantil+</label></div>
  <label class="f">Descripción breve<input data-ef="desc" class="inp" value="${esc(e.desc||'')}" maxlength="160"></label>
  <label class="f">Objetivo (empieza por un verbo: Mejorar, Resolver…)<input data-ef="obj" class="inp" value="${esc(e.obj||'')}" maxlength="120"></label>
  ${ta('org','Organización','Espacio, jugadores, material…')}${ta('eje','Ejecución')}${ta('con','Consignas')}
@@ -743,7 +833,7 @@ function ejSaveDraft(){
  const tit=String(v('tit')).trim(),obj=String(v('obj')).trim();
  if(!tit||!obj){toast('Escribe al menos el título y el objetivo');return false}
  const e=Object.assign({},EJS.edit,{tit,obj,f:v('f'),n:+v('n')||1,dur:Math.max(1,Math.min(60,+v('dur')||10)),ser:Math.max(1,Math.min(6,+v('ser')||1)),
-  cat:[v('cat_pre')?'pre':'',v('cat_ale')?'ale':''].filter(Boolean),desc:String(v('desc')).trim(),org:lines('org'),eje:lines('eje'),con:lines('con'),
+  cat:[v('cat_pre')?'pre':'',v('cat_ale')?'ale':'',v('cat_inf')?'inf':''].filter(Boolean),desc:String(v('desc')).trim(),org:lines('org'),eje:lines('eje'),con:lines('con'),
   fac:String(v('fac')).trim(),dif:String(v('dif')).trim(),est:v('est'),sit:v('sit'),custom:true});
  if(!e.id)e.id='u'+Date.now();
  const C=ST.ejer.custom,i=C.findIndex(x=>x.id===e.id);if(i>=0)C[i]=e;else C.push(e);
@@ -779,6 +869,76 @@ setInterval(()=>{
  const vEl=$('#tmV');if(vEl)vEl.textContent=mmss(TMR.left);
 },250);
 
+/* ---- Animación: se genera a partir de las flechas del dibujo (en orden).
+   p = pase o tiro (viaja el balón) · c = conducción (jugador + balón) · m = movimiento sin balón ---- */
+const ANI_MS=1150,ANI_HOLD=1000;let ANI=null;
+function animPlan(dg){
+ if(!dg||!(dg.F||[]).length)return null;
+ const J=(dg.J||[]).map(p=>[p[0],p[1]]),B=(dg.B||[]).map(b=>[b[0],b[1]]);
+ const first=dg.F.find(f=>f[4]!=='m');if(!B.length&&first)B.push([first[0],first[1]]);
+ const near=(arr,x,y,skip)=>{let bi=-1,bd=1e9;arr.forEach((p,i)=>{if(i===skip)return;const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;bi=i}});return bi};
+ const typ=i=>((dg.J||[])[i]||[])[2],lab=i=>{const p=(dg.J||[])[i];return p&&p[3]&&p[3].length<=2&&!/^\d$/.test(p[3])?p[3]:''};
+ const nm=i=>lab(i)||({a:'un atacante',d:'un defensor',p:'el portero',c:'el comodín'}[typ(i)]||'un jugador');
+ const nmTo=(i,from)=>lab(i)||(typ(i)===typ(from)&&typ(i)!=='c'?'un compañero':nm(i));
+ const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+ const states=[{J:J.map(p=>p.slice()),B:B.map(p=>p.slice())}],moves=[];
+ dg.F.forEach(([x1,y1,x2,y2,k])=>{
+  const s=states[states.length-1],n={J:s.J.map(p=>p.slice()),B:s.B.map(p=>p.slice())},mv={k,j:-1,b:-1,txt:''};
+  if(k==='p'){
+   mv.b=near(n.B,x1,y1);const bp=mv.b>=0?n.B[mv.b]:[x1,y1],from=near(n.J,bp[0],bp[1]),to=near(n.J,x2,y2,from),dTo=to>=0?Math.hypot(n.J[to][0]-x2,n.J[to][1]-y2):99;
+   const tiro=(dg.t!=='cuadro'&&(y2<12||y2>88))||(dg.M||[]).some(m=>Math.hypot(m[0]-x2,m[1]-y2)<9)||(dTo<12&&typ(to)==='p'&&typ(from)!=='p');
+   mv.txt=tiro?`${cap(nm(from))} tira a portería`:(dTo<10?`${cap(nm(from))} pasa a ${nmTo(to,from)}`:`${cap(nm(from))} pasa al espacio`);
+   if(mv.b>=0)n.B[mv.b]=[x2,y2];
+  }else if(k==='c'){
+   mv.j=near(n.J,x1,y1);if(n.B.length)mv.b=near(n.B,n.J[mv.j][0],n.J[mv.j][1]);
+   const dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy)||1;n.J[mv.j]=[x2-dx/l*4,y2-dy/l*4];if(mv.b>=0)n.B[mv.b]=[x2,y2];
+   mv.txt=`${cap(nm(mv.j))} conduce el balón`;
+  }else{mv.j=near(n.J,x1,y1);n.J[mv.j]=[x2,y2];const cerca=n.B.some(b=>Math.hypot(b[0]-x2,b[1]-y2)<10),t=typ(mv.j);mv.txt=`${cap(nm(mv.j))} ${t==='d'?'presiona':(t==='p'?'se coloca':(cerca?'se desmarca para recibir':'se mueve sin balón'))}`}
+  states.push(n);moves.push(mv);
+ });
+ return{states,moves};
+}
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function aniApply(){
+ const A=ANI;if(!A)return;const svg=document.getElementById('anisvg');if(!svg){aniStop();return}
+ const S0=A.plan.states[A.k],S1=A.plan.states[A.k+1]||S0,t=ease(Math.min(1,Math.max(0,A.p)));
+ S0.J.forEach((p,i)=>{const q=S1.J[i]||p,el=document.getElementById(A.uid+'j'+i);if(el)el.setAttribute('transform',`translate(${(p[0]+(q[0]-p[0])*t).toFixed(2)} ${(p[1]+(q[1]-p[1])*t).toFixed(2)})`)});
+ S0.B.forEach((p,i)=>{const q=S1.B[i]||p,el=document.getElementById(A.uid+'b'+i);if(el)el.setAttribute('transform',`translate(${(p[0]+(q[0]-p[0])*t).toFixed(2)} ${(p[1]+(q[1]-p[1])*t).toFixed(2)})`)});
+ A.plan.moves.forEach((m,i)=>{const el=document.getElementById(A.uid+'f'+i);if(el)el.style.opacity=i<A.k||(i===A.k&&A.p>=1)?'.3':(i===A.k?'1':'.12')});
+ const n=A.plan.moves.length,cap=document.getElementById('anicap'),bt=document.getElementById('aniplay');
+ if(cap)cap.textContent=A.k===0&&A.p<=0&&!A.play?'Posición inicial. Pulsa ▶ para ver el ejercicio en movimiento.':`Paso ${A.k+1} de ${n} · ${A.plan.moves[A.k].txt}`;
+ if(bt)bt.textContent=A.play?'⏸ Pausa':'▶ Reproducir';
+ document.querySelectorAll('#anidots i').forEach((d,i)=>d.className=i<A.k||(i===A.k&&A.p>=1)?'on':(i===A.k&&A.p>0?'cur':''));
+}
+function aniLoop(now){
+ const A=ANI;if(!A||!A.play)return;if(!document.getElementById('anisvg')){aniStop();return}
+ const dt=now-(A.last||now);A.last=now;
+ if(A.hold>0){A.hold-=dt;if(A.hold<=0){A.k=0;A.p=0}}
+ else{A.p+=dt/ANI_MS;if(A.p>=1){if(A.k<A.plan.moves.length-1){A.k++;A.p=0}else{A.p=1;A.hold=ANI_HOLD}}}
+ aniApply();A.raf=requestAnimationFrame(aniLoop);
+}
+function aniStop(){if(ANI&&ANI.raf)cancelAnimationFrame(ANI.raf);if(ANI){ANI.play=false;ANI.raf=0}}
+function aniMount(e){
+ const plan=animPlan(e.dg);if(!plan){ANI=null;return}
+ const uid=String(e.id+'d').replace(/[^\w-]/g,'');
+ if(!ANI||ANI.id!==e.id){aniStop();const rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;ANI={id:e.id,uid,plan,k:0,p:0,play:!rm,hold:0,last:0}}
+ else{ANI.plan=plan;ANI.uid=uid}
+ aniApply();if(ANI.play){ANI.last=0;ANI.raf=requestAnimationFrame(aniLoop)}
+}
+function aniClick(a){
+ const A=ANI;if(!A)return;const n=A.plan.moves.length;
+ if(a==='anplay'){if(A.play){aniStop()}else{if(A.k>=n-1&&A.p>=1){A.k=0;A.p=0}A.play=true;A.last=0;A.hold=0;A.raf=requestAnimationFrame(aniLoop)}}
+ else if(a==='annext'){aniStop();if(A.p<1)A.p=1;else if(A.k<n-1){A.k++;A.p=1}}
+ else if(a==='anprev'){aniStop();if(A.k>0){A.k--;A.p=1}else{A.p=0}}
+ else if(a==='anreset'){aniStop();A.k=0;A.p=0}
+ aniApply();
+}
+function aniHtml(e){
+ const plan=animPlan(e.dg);if(!plan)return'';
+ return`<div class="anibar"><button data-a="anprev" class="btn" aria-label="Paso anterior">⏮</button><button data-a="anplay" id="aniplay" class="btn pri grow">▶ Reproducir</button><button data-a="annext" class="btn" aria-label="Paso siguiente">⏭</button><button data-a="anreset" class="btn" aria-label="Volver al inicio">↺</button></div>
+ <div id="anidots" class="anidots">${plan.moves.map(()=>'<i></i>').join('')}</div><p id="anicap" class="anicap"></p>`;
+}
+
 /* ---- render ---- */
 function render(){
  const T=team(ST.team);
@@ -795,6 +955,7 @@ function render(){
  $('#app').innerHTML=head+v;
  $('#nav').innerHTML=[['inicio','🏠','Inicio'],['post','📝','Post-partido'],['plan','📋','Game Plan'],['ejer','🏋️','Ejercicios'],['carga','⚖️','Reparto']].map(([id,i,l])=>`<button data-a="tab" data-id="${id}" class="${ST.tab===id?'on':''}"><span>${i}</span>${l}</button>`).join('');
  if(ST.tab==='ejer'&&!EJS.sel&&!EJS.edit&&EJS.q)ejFilter();
+ if(ST.tab==='ejer'&&EJS.sel&&!EJS.edit){const e=ejById(EJS.sel);if(e)aniMount(e)}else aniStop();
  $('#over').innerHTML=OVER&&T?`<div class="over">${vMatchView(T)}</div>`:'';
 }
 
@@ -825,6 +986,7 @@ async function wake(on){try{if(on&&navigator.wakeLock)WL=await navigator.wakeLoc
 document.addEventListener('click',ev=>{
  const b=ev.target.closest('[data-a]');if(!b||b.disabled)return;
  const a=b.dataset.a,id=b.dataset.id,T=team(ST.team);
+ if(/^an/.test(a)){aniClick(a);return}
  if(/^(ej|tm)/.test(a)){if(ejClick(a,b)!==false){save();render()}return}
  if(a==='tab'){ST.tab=id;SEL=null;if(id==='ejer'){EJS.sel=null;EJS.edit=null}scrollTo(0,0)}
  else if(a==='team'){ST.team=id;SEL=null}
