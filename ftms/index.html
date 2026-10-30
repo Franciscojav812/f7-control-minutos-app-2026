@@ -26,6 +26,7 @@ body[data-sec=setup],body[data-sec=carga]{--acc:#8da0f0;--top:#1b2670}
 body[data-sec=match],body[data-sec=plan]{--acc:#ec2f93;--top:#4a1442}
 body[data-sec=hist],body[data-sec=inicio]{--acc:#f4b53f;--top:#3b2b0b}
 body[data-sec=ana],body[data-sec=post]{--acc:#3ddc97;--top:#0e3a2d}
+body[data-sec=ejer]{--acc:#ff8a3d;--top:#43200a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;overscroll-behavior:none}
 body{background:linear-gradient(180deg,var(--top) 0,var(--ink) 300px) var(--ink) no-repeat;color:var(--chalk);font-family:Barlow,"Segoe UI",system-ui,sans-serif;font-size:16px;line-height:1.4;padding-top:env(safe-area-inset-top)}
@@ -74,8 +75,8 @@ header.top img{width:56px;height:56px;border-radius:50%;flex:none;box-shadow:0 0
 .teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 .teams button{min-height:48px;border-radius:16px;font-weight:700;background:var(--bench);color:var(--benchl)}
 .teams button.on{background:var(--turf);color:var(--ink)}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(22,22,34,.95);border-top:1px solid color-mix(in srgb,var(--acc) 40%,var(--line));display:grid;grid-template-columns:repeat(4,1fr);max-width:28rem;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
-nav button{min-height:64px;font-weight:700;font-size:.8rem;color:var(--mute)}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(22,22,34,.95);border-top:1px solid color-mix(in srgb,var(--acc) 40%,var(--line));display:grid;grid-template-columns:repeat(5,1fr);max-width:28rem;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
+nav button{min-height:64px;font-weight:700;font-size:.7rem;color:var(--mute);padding:0 2px}
 nav button span{display:block;font-size:1.25rem;line-height:1.2}
 nav button.on{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:112px;z-index:60;background:var(--chalk);color:var(--ink);font-weight:700;padding:8px 16px;border-radius:999px;max-width:90%;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -105,6 +106,21 @@ td:first-child,th:first-child{text-align:left}
 details>summary{cursor:pointer;font-weight:700}
 .ficha table td:first-child{color:var(--mute);width:96px;vertical-align:top}.ficha td{text-align:left}
 a{color:var(--turf)}
+/* ejercicios */
+.hscroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.hscroll::-webkit-scrollbar{display:none}.hscroll .chip{flex:none}
+.ej{display:flex;gap:12px;align-items:center;width:100%;text-align:left}
+.thumb{width:84px;height:84px;flex:none;border-radius:14px;display:block}
+.pitchsvg{width:100%;height:auto;border-radius:22px;display:block;box-shadow:inset 0 0 0 3px rgba(238,243,236,.4)}
+.nodg{display:grid;place-items:center;background:var(--bench);color:var(--benchl);font-weight:700}.pitchsvg.nodg{aspect-ratio:1/1}
+.lvl{display:inline-block;padding:3px 10px;border-radius:8px;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.l1{background:#2fbfae}.l2{background:var(--amber)}.l3{background:var(--turf)}
+.chev{color:var(--acc);font-size:1.8rem;font-weight:700;flex:none}
+.lst{margin:4px 0 0;padding-left:18px}.lst li{margin:3px 0}.lst li::marker{color:var(--acc)}
+.ico{flex:none;width:38px;height:38px;border-radius:10px;background:var(--bench);display:grid;place-items:center;font-size:1.1rem}
+.ttl{font-family:var(--disp);font-style:italic;font-weight:700;font-size:1.25rem;text-transform:uppercase;letter-spacing:.02em}
+.tmv{font:italic 700 2.4rem var(--disp)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.75rem;color:var(--mute);margin:8px 2px 4px}.lg{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.chk{display:flex;align-items:center;gap:6px;min-height:44px;margin-right:14px;font-weight:600}.chk input{width:20px;height:20px;accent-color:var(--turf)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -165,7 +181,8 @@ function dl(name,text,type){const a=document.createElement('a');a.href=URL.creat
 function loadState(){
  let s=null;try{s=JSON.parse(localStorage.getItem(KEY))}catch(e){}
  if(!s||s.ver!==VER)s={ver:VER};
- s.team=TEAMS[s.team]?s.team:'pre';s.tab=['inicio','post','plan','carga'].includes(s.tab)?s.tab:'inicio';
+ s.team=TEAMS[s.team]?s.team:'pre';s.tab=['inicio','post','plan','ejer','carga'].includes(s.tab)?s.tab:'inicio';
+ s.ejer=Object.assign({fav:[],custom:[]},s.ejer||{});
  s.post=s.post||{};s.plans=s.plans||{};s.imported=s.imported||null;
  s.cfg=Object.assign({win:3,red:85,amber:70,low:35},s.cfg||{});
  return s;
@@ -410,7 +427,7 @@ function vInicio(T){
  return h+vCopias();
 }
 function vCopias(){
- return`<h2>Copias y exportación</h2><div class="card"><p class="small mute">Lo que haces en el FTMS (formularios, planes, umbrales) vive solo en este navegador. Haz una copia de vez en cuando y guárdala fuera del móvil.</p>
+ return`<h2>Copias y exportación</h2><div class="card"><p class="small mute">Lo que haces en el FTMS (formularios, planes, umbrales y ejercicios propios) vive solo en este navegador. Haz una copia de vez en cuando y guárdala fuera del móvil.</p>
  <div class="grid2"><button data-a="expFt" class="btn">Copia FTMS (.json)</button><button data-a="impFt" class="btn">Importar copia FTMS</button>
  <button data-a="csvPost" class="btn">CSV post-partido</button><button data-a="csvGol" class="btn">CSV goles en contra</button></div>
  <p class="xs mute">Los CSV usan <b>partido_id</b>, la misma columna que el Excel de la app de minutos, para unirlos en Power BI o pandas. Son datos de menores: no los subas a servicios públicos.</p></div>
@@ -548,6 +565,220 @@ function vCarga(T){
  return h+`<p class="xs mute">↑ ↓ comparan con los ${cf.win} partidos anteriores. Un no convocado cuenta como 0 minutos: revisa el motivo antes de sacar conclusiones.</p>`;
 }
 
+/* ==========================================================
+   EJERCICIOS · biblioteca libre para entrenar
+   Contenido propio, coherente con la formación UEFA C (RFEF).
+   Dibujo (dg) en coordenadas 0-100: t = cuadro | area | campo
+   J jugadores [x,y,tipo,etiqueta] (a ataca, d defiende, p portero, c comodín)
+   K conos [x,y] · M miniporterías [x,y,ancho] · B balones [x,y]
+   F flechas [x1,y1,x2,y2,tipo] (p pase/tiro, c conducción, m movimiento) · Z líneas de zona [x1,y1,x2,y2]
+   ========================================================== */
+const FUND={pase:'Pase',control:'Control y recepción',conduccion:'Conducción',regate:'Regate',remate:'Remate',defensa:'Defensa',portero:'Portero',coord:'Coordinación',juego:'Juego colectivo'};
+const NIV={1:'Principiante',2:'Intermedio',3:'Avanzado'};
+const EJ=[
+{id:'p1',f:'pase',n:1,dur:10,ser:1,cat:['pre','ale'],tit:'Pase corto en parejas',desc:'Dos jugadores se pasan el balón a poca distancia, controlando antes de devolver.',obj:'Mejorar el pase corto con el interior y el control.',org:['Parejas a 6-8 m','Un balón por pareja','Dos conos marcan la posición de cada uno'],eje:['Pase raso con el interior del pie','Control con el pie contrario al que pasó el compañero','Cada 2 minutos se cambia de pie'],con:['Pie de apoyo apuntando al compañero','Mirar al compañero antes de pasar','Amortiguar el balón al controlar'],fac:'Acercar a los jugadores a 4-5 m.',dif:'Pasar a un toque o alejarse a 10 m.',est:'Rueda de pase',sit:'Individual · jugador',
+ dg:{t:'cuadro',J:[[25,50,'a','A'],[75,50,'a','B']],K:[[25,62],[75,62]],B:[[31,50]],F:[[33,46,67,46,'p'],[67,54,33,54,'p']]}},
+{id:'p2',f:'pase',n:1,dur:10,ser:1,cat:['pre','ale'],tit:'Pase por puertas de conos',desc:'Pasar el balón al compañero haciendo que atraviese una puerta de conos.',obj:'Mejorar la precisión en el pase.',org:['Parejas a 10 m','Una puerta de 1,5 m en el centro','Varias parejas en paralelo'],eje:['Cada pase debe cruzar la puerta','Punto por cada pase que entra','Reducir la puerta cada 3 minutos'],con:['Golpear el centro del balón','Acompañar con la pierna tras el golpeo'],fac:'Puerta más ancha.',dif:'Puerta de 1 m o pase con el pie menos hábil.',est:'Rueda de pase',sit:'Individual · jugador',
+ dg:{t:'cuadro',J:[[18,30,'a','A'],[82,30,'a','B'],[18,72,'a','C'],[82,72,'a','D']],K:[[50,24],[50,36],[50,66],[50,78]],B:[[24,30],[24,72]],F:[[26,30,74,30,'p'],[26,72,74,72,'p']]}},
+{id:'p3',f:'pase',n:1,dur:12,ser:1,cat:['pre','ale'],tit:'Triángulo de pase',desc:'Tres jugadores en triángulo: se pasa y se sigue al balón.',obj:'Mejorar el pase y el movimiento después de pasar.',org:['Triángulo de 8 m con conos','3-4 jugadores por triángulo','Un balón'],eje:['A pasa a B y ocupa el sitio de B','B controla y pasa a C','Cambiar de sentido cada 2 minutos'],con:['Pasar y moverse enseguida','Controlar orientado hacia el siguiente compañero'],fac:'Sin seguir el pase: cada uno en su cono.',dif:'A un toque.',est:'Rueda de pase',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[50,18,'a','A'],[22,78,'a','B'],[78,78,'a','C']],K:[[50,10],[16,86],[84,86]],B:[[50,25]],F:[[46,25,26,70,'p'],[30,78,70,78,'p'],[74,70,54,25,'p']]}},
+{id:'p4',f:'pase',n:1,dur:12,ser:1,cat:['pre','ale'],tit:'Rondo 4c1',desc:'Cuatro pasan el balón en un cuadrado y uno intenta tocarlo.',obj:'Mejorar el pase corto, el control y ofrecer líneas de pase.',org:['Cuadrado de 8x8 m','4 jugadores en los lados y 1 en el centro','Un balón'],eje:['Los 4 se pasan el balón a 2 toques','Si el del centro toca el balón, cambia con quien lo perdió','Meta: 10 pases seguidos'],con:['Moverse por el lado para dar línea de pase','Pase firme al pie','Controlar con el pie lejano al defensor'],fac:'Toques libres o cuadrado más grande.',dif:'A un toque o 4c2 en 10x10 m.',est:'Conservación',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[20,20,'a','A'],[80,20,'a','B'],[20,80,'a','C'],[80,80,'a','D'],[50,50,'d','X']],K:[[10,10],[90,10],[10,90],[90,90]],B:[[26,20]],F:[[28,20,72,20,'p'],[80,28,80,72,'p']]}},
+{id:'p5',f:'pase',n:2,dur:12,ser:1,cat:['ale'],tit:'Pared con apoyo',desc:'El jugador con balón juega con un apoyo y recibe la devolución en carrera.',obj:'Resolver el 2c1 con una pared.',org:['Grupos de 3 en un pasillo de 20x10 m','Un cono hace de defensor','Columna de salida en un extremo'],eje:['A conduce hacia el cono y pasa a B','B devuelve al espacio por detrás del cono','A recibe en carrera y conduce hasta la línea'],con:['Fijar al defensor conduciendo hacia él','Pasar antes de llegar al defensor','Devolver al espacio, no al pie'],fac:'Sin límite de toques para el apoyo.',dif:'Defensor real que solo puede moverse lateralmente.',est:'Oleada',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[25,82,'a','A'],[62,48,'a','B']],K:[[40,52]],B:[[29,76]],F:[[30,76,56,52,'p'],[60,42,44,24,'p'],[28,74,38,28,'m']]}},
+{id:'p6',f:'pase',n:2,dur:15,ser:1,cat:['ale'],tit:'Rondo 5c2',desc:'Cinco jugadores mantienen el balón ante dos defensores.',obj:'Mejorar la circulación del balón y el perfil corporal.',org:['Círculo o cuadrado de 12x12 m','5 atacantes por fuera y 2 defensores dentro'],eje:['Máximo 2 toques','Pase entre los dos defensores: punto doble','El defensor que roba cambia con quien perdió'],con:['Perfil abierto antes de recibir','Buscar el pase entre defensores','Los de al lado se ofrecen siempre'],fac:'Toques libres.',dif:'A un toque o con espacio menor.',est:'Conservación',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',J:[[50,12,'a','A'],[14,42,'a','B'],[86,42,'a','C'],[26,86,'a','D'],[74,86,'a','E'],[42,50,'d','X'],[60,56,'d','X']],B:[[20,42]],F:[[22,42,78,42,'p'],[84,50,77,80,'p']]}},
+{id:'c1',f:'control',n:1,dur:10,ser:1,cat:['pre','ale'],tit:'Control orientado en parejas',desc:'Recibir el balón y, con el primer toque, salir hacia un lado por una puerta de conos.',obj:'Mejorar el control orientado.',org:['Parejas a 10 m','Dos puertas de conos a los lados del receptor'],eje:['A pasa a B','B controla hacia una puerta y la cruza conduciendo','B vuelve y pasa a A, que hace lo mismo'],con:['Mirar antes de recibir dónde está la puerta','Controlar con el pie lejano','Primer toque hacia el espacio'],fac:'Sin puertas: solo controlar hacia un lado.',dif:'El pasador dice la puerta en el último momento.',est:'Rueda de pase',sit:'Individual · jugador',
+ dg:{t:'cuadro',J:[[22,55,'a','A'],[68,55,'a','B']],K:[[84,30],[94,30],[84,80],[94,80]],B:[[28,55]],F:[[30,55,61,55,'p'],[72,50,88,34,'c']]}},
+{id:'c2',f:'control',n:2,dur:12,ser:1,cat:['ale'],tit:'Control y giro con defensor',desc:'El receptor, de espaldas a la portería, controla y gira ante un defensor pasivo.',obj:'Mejorar el control y el giro para encarar.',org:['Medio campo de F7','Pasador, receptor y defensor','Portero en la portería'],eje:['El pasador da al receptor','El receptor controla, gira y tira','El defensor solo acompaña al principio'],con:['Mirar por encima del hombro antes de recibir','Controlar hacia el lado contrario del defensor','Girar con el primer toque si hay espacio'],fac:'Sin defensor.',dif:'Defensor activo.',est:'Oleada',sit:'Sectorial · jugadores',
+ dg:{t:'area',J:[[50,88,'a','A'],[50,56,'a','B'],[46,42,'d','X'],[50,9,'p','P']],B:[[50,82]],F:[[50,81,50,63,'p'],[55,52,68,32,'c'],[68,30,56,8,'p']]}},
+{id:'c3',f:'control',n:2,dur:12,ser:1,cat:['ale'],tit:'Recibir entre líneas',desc:'Cuadrado dividido en tres zonas: el balón pasa de un extremo a otro a través del jugador del centro.',obj:'Mejorar la recepción con presión y el perfil corporal.',org:['Cuadrado de 20x30 m en tres zonas','Un jugador en cada zona de los extremos','En el centro, un atacante y un defensor'],eje:['El del extremo pasa al del centro','El del centro controla y pasa al extremo contrario','El defensor solo puede estar en la zona central'],con:['Desmarcarse para recibir libre','Perfil abierto para ver los dos extremos','Controlar hacia donde vas a pasar'],fac:'Defensor pasivo.',dif:'Dos defensores en el centro.',est:'Conservación',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',Z:[[6,36,94,36],[6,64,94,64]],J:[[50,86,'a','A'],[56,50,'a','B'],[50,14,'a','C'],[38,46,'d','X']],B:[[50,80]],F:[[52,79,55,57,'p'],[57,43,51,21,'p']]}},
+{id:'d1',f:'conduccion',n:1,dur:10,ser:1,cat:['pre'],tit:'Eslalon entre conos',desc:'Conducir el balón entre conos sin tocarlos.',obj:'Mejorar la conducción y los cambios de dirección.',org:['Fila de 5 conos a 2 m','Una columna por fila de conos','Un balón por jugador'],eje:['Conducir haciendo zigzag','Al final, pase al siguiente de la fila','Usar el interior y el exterior del pie'],con:['Toques cortos y suaves','Balón cerca del pie','Cabeza arriba entre cono y cono'],fac:'Conos más separados.',dif:'Solo con el pie menos hábil o con la planta.',est:'Circuito',sit:'Individual · jugador',
+ dg:{t:'cuadro',J:[[12,50,'a','A']],K:[[28,42],[42,58],[56,42],[70,58],[84,42]],B:[[18,50]],F:[[20,50,92,50,'c']]}},
+{id:'d2',f:'conduccion',n:1,dur:10,ser:1,cat:['pre'],tit:'Semáforo',desc:'Todos conducen libres y cambian el ritmo según el color que dice el entrenador.',obj:'Mejorar la conducción con cambios de ritmo.',org:['Cuadrado de 20x20 m','Un balón por jugador'],eje:['Verde: conducir rápido','Ámbar: conducir despacio','Rojo: parar el balón con la planta'],con:['Cabeza arriba para no chocar','Toques cortos al frenar','Arrancar con un toque largo'],fac:'Solo verde y rojo.',dif:'Añadir un color para cambiar de dirección.',est:'Juego adaptado al fútbol',sit:'—',
+ dg:{t:'cuadro',J:[[24,26,'a',''],[70,22,'a',''],[40,64,'a',''],[78,72,'a',''],[20,80,'a','']],B:[[30,26],[76,22],[46,64],[72,72],[26,80]],F:[[32,30,52,42,'c'],[74,28,62,46,'c'],[48,68,62,82,'c']]}},
+{id:'d3',f:'conduccion',n:2,dur:12,ser:1,cat:['pre','ale'],tit:'Cruzar la línea',desc:'1c1 en el que el atacante debe cruzar una línea conduciendo.',obj:'Mejorar la conducción con oposición.',org:['Pasillo de 15x20 m','Línea de meta marcada con conos','Atacante y defensor enfrentados'],eje:['El atacante conduce hacia la línea','El defensor intenta robar','Si roba, intenta cruzar la línea contraria'],con:['Proteger el balón con el cuerpo','Cambiar de ritmo para superar','Llevar el balón por el lado contrario al defensor'],fac:'El defensor sale con retraso.',dif:'Línea más corta.',est:'Oleada',sit:'Individual · jugador',
+ dg:{t:'cuadro',Z:[[20,14,80,14]],K:[[20,14],[80,14],[20,90],[80,90]],J:[[50,82,'a','A'],[50,44,'d','X']],B:[[50,76]],F:[[52,74,66,20,'c'],[50,38,58,30,'m']]}},
+{id:'r1',f:'regate',n:1,dur:12,ser:1,cat:['pre','ale'],tit:'Oleadas 1c1 en pasillo',desc:'Atacante contra defensor en un pasillo que termina en portería.',obj:'Resolver situaciones de 1c1.',org:['Pasillo de 12 m de ancho hasta la portería','Dos columnas: atacantes y defensores','Portero'],eje:['El defensor pasa al atacante y sale a defender','El atacante intenta superarle y tirar','Se cambian los roles tras cada turno'],con:['Ir hacia el defensor a buena velocidad','Fintar antes de cambiar de dirección','Cambio de ritmo tras el regate'],fac:'El defensor empieza unos pasos atrás.',dif:'Pasillo más estrecho.',est:'Oleada',sit:'Individual · jugador',
+ dg:{t:'area',K:[[30,40],[30,62],[30,84],[70,40],[70,62],[70,84]],J:[[50,86,'a','A'],[50,56,'d','X'],[50,9,'p','P']],B:[[50,80]],F:[[52,78,62,40,'c'],[62,36,54,8,'p']]}},
+{id:'r2',f:'regate',n:1,dur:10,ser:1,cat:['pre'],tit:'Tiburones y pececillos',desc:'Los pececillos conducen por el cuadrado y los tiburones intentan robarles el balón.',obj:'Mejorar la protección y el regate en juego.',org:['Cuadrado de 20x20 m','Todos con balón menos 2 tiburones'],eje:['Los tiburones intentan sacar balones del cuadrado','Quien pierde el balón pasa a ser tiburón','Gana el último pececillo'],con:['Proteger con el cuerpo','Cabeza arriba para ver a los tiburones','Cambiar de dirección al acercarse uno'],fac:'Un solo tiburón.',dif:'Cuadrado más pequeño.',est:'Juego adaptado al fútbol',sit:'—',
+ dg:{t:'cuadro',J:[[22,24,'a',''],[76,22,'a',''],[30,70,'a',''],[78,76,'a',''],[46,48,'d','X'],[62,54,'d','X']],B:[[28,24],[70,22],[36,70],[72,76]],F:[[28,30,36,44,'c'],[70,28,84,40,'c'],[50,44,34,66,'m']]}},
+{id:'r3',f:'regate',n:2,dur:12,ser:1,cat:['pre','ale'],tit:'1c1 con dos miniporterías',desc:'El atacante elige a qué miniportería atacar según se coloca el defensor.',obj:'Mejorar el regate y la toma de decisión.',org:['Cuadrado de 15x15 m','Dos miniporterías en el fondo','Columnas de atacantes y defensores'],eje:['El defensor pasa al atacante','El atacante marca en cualquiera de las dos','Si el defensor roba, conduce hasta la línea de salida'],con:['Mirar qué portería deja libre el defensor','Amagar hacia un lado y salir al otro','Tirar en cuanto haya hueco'],fac:'Miniporterías más anchas.',dif:'Gol solo tras regate.',est:'Partido',sit:'Individual · jugador',
+ dg:{t:'cuadro',M:[[28,8,14],[72,8,14]],J:[[50,82,'a','A'],[52,46,'d','X']],B:[[50,76]],F:[[48,74,32,24,'c'],[30,20,28,12,'p']]}},
+{id:'t1',f:'remate',n:1,dur:12,ser:1,cat:['pre','ale'],tit:'Remate con el interior',desc:'Tiros con el interior a portería con balón parado o en movimiento suave.',obj:'Mejorar el remate con precisión.',org:['Portería con portero','Fila de jugadores a 10 m','Un balón por jugador'],eje:['Tirar con el interior buscando los palos','Recoger el balón y volver a la fila','Alternar pie derecho e izquierdo'],con:['Pie de apoyo al lado del balón','Mirar la portería antes de tirar','Tirar raso'],fac:'Sin portero o portería más grande.',dif:'Tirar tras un control.',est:'Rueda de pase',sit:'Individual · jugador',
+ dg:{t:'area',J:[[50,66,'a','A'],[50,9,'p','P']],B:[[50,60]],F:[[50,58,42,7,'p']]}},
+{id:'t2',f:'remate',n:1,dur:14,ser:1,cat:['pre','ale'],tit:'Conducir y rematar',desc:'Conducción rápida hasta una zona y remate a portería.',obj:'Mejorar el remate tras conducción.',org:['Salida a 25 m de la portería','Zona de tiro marcada con conos','Portero'],eje:['Conducir hasta la zona de tiro','Rematar antes de pasar la última línea de conos','Recoger y volver por fuera'],con:['Último toque para preparar el tiro','Tirar al lado contrario del portero','Rematar sin parar la carrera'],fac:'Zona de tiro más cerca.',dif:'Defensor que sale desde un lado.',est:'Oleada',sit:'Individual · jugador',
+ dg:{t:'area',K:[[38,44],[62,44]],J:[[50,92,'a','A'],[50,9,'p','P']],B:[[50,86]],F:[[50,84,50,52,'c'],[50,48,60,7,'p']]}},
+{id:'t3',f:'remate',n:2,dur:12,ser:1,cat:['ale'],tit:'Pared y remate',desc:'Pared con un apoyo cerca del área y remate.',obj:'Mejorar el remate tras combinación.',org:['Medio campo de F7','Un apoyo fijo frente al área','Portero'],eje:['A pasa al apoyo','El apoyo devuelve al espacio','A remata de primeras o tras un control'],con:['Pasar fuerte al apoyo','Desmarque hacia el espacio de la devolución','Remate raso y cruzado'],fac:'Remate tras control.',dif:'Remate de primeras obligatorio.',est:'Oleada',sit:'Sectorial · jugadores',
+ dg:{t:'area',J:[[28,86,'a','A'],[56,58,'a','B'],[50,9,'p','P']],B:[[32,80]],F:[[34,80,50,62,'p'],[52,52,40,38,'p'],[30,78,36,42,'m'],[40,34,46,7,'p']]}},
+{id:'t4',f:'remate',n:2,dur:14,ser:1,cat:['ale'],tit:'Centro atrás y remate',desc:'Un extremo llega a línea de fondo y da el pase atrás a dos rematadores.',obj:'Mejorar el remate tras centro desde banda.',org:['Medio campo de F7','Un extremo y dos rematadores','Portero'],eje:['El extremo conduce hasta línea de fondo','Pase atrás raso','Uno ataca el primer palo y otro el segundo'],con:['Atacar el primer y el segundo palo','Llegar en carrera, no esperar parado','Rematar raso'],fac:'Sin portero.',dif:'Un defensor dentro del área.',est:'Oleada',sit:'Sectorial · jugadores',
+ dg:{t:'area',J:[[86,56,'a','A'],[42,62,'a','B'],[62,66,'a','C'],[50,9,'p','P']],B:[[86,50]],F:[[86,48,86,20,'c'],[83,18,56,28,'p'],[44,56,42,24,'m'],[62,60,60,22,'m']]}},
+{id:'e1',f:'defensa',n:1,dur:10,ser:1,cat:['pre','ale'],tit:'1c1 defensivo en pasillo',desc:'El defensor defiende su línea ante un atacante que conduce.',obj:'Mejorar la entrada y el perfil defensivo.',org:['Pasillo de 10x15 m','Atacante con balón y defensor','Línea de meta detrás del defensor'],eje:['El atacante intenta cruzar la línea conduciendo','El defensor intenta robar sin salir del pasillo','Se cambian los roles'],con:['Perfilarse de lado, no de frente','Llevar al atacante hacia la banda','No tirarse al suelo: esperar el momento'],fac:'Pasillo más estrecho.',dif:'Pasillo más ancho.',est:'Oleada',sit:'Individual · jugador',
+ dg:{t:'cuadro',Z:[[30,90,70,90]],K:[[30,10],[30,50],[30,90],[70,10],[70,50],[70,90]],J:[[50,22,'a','A'],[50,62,'d','X']],B:[[50,28]],F:[[50,30,58,52,'c'],[50,68,56,58,'m']]}},
+{id:'e2',f:'defensa',n:2,dur:12,ser:1,cat:['ale'],tit:'2c1 defensivo: temporizar',desc:'Un defensor frena a dos atacantes hasta que llega la ayuda.',obj:'Mejorar la temporización en inferioridad.',org:['Medio campo de F7','Dos atacantes, un defensor y un segundo defensor que sale con retraso','Portero'],eje:['Los atacantes salen desde el medio campo','El defensor retrasa el ataque sin lanzarse','A los 3 segundos sale el segundo defensor'],con:['Retroceder de lado mirando al balón','Tapar la línea de pase más peligrosa','Ir a robar solo cuando llegue la ayuda'],fac:'El segundo defensor sale antes.',dif:'Ayuda a los 5 segundos.',est:'Oleada',sit:'Sectorial · jugadores',
+ dg:{t:'area',J:[[34,80,'a','A'],[68,80,'a','B'],[50,48,'d','X'],[50,9,'p','P']],B:[[40,80]],F:[[42,80,60,80,'p'],[50,54,56,60,'m']]}},
+{id:'e3',f:'defensa',n:3,dur:15,ser:1,cat:['ale'],tit:'Cobertura en 2c2',desc:'Dos defensores se ayudan: uno presiona y el otro cubre.',obj:'Mejorar la cobertura y la permuta.',org:['Medio campo de F7','2 atacantes, 2 defensores y portero'],eje:['El defensor más cercano al balón presiona','El otro se coloca en diagonal para cubrir','Si superan al primero, el segundo sale y el primero ocupa su hueco'],con:['Cubrir en diagonal, entre el balón y la portería','Hablar: "¡voy!", "¡cubro!"','Permutar sin seguir el balón'],fac:'Atacantes con toques limitados.',dif:'3c3 con más espacio.',est:'Partido',sit:'Sectorial · jugadores',
+ dg:{t:'area',J:[[34,74,'a','A'],[72,68,'a','B'],[38,52,'d','X'],[56,40,'d','X'],[50,9,'p','P']],B:[[34,68]],F:[[36,66,40,58,'c'],[58,46,48,36,'m']]}},
+{id:'g1',f:'portero',n:1,dur:10,ser:1,cat:['pre','ale'],tit:'Blocaje y caída lateral',desc:'El entrenador o un compañero lanza con la mano y el portero bloca.',obj:'Mejorar el blocaje y la caída.',org:['Portería y un lanzador a 6-8 m','Balones blandos al principio'],eje:['Lanzar a media altura, a la derecha y a la izquierda','El portero bloca y se levanta rápido','10 lanzamientos por portero'],con:['Manos delante del cuerpo','Caer de lado, no de espaldas','Levantarse enseguida'],fac:'Lanzamientos al cuerpo.',dif:'Lanzamientos con el pie.',est:'Circuito',sit:'Individual · jugador',
+ dg:{t:'area',J:[[50,46,'a','A'],[50,12,'p','P']],B:[[50,40]],F:[[50,39,38,13,'p']]}},
+{id:'g2',f:'portero',n:2,dur:12,ser:1,cat:['ale'],tit:'Parar y salir rápido',desc:'Tras una parada, el portero saca rápido con la mano a un compañero que se desmarca.',obj:'Mejorar la parada y el saque rápido.',org:['Campo de F7','Tirador, portero y dos receptores en bandas'],eje:['El tirador chuta a portería','El portero bloca y saca con la mano a un receptor libre','Punto si saca en menos de 5 segundos'],con:['Colocarse antes del tiro','Mirar antes de sacar','Saque raso al pie del compañero'],fac:'Sin límite de tiempo.',dif:'Un defensor cerca de los receptores.',est:'Oleada',sit:'Sectorial · jugadores',
+ dg:{t:'campo',J:[[50,50,'a','A'],[50,90,'p','P'],[16,66,'a','B'],[84,62,'a','C']],B:[[50,56]],F:[[50,58,46,86,'p'],[56,88,80,66,'p'],[86,58,90,46,'m']]}},
+{id:'k1',f:'coord',n:1,dur:10,ser:1,cat:['pre'],tit:'Circuito de coordinación con balón',desc:'Recorrido de apoyos y saltos que termina conduciendo y tirando.',obj:'Mejorar las habilidades coordinativas.',org:['Conos en zigzag, aros o escalera y una miniportería','Una columna de jugadores'],eje:['Pasar entre los conos con apoyos rápidos','Saltar a pies juntos y a la pata coja','Recoger un balón, conducir y tirar a la miniportería'],con:['Apoyos de puntillas','Brazos para equilibrarse','Bajar el centro de gravedad en los giros'],fac:'Menos estaciones.',dif:'Señales del entrenador para cambiar el orden.',est:'Circuito',sit:'—',
+ dg:{t:'cuadro',M:[[84,14,14]],K:[[20,82],[30,72],[40,82],[50,72]],J:[[10,92,'a','A']],B:[[62,48]],F:[[14,88,52,68,'m'],[58,62,64,52,'m'],[66,46,80,24,'c'],[82,22,84,16,'p']]}},
+{id:'k2',f:'coord',n:1,dur:10,ser:1,cat:['pre'],tit:'Quita petos con balón',desc:'Cada jugador lleva un peto en la cintura y conduce intentando quitar petos a los demás.',obj:'Mejorar la conducción y la percepción del entorno.',org:['Cuadrado de 20x20 m','Un balón y un peto por jugador'],eje:['Conducir sin perder el balón','Quitar petos sin dejar de conducir','Gana quien más petos consigue'],con:['Mirar alrededor, no solo al balón','Cambios de dirección rápidos','Proteger tu peto girando el cuerpo'],fac:'Sin balón, solo petos.',dif:'Espacio más pequeño.',est:'Juego adaptado al fútbol',sit:'—',
+ dg:{t:'cuadro',J:[[26,28,'a',''],[70,26,'a',''],[44,56,'a',''],[24,78,'a',''],[76,74,'a','']],B:[[32,28],[64,26],[50,56],[30,78],[70,74]],F:[[34,32,42,48,'c'],[62,30,52,50,'c']]}},
+{id:'j1',f:'juego',n:1,dur:6,ser:2,cat:['pre','ale'],tit:'Partido 3c3 con miniporterías',desc:'Partido reducido con dos miniporterías por equipo.',obj:'Buscar el espacio libre para atacar.',org:['Campo de 25x20 m','Dos miniporterías en cada fondo','Equipos de 3, sin portero'],eje:['Partidos de 6 minutos','Se puede marcar en cualquiera de las dos','Saque desde la línea de fondo tras gol'],con:['Levantar la cabeza para ver la portería libre','Separarse del compañero con balón','Cambiar el juego hacia la portería libre'],fac:'Porterías más grandes.',dif:'Gol solo tras 3 pases.',est:'Partido',sit:'Sectorial · jugadores',
+ dg:{t:'cuadro',M:[[28,8,14],[72,8,14],[28,92,14],[72,92,14]],J:[[30,70,'a',''],[70,72,'a',''],[50,56,'a',''],[34,34,'d',''],[66,32,'d',''],[50,46,'d','']],B:[[56,56]],F:[[56,58,68,66,'p'],[74,66,72,14,'c']]}},
+{id:'j2',f:'juego',n:2,dur:8,ser:2,cat:['ale'],tit:'Conservación 4c4 + 2 comodines',desc:'Dos equipos se disputan el balón con dos comodines que juegan con quien lo tiene.',obj:'Crear y ocupar espacios para conservar el balón.',org:['Cuadrado de 30x30 m','Dos equipos de 4 y 2 comodines en los fondos'],eje:['Punto al pasar de un comodín al otro','Los comodines juegan a 2 toques','Si se roba, se busca enseguida a un comodín'],con:['Abrirse para dar amplitud','Ofrecer siempre línea de pase','Perfil abierto para ver los dos lados'],fac:'Tres comodines.',dif:'Comodines a un toque.',est:'Conservación',sit:'Intersectorial · jugadores',
+ dg:{t:'cuadro',J:[[24,30,'a',''],[76,30,'a',''],[24,70,'a',''],[76,70,'a',''],[40,44,'d',''],[60,44,'d',''],[40,58,'d',''],[60,58,'d',''],[50,8,'c','C'],[50,92,'c','C']],B:[[30,70]],F:[[30,66,46,90,'p'],[54,88,72,74,'p'],[76,62,76,38,'p'],[72,26,56,10,'p']]}},
+{id:'j3',f:'juego',n:3,dur:8,ser:2,cat:['ale'],tit:'Salida 3+P contra 2',desc:'Portero y tres jugadores salen jugando ante dos presionadores.',obj:'Mejorar la salida de balón creando líneas de pase.',org:['Medio campo de F7','Portero, 3 jugadores y 2 presionadores'],eje:['Saca siempre el portero','Punto al cruzar el medio campo conduciendo','Si los presionadores roban, atacan la portería'],con:['Abrirse a las bandas para dar amplitud','Perfil abierto antes de recibir','Fijar al presionador y pasar al lado contrario'],fac:'Un solo presionador.',dif:'Tres presionadores.',est:'Conservación',sit:'Intersectorial · jugadores',
+ dg:{t:'campo',J:[[50,90,'p','P'],[16,72,'a',''],[50,70,'a',''],[84,72,'a',''],[40,58,'d','X'],[62,58,'d','X']],B:[[50,84]],F:[[46,86,20,76,'p'],[18,66,20,46,'c']]}},
+{id:'j4',f:'juego',n:3,dur:10,ser:2,cat:['ale'],tit:'Partido con carriles',desc:'Partido con dos carriles laterales en los que no se puede defender.',obj:'Mejorar la amplitud y el juego por bandas.',org:['Campo de F7 con dos carriles laterales de 5 m','Equipos de 5 más portero'],eje:['En los carriles no se puede defender','Gol tras pase desde un carril: vale doble','Máximo un jugador por equipo en cada carril'],con:['Pisar la banda para abrir el campo','Atacar el espacio interior cuando la defensa se abre','Centro atrás tras llegar a línea de fondo'],fac:'Carriles más anchos.',dif:'En el carril, máximo 2 toques.',est:'Partido',sit:'Completa · equipo',
+ dg:{t:'campo',Z:[[18,4,18,96],[82,4,82,96]],J:[[50,90,'p','P'],[50,10,'p','P'],[10,50,'a',''],[40,62,'a',''],[60,46,'a',''],[90,40,'a',''],[34,40,'d',''],[56,30,'d',''],[66,58,'d','']],B:[[16,50]],F:[[10,44,10,22,'c'],[13,20,46,18,'p']]}}
+];
+
+/* ---- Ejercicios: estado de la vista, dibujo, lista, ficha, cronómetro y editor ---- */
+let EJS={f:'',n:0,fav:false,cat:true,q:'',sel:null,edit:null},TMR=null;
+const EST=['Juego adaptado al fútbol','Circuito','Rueda de pase','Oleada','Conservación','Partido'];
+const SITS=['—','Individual · jugador','Sectorial · jugador','Sectorial · jugadores','Intersectorial · jugadores','Completa · equipo'];
+const allEj=()=>[...EJ,...(ST.ejer.custom||[])];
+const ejById=id=>allEj().find(e=>e.id===id);
+const isFav=id=>(ST.ejer.fav||[]).includes(id);
+const durTxt=e=>(+e.ser||1)>1?`${e.ser}×${e.dur}'`:`${e.dur}'`;
+const catTxt=e=>(e.cat||[]).map(c=>c==='pre'?'Prebenjamín':'Alevín').join(' · ');
+const mmss=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')};
+function wavy(x1,y1,x2,y2){
+ const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1,n=Math.max(2,Math.round(len/7)),px=-dy/len,py=dx/len;let d=`M${x1} ${y1}`;
+ for(let i=1;i<=n;i++){const t0=(i-.5)/n,t1=i/n,o=i%2?2.2:-2.2;d+=` Q${(x1+dx*t0+px*o).toFixed(1)} ${(y1+dy*t0+py*o).toFixed(1)} ${(x1+dx*t1).toFixed(1)} ${(y1+dy*t1).toFixed(1)}`}
+ return d;
+}
+function pitchSvg(dg,uid,small){
+ const cls=small?'thumb':'pitchsvg';
+ if(!dg)return`<div class="${cls} nodg"><span>${small?'✎':'Ejercicio sin dibujo'}</span></div>`;
+ const L='rgba(255,255,255,.7)',sw=small?1.4:.8,uidS=String(uid).replace(/[^\w-]/g,'');
+ const mk=(k,c)=>`<marker id="m${k}${uidS}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="${c}"/></marker>`;
+ const ln=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${L}" stroke-width="${sw}"/>`;
+ const goal=(y)=>`<rect x="40" y="${y}" width="20" height="3" fill="none" stroke="#fff" stroke-width="${sw}"/>`;
+ let s=`<svg viewBox="0 0 100 100" class="${cls}" role="img" aria-label="Dibujo del ejercicio"><defs>${mk('p','#fff')}${mk('c','#fff')}${mk('m','#ffe08a')}</defs><rect width="100" height="100" fill="#1e8f4d"/>`+[0,1,2,3,4].map(i=>`<rect y="${i*20+10}" width="100" height="10" fill="#198044"/>`).join('');
+ if(dg.t==='area')s+=ln(4,4,92,92)+ln(22,4,56,22)+ln(36,4,28,8)+goal(1)+`<circle cx="50" cy="18" r=".9" fill="${L}"/>`;
+ else if(dg.t==='campo')s+=ln(4,4,92,92)+`<line x1="4" y1="50" x2="96" y2="50" stroke="${L}" stroke-width="${sw}"/><circle cx="50" cy="50" r="10" fill="none" stroke="${L}" stroke-width="${sw}"/>`+ln(25,4,50,16)+ln(25,80,50,16)+goal(1)+goal(96);
+ else s+=ln(6,6,88,88);
+ (dg.Z||[]).forEach(([a,b,c,d])=>{s+=`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="${L}" stroke-width="${sw}" stroke-dasharray="2 2"/>`});
+ (dg.M||[]).forEach(([x,y,w])=>{s+=`<rect x="${x-w/2}" y="${y-1.6}" width="${w}" height="3.2" fill="none" stroke="#fff" stroke-width="${small?1.6:1}"/>`});
+ (dg.K||[]).forEach(([x,y])=>{s+=`<path d="M${x-2.2} ${y+2}L${x} ${y-2.6}L${x+2.2} ${y+2}z" fill="#ff8a3d"/>`});
+ (dg.F||[]).forEach(([x1,y1,x2,y2,k])=>{const c=k==='m'?'#ffe08a':'#fff',w=small?1.3:.9;
+  s+=k==='c'?`<path d="${wavy(x1,y1,x2,y2)}" fill="none" stroke="${c}" stroke-width="${w}" marker-end="url(#mc${uidS})"/>`
+   :`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}"${k==='p'?' stroke-dasharray="2.4 1.8"':''} marker-end="url(#m${k==='m'?'m':'p'}${uidS})"/>`});
+ (dg.B||[]).forEach(([x,y])=>{s+=`<circle cx="${x}" cy="${y}" r="1.9" fill="#fff" stroke="#111" stroke-width=".5"/>`});
+ const PC={a:['#ec2f93','#fff'],d:['#f4b53f','#0b0b12'],p:['#3ddc97','#0b0b12'],c:['#8da0f0','#0b0b12']};
+ (dg.J||[]).forEach(([x,y,t,l])=>{const[f,tc]=PC[t]||PC.a;
+  s+=`<circle cx="${x}" cy="${y}" r="${small?5.5:4.6}" fill="${f}" stroke="#fff" stroke-width="${small?1.2:.8}"/>`+(l&&!small?`<text x="${x}" y="${y+1.8}" text-anchor="middle" font-size="5" font-weight="700" fill="${tc}" font-family="Barlow,sans-serif">${esc(l)}</text>`:'')});
+ return s+'</svg>';
+}
+const LEYENDA=`<div class="legend"><span><i class="lg" style="background:#ec2f93"></i>Ataca</span><span><i class="lg" style="background:#f4b53f"></i>Defiende</span><span><i class="lg" style="background:#3ddc97"></i>Portero</span><span><i class="lg" style="background:#8da0f0"></i>Comodín</span><span>╌▸ Pase o tiro</span><span>∿▸ Conducción</span><span style="color:#ffe08a">—▸ Movimiento</span><span style="color:#ff8a3d">▲ Cono</span></div>`;
+function ejFilter(){
+ const q=(EJS.q||'').trim().toLowerCase();let n=0;
+ document.querySelectorAll('.ej[data-s]').forEach(el=>{const ok=!q||el.dataset.s.includes(q);el.style.display=ok?'':'none';if(ok)n++});
+ const c=$('#ejcount');if(c)c.textContent=`${n} ejercicio${n===1?'':'s'}`;
+}
+function vEjer(){
+ if(EJS.edit)return vEjEdit();
+ if(EJS.sel){const e=ejById(EJS.sel);if(e)return vEjDet(e);EJS.sel=null}
+ const cat=TEAMS[ST.team].cat,catN=cat==='pre'?'Prebenjamín':'Alevín';
+ const L=allEj().filter(e=>(!EJS.f||e.f===EJS.f)&&(!EJS.n||e.n===EJS.n)&&(!EJS.fav||isFav(e.id))&&(!EJS.cat||!(e.cat||[]).length||e.cat.includes(cat)));
+ const chip=(a,v,on,txt)=>`<button data-a="${a}" data-v="${v}" class="chip ${on?'on':''}">${txt}</button>`;
+ let h=`<h1>Ejercicios</h1><p class="mute">Elige el fundamento y empieza a entrenar.</p>
+ <input data-ej="q" class="inp" placeholder="Buscar un ejercicio…" value="${esc(EJS.q)}" style="margin:6px 0 10px" aria-label="Buscar">
+ <div class="hscroll">${chip('ejf','',!EJS.f,'Todos')}${Object.entries(FUND).map(([k,v])=>chip('ejf',k,EJS.f===k,v)).join('')}</div>
+ <div class="hscroll" style="margin-top:8px">${chip('ejn',0,!EJS.n,'Todos los niveles')}${[1,2,3].map(n=>chip('ejn',n,EJS.n===n,NIV[n])).join('')}</div>
+ <div class="hscroll" style="margin-top:8px">${chip('ejcat','',EJS.cat,'Solo '+catN)}${chip('ejfav','',EJS.fav,'★ Guardados')}</div>
+ <div class="row" style="margin:12px 0 2px"><span class="grow small mute" id="ejcount">${L.length} ejercicio${L.length===1?'':'s'}</span><button data-a="ejnew" class="btn" style="min-height:44px">＋ Crear ejercicio</button></div>`;
+ h+=L.map(e=>`<button data-a="ejopen" data-id="${esc(e.id)}" data-s="${esc((e.tit+' '+(FUND[e.f]||'')+' '+(e.obj||'')+' '+(e.desc||'')).toLowerCase())}" class="card ej">${pitchSvg(e.dg,e.id+'t',true)}<span class="grow" style="min-width:0"><span class="b" style="display:block;font-size:1.05rem;line-height:1.2">${esc(e.tit)}${isFav(e.id)?' <span style="color:var(--amber)">★</span>':''}</span><span class="small mute" style="display:block;margin:4px 0 8px">⏱ ${durTxt(e)} · ${esc(FUND[e.f]||'')}${e.custom?' · propio':''}</span><span class="lvl l${e.n}">${NIV[e.n]||''}</span></span><span class="chev" aria-hidden="true">›</span></button>`).join('')||'<div class="card mute">No hay ejercicios con estos filtros.</div>';
+ return h;
+}
+function tmHtml(e){
+ const ms=(+e.dur||10)*60000,t=TMR&&TMR.id===e.id?TMR:{ser:+e.ser||1,cur:1,left:ms,run:false};
+ const lbl=t.run?'Pausa':(t.left<ms&&t.left>0?'Seguir':(t.left<=0?'Terminado':'Iniciar'));
+ return`<div class="card tmr"><div class="row"><span class="grow"><span class="ttl">⏱ Cronómetro</span><br><span class="small mute" id="tmS">Serie ${t.cur} de ${t.ser} · ${e.dur}' por serie</span></span><span class="num tmv" id="tmV">${mmss(t.left)}</span></div>
+ <div class="grid2" style="margin-top:8px"><button data-a="tmgo" data-id="${esc(e.id)}" class="btn pri" id="tmB" ${t.left<=0?'disabled':''}>${lbl}</button><button data-a="tmreset" data-id="${esc(e.id)}" class="btn">Reiniciar</button></div></div>`;
+}
+function vEjDet(e){
+ const li=a=>`<ul class="lst">${(a||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+ const box=(ic,t,b)=>`<div class="card"><div class="row" style="align-items:flex-start"><span class="ico" aria-hidden="true">${ic}</span><div class="grow"><div class="ttl">${t}</div>${b}</div></div></div>`;
+ return`<div class="row"><button data-a="ejback" class="btn">‹ Ejercicios</button><span class="grow"></span><button data-a="ejstar" data-id="${esc(e.id)}" class="btn" aria-label="${isFav(e.id)?'Quitar de guardados':'Guardar'}" style="font-size:1.3rem;color:var(--amber)">${isFav(e.id)?'★':'☆'}</button></div>
+ <h1 style="margin-top:14px">${esc(e.tit)}</h1>
+ <div class="row wrap" style="margin:8px 0"><span class="lvl l${e.n}">${NIV[e.n]||''}</span><span class="small mute">${durTxt(e)} · ${esc(FUND[e.f]||'')}${catTxt(e)?' · '+catTxt(e):''}${e.custom?' · propio':''}</span></div>
+ ${e.desc?`<p class="mute">${esc(e.desc)}</p>`:''}
+ <div style="margin-top:10px">${pitchSvg(e.dg,e.id+'d',false)}</div>${e.dg?LEYENDA:''}
+ ${tmHtml(e)}
+ ${box('🎯','Objetivo',`<p>${esc(e.obj||'—')}</p>`)}
+ ${(e.org||[]).length?box('👥','Organización',li(e.org)):''}
+ ${(e.eje||[]).length?box('▶️','Ejecución',li(e.eje)):''}
+ ${(e.con||[]).length?box('💬','Consignas',li(e.con)):''}
+ ${(e.fac||e.dif)?box('🔁','Variantes',`${e.fac?`<p><b>Más fácil:</b> ${esc(e.fac)}</p>`:''}${e.dif?`<p><b>Más difícil:</b> ${esc(e.dif)}</p>`:''}`):''}
+ ${box('📋','Ficha RFEF',`<p>Estrategia didáctica: <b>${esc(e.est||'—')}</b><br>Situación de juego: <b>${esc(e.sit||'—')}</b></p>`)}
+ <div class="grid2" style="margin-top:8px">${e.custom?`<button data-a="ejedit" data-id="${esc(e.id)}" class="btn">Editar</button><button data-a="ejdel" data-id="${esc(e.id)}" class="btn" style="color:var(--red)">Borrar</button>`:`<button data-a="ejdup" data-id="${esc(e.id)}" class="btn" style="grid-column:span 2">Duplicar y editar como ejercicio propio</button>`}</div>`;
+}
+function vEjEdit(){
+ const e=EJS.edit,opt=(arr,cur)=>arr.map(([v,t])=>`<option value="${esc(v)}" ${String(cur)===String(v)?'selected':''}>${esc(t)}</option>`).join('');
+ const ta=(k,l,ph)=>`<label class="f">${l}<textarea data-ef="${k}" class="inp" placeholder="${ph||'Una idea por línea'}">${esc((e[k]||[]).join('\n'))}</textarea></label>`;
+ return`<button data-a="ejcancel" class="btn">‹ Cancelar</button><h1 style="margin-top:14px">${e.id?'Editar ejercicio':'Nuevo ejercicio'}</h1>
+ ${e.dg?'<p class="small mute">Se conserva el dibujo del ejercicio original.</p>':'<p class="small mute">Los ejercicios propios se guardan sin dibujo. Para tener dibujo, duplica uno de la biblioteca.</p>'}
+ <div class="card"><label class="f">Título<input data-ef="tit" class="inp" value="${esc(e.tit||'')}" maxlength="60"></label>
+ <div class="grid2"><label class="f">Fundamento<select data-ef="f" class="inp">${opt(Object.entries(FUND),e.f)}</select></label><label class="f">Nivel<select data-ef="n" class="inp">${opt([[1,NIV[1]],[2,NIV[2]],[3,NIV[3]]],e.n)}</select></label>
+ <label class="f">Minutos por serie<input data-ef="dur" type="number" min="1" max="60" inputmode="numeric" class="inp" value="${esc(e.dur||10)}"></label><label class="f">Series<input data-ef="ser" type="number" min="1" max="6" inputmode="numeric" class="inp" value="${esc(e.ser||1)}"></label></div>
+ <div class="small mute" style="margin-top:8px">Categorías</div><div class="row"><label class="chk"><input type="checkbox" data-ef="cat_pre" ${(e.cat||[]).includes('pre')?'checked':''}> Prebenjamín</label><label class="chk"><input type="checkbox" data-ef="cat_ale" ${(e.cat||[]).includes('ale')?'checked':''}> Alevín</label></div>
+ <label class="f">Descripción breve<input data-ef="desc" class="inp" value="${esc(e.desc||'')}" maxlength="160"></label>
+ <label class="f">Objetivo (empieza por un verbo: Mejorar, Resolver…)<input data-ef="obj" class="inp" value="${esc(e.obj||'')}" maxlength="120"></label>
+ ${ta('org','Organización','Espacio, jugadores, material…')}${ta('eje','Ejecución')}${ta('con','Consignas')}
+ <label class="f">Variante más fácil<input data-ef="fac" class="inp" value="${esc(e.fac||'')}"></label><label class="f">Variante más difícil<input data-ef="dif" class="inp" value="${esc(e.dif||'')}"></label>
+ <div class="grid2"><label class="f">Estrategia didáctica<select data-ef="est" class="inp">${opt(EST.map(x=>[x,x]),e.est)}</select></label><label class="f">Situación de juego<select data-ef="sit" class="inp">${opt(SITS.map(x=>[x,x]),e.sit)}</select></label></div>
+ <p class="xs mute">No escribas nombres de jugadores ni datos de salud.</p>
+ <div class="grid2" style="margin-top:8px"><button data-a="ejcancel" class="btn">Cancelar</button><button data-a="ejsave" class="btn pri">Guardar</button></div></div>`;
+}
+function ejSaveDraft(){
+ const v=k=>{const el=document.querySelector(`[data-ef="${k}"]`);return el?(el.type==='checkbox'?el.checked:el.value):''};
+ const lines=k=>String(v(k)).split('\n').map(x=>x.trim()).filter(Boolean);
+ const tit=String(v('tit')).trim(),obj=String(v('obj')).trim();
+ if(!tit||!obj){toast('Escribe al menos el título y el objetivo');return false}
+ const e=Object.assign({},EJS.edit,{tit,obj,f:v('f'),n:+v('n')||1,dur:Math.max(1,Math.min(60,+v('dur')||10)),ser:Math.max(1,Math.min(6,+v('ser')||1)),
+  cat:[v('cat_pre')?'pre':'',v('cat_ale')?'ale':''].filter(Boolean),desc:String(v('desc')).trim(),org:lines('org'),eje:lines('eje'),con:lines('con'),
+  fac:String(v('fac')).trim(),dif:String(v('dif')).trim(),est:v('est'),sit:v('sit'),custom:true});
+ if(!e.id)e.id='u'+Date.now();
+ const C=ST.ejer.custom,i=C.findIndex(x=>x.id===e.id);if(i>=0)C[i]=e;else C.push(e);
+ EJS.edit=null;EJS.sel=e.id;toast('Ejercicio guardado');return true;
+}
+function ejClick(a,b){
+ const id=b.dataset.id,v=b.dataset.v;
+ if(a==='ejf')EJS.f=v;
+ else if(a==='ejn')EJS.n=+v||0;
+ else if(a==='ejfav')EJS.fav=!EJS.fav;
+ else if(a==='ejcat')EJS.cat=!EJS.cat;
+ else if(a==='ejopen'){EJS.sel=id;scrollTo(0,0)}
+ else if(a==='ejback'){EJS.sel=null}
+ else if(a==='ejstar'){const F=ST.ejer.fav;ST.ejer.fav=F.includes(id)?F.filter(x=>x!==id):[...F,id]}
+ else if(a==='ejnew'){EJS.edit={id:null,tit:'',f:EJS.f||'pase',n:1,dur:10,ser:1,cat:[TEAMS[ST.team].cat],org:[],eje:[],con:[],est:'Partido',sit:'—',dg:null};scrollTo(0,0)}
+ else if(a==='ejdup'){const e=ejById(id);if(e){EJS.edit=JSON.parse(JSON.stringify(e));EJS.edit.id=null;EJS.edit.tit=(e.tit+' (propio)').slice(0,60);scrollTo(0,0)}}
+ else if(a==='ejedit'){const e=ejById(id);if(e)EJS.edit=JSON.parse(JSON.stringify(e));scrollTo(0,0)}
+ else if(a==='ejdel'){const e=ejById(id);if(e&&confirm('¿Borrar el ejercicio «'+e.tit+'»?')){ST.ejer.custom=ST.ejer.custom.filter(x=>x.id!==id);ST.ejer.fav=ST.ejer.fav.filter(x=>x!==id);EJS.sel=null}}
+ else if(a==='ejcancel'){EJS.edit=null}
+ else if(a==='ejsave'){if(!ejSaveDraft())return false;scrollTo(0,0)}
+ else if(a==='tmgo'){const e=ejById(id);if(!e)return false;const ms=(+e.dur||10)*60000;
+  if(!TMR||TMR.id!==id)TMR={id,ser:+e.ser||1,cur:1,left:ms,run:false,ms};
+  if(TMR.left<=0)return false;TMR.run=!TMR.run;TMR.t0=Date.now();wake(TMR.run)}
+ else if(a==='tmreset'){TMR=null;wake(false)}
+ return true;
+}
+function beepEj(){try{const C=window.AudioContext||window.webkitAudioContext,x=new C(),o=x.createOscillator(),g=x.createGain();o.frequency.value=880;g.gain.value=.2;o.connect(g);g.connect(x.destination);o.start();setTimeout(()=>{o.stop();x.close()},700)}catch(e){}}
+setInterval(()=>{
+ if(!TMR||!TMR.run)return;const now=Date.now();TMR.left-=now-TMR.t0;TMR.t0=now;
+ if(TMR.left<=0){try{navigator.vibrate&&navigator.vibrate([300,120,300])}catch(e){}beepEj();TMR.run=false;
+  if(TMR.cur<TMR.ser){TMR.cur++;TMR.left=TMR.ms;toast(`Fin de la serie. Pulsa Iniciar para la serie ${TMR.cur}.`)}else{TMR.left=0;toast('Ejercicio terminado');wake(false)}
+  if(ST.tab==='ejer'&&EJS.sel===TMR.id&&!EJS.edit)render();return}
+ const vEl=$('#tmV');if(vEl)vEl.textContent=mmss(TMR.left);
+},250);
+
 /* ---- render ---- */
 function render(){
  const T=team(ST.team);
@@ -555,13 +786,15 @@ function render(){
  const head=`<header class="top"><img src="../crest.jpg" alt="Escudo Club San José del Parque"><div class="grow"><div class="app-kicker">FTMS · Táctica</div><div class="team-t">${TEAMS[ST.team].name}</div><div class="mute small" style="font-weight:600">Club San José del Parque · Fútbol 7 · ${TEAMS[ST.team].half}×2 min</div></div><a href="../" class="hbtn" aria-label="Abrir la app de minutos">⏱ Minutos</a></header>
  <div class="teams">${Object.keys(TEAMS).map(id=>`<button data-a="team" data-id="${id}" class="${ST.team===id?'on':''}">${TEAMS[id].name}</button>`).join('')}</div>`;
  let v;
- if(!T&&ST.tab!=='inicio')v=`<h1>FTMS</h1>`+noData();
+ if(ST.tab==='ejer')v=vEjer();
+ else if(!T&&ST.tab!=='inicio')v=`<h1>FTMS</h1>`+noData();
  else if(ST.tab==='inicio')v=vInicio(T);
  else if(ST.tab==='post'){const g=SEL&&T.history.find(x=>x.id===SEL);v=g?vPost(T,g):vPostList(T)}
  else if(ST.tab==='plan')v=vPlan(T);
  else v=vCarga(T);
  $('#app').innerHTML=head+v;
- $('#nav').innerHTML=[['inicio','🏠','Inicio'],['post','📝','Post-partido'],['plan','📋','Game Plan'],['carga','⚖️','Reparto']].map(([id,i,l])=>`<button data-a="tab" data-id="${id}" class="${ST.tab===id?'on':''}"><span>${i}</span>${l}</button>`).join('');
+ $('#nav').innerHTML=[['inicio','🏠','Inicio'],['post','📝','Post-partido'],['plan','📋','Game Plan'],['ejer','🏋️','Ejercicios'],['carga','⚖️','Reparto']].map(([id,i,l])=>`<button data-a="tab" data-id="${id}" class="${ST.tab===id?'on':''}"><span>${i}</span>${l}</button>`).join('');
+ if(ST.tab==='ejer'&&!EJS.sel&&!EJS.edit&&EJS.q)ejFilter();
  $('#over').innerHTML=OVER&&T?`<div class="over">${vMatchView(T)}</div>`:'';
 }
 
@@ -592,7 +825,8 @@ async function wake(on){try{if(on&&navigator.wakeLock)WL=await navigator.wakeLoc
 document.addEventListener('click',ev=>{
  const b=ev.target.closest('[data-a]');if(!b||b.disabled)return;
  const a=b.dataset.a,id=b.dataset.id,T=team(ST.team);
- if(a==='tab'){ST.tab=id;SEL=null;scrollTo(0,0)}
+ if(/^(ej|tm)/.test(a)){if(ejClick(a,b)!==false){save();render()}return}
+ if(a==='tab'){ST.tab=id;SEL=null;if(id==='ejer'){EJS.sel=null;EJS.edit=null}scrollTo(0,0)}
  else if(a==='team'){ST.team=id;SEL=null}
  else if(a==='open'){ST.tab='post';SEL=id;scrollTo(0,0)}
  else if(a==='back'){SEL=null}
@@ -614,7 +848,7 @@ document.addEventListener('click',ev=>{
  else if(a==='closeM'){OVER=null;wake(false)}
  else if(a==='impMin'){$('#impMin').click();return}
  else if(a==='impFt'){$('#impFt').click();return}
- else if(a==='expFt'){dl('ftms-copia.json',JSON.stringify({app:'ftms',version:VER,exportado:new Date().toISOString(),post:ST.post,plans:ST.plans,cfg:ST.cfg},null,1),'application/json');return}
+ else if(a==='expFt'){dl('ftms-copia.json',JSON.stringify({app:'ftms',version:VER,exportado:new Date().toISOString(),post:ST.post,plans:ST.plans,cfg:ST.cfg,ejer:ST.ejer},null,1),'application/json');return}
  else if(a==='csvPost'){exportPost();return}
  else if(a==='csvGol'){exportGol();return}
  save();render();
@@ -631,6 +865,7 @@ document.addEventListener('change',ev=>{
 });
 /* textos: guardar mientras se escribe sin repintar (no perder el foco) */
 document.addEventListener('input',ev=>{
+ if(ev.target.dataset&&ev.target.dataset.ej==='q'){EJS.q=ev.target.value;ejFilter();return}
  const e=ev.target,T=team(ST.team);if(!T)return;
  if(e.dataset.f==='nota'){const g=T.history.find(x=>x.id===SEL);if(g){form(T,g).nota=e.value;save()}}
  else if(e.dataset.p==='rival'||e.dataset.p==='nota'){planOf(T)[e.dataset.p]=e.value;save()}
@@ -645,8 +880,8 @@ readFile($('#impMin'),d=>{
 });
 readFile($('#impFt'),d=>{
  if(!d||d.app!=='ftms'||!d.post){toast('No es una copia del FTMS');return}
- if(!confirm('Se reemplazarán los formularios, planes y umbrales del FTMS por la copia. ¿Continuar?'))return;
- ST.post=d.post||{};ST.plans=d.plans||{};ST.cfg=Object.assign(ST.cfg,d.cfg||{});save();render();toast('Copia FTMS importada');
+ if(!confirm('Se reemplazarán los formularios, planes, umbrales y ejercicios propios del FTMS por la copia. ¿Continuar?'))return;
+ ST.post=d.post||{};ST.plans=d.plans||{};if(d.ejer)ST.ejer=Object.assign({fav:[],custom:[]},d.ejer);ST.cfg=Object.assign(ST.cfg,d.cfg||{});save();render();toast('Copia FTMS importada');
 });
 /* si la app de minutos guarda en otra pestaña, refrescar */
 addEventListener('storage',e=>{if(e.key===SRC_KEY)render()});
