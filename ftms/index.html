@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FTMS · San José del Parque</title>
+<meta name="theme-color" content="#0b0b12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FTMS">
+<script>
+/* /ftms -> /ftms/ : sin la barra final, las rutas relativas (sw.js, ../) apuntarían a la raíz */
+(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html?$/.test(p))location.replace(p+'/'+location.search+location.hash)})();
+</script>
+<style>
+:root{--ink:#0b0b12;--panel:#15151f;--panel2:#1d1d2a;--line:#2b2b3b;--chalk:#f3f1ea;--mute:#9b99a8;--turf:#e0218a;--amber:#f4b53f;--red:#ef5350;--green:#3ecf8e;--blue:#5aa9ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--ink);color:var(--chalk);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.4}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+button:disabled{opacity:.4;cursor:default}
+main{max-width:30rem;margin:0 auto;padding:16px 16px 120px}
+h1,h2,h3{font-family:"Barlow Condensed","Barlow",system-ui,sans-serif;font-style:italic;font-weight:700;letter-spacing:-.01em;margin:0}
+h1{font-size:2.6rem;line-height:1}
+h2{font-size:1.7rem;margin:22px 0 8px}
+h3{font-size:1.3rem;margin:14px 0 6px}
+p{margin:6px 0}
+.mute{color:var(--mute)}.small{font-size:.85rem}.xs{font-size:.75rem}.b{font-weight:700}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;margin:8px 0}
+.row{display:flex;align-items:center;gap:8px}.wrap{flex-wrap:wrap}.grow{flex:1;min-width:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{min-height:48px;border-radius:14px;padding:0 14px;background:var(--panel2);border:1px solid var(--line);font-weight:700}
+.btn.pri{background:var(--turf);border-color:var(--turf);color:#fff}
+.btn.ok{background:var(--green);border-color:var(--green);color:var(--ink)}
+.btn.w{width:100%}
+.chip{min-height:40px;padding:0 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-weight:600;font-size:.9rem}
+.chip.on{background:var(--turf);border-color:var(--turf);color:#fff}
+.inp{width:100%;min-height:46px;border-radius:12px;background:var(--ink);border:1px solid var(--line);padding:0 12px;color:var(--chalk)}
+textarea.inp{padding:10px 12px;min-height:80px;resize:vertical}
+label.f{display:block;color:var(--mute);font-size:.85rem;margin-top:8px}
+label.f>.inp{margin-top:4px;color:var(--chalk);font-size:1rem}
+.tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:700}
+.t-ok{background:var(--green);color:var(--ink)}.t-pend{background:var(--amber);color:var(--ink)}.t-mute{background:var(--line);color:var(--chalk)}
+.res{display:inline-block;min-width:58px;text-align:center;padding:3px 10px;border-radius:999px;font-weight:700}
+.res.G{background:var(--green);color:var(--ink)}.res.E{background:var(--amber);color:var(--ink)}.res.P{background:var(--red);color:var(--ink)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none}
+.d-rojo{background:var(--red)}.d-ambar{background:var(--amber)}.d-verde{background:var(--green)}.d-bajo{background:var(--blue)}.d-portero{background:var(--mute)}.d-nd{background:var(--line)}
+.bar{height:6px;border-radius:6px;background:var(--ink);overflow:hidden;margin-top:6px}.bar>i{display:block;height:100%}
+.item{border-left:4px solid var(--line);padding:8px 10px;background:var(--panel2);border-radius:10px;margin:8px 0}
+.item.f{border-color:var(--green)}.item.m{border-color:var(--amber)}.item.s{border-color:var(--blue)}
+.item .q{color:var(--mute);font-size:.85rem;margin-top:4px}
+.item .t{font-size:.9rem;margin-top:6px}
+header.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+header.top .logo{width:48px;height:48px;border-radius:50%;background:var(--turf);display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-style:italic;font-size:1.2rem;color:#fff;flex:none}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.teams button{min-height:46px;border-radius:14px;font-weight:700;background:var(--panel2);color:var(--mute)}
+.teams button.on{background:var(--turf);color:#fff}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(21,21,31,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);max-width:30rem;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
+nav button{min-height:62px;font-weight:700;font-size:.8rem;color:var(--mute)}
+nav button span{display:block;font-size:1.3rem;line-height:1.2}
+nav button.on{color:var(--turf)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;z-index:60;background:var(--chalk);color:var(--ink);font-weight:700;padding:8px 16px;border-radius:999px;max-width:90%;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}
+.pitch{background:repeating-linear-gradient(180deg,#14532d 0 36px,#166534 36px 72px);border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;gap:14px;border:2px solid rgba(255,255,255,.25)}
+.prow{display:flex;justify-content:space-around;gap:4px}
+.pl{display:flex;flex-direction:column;align-items:center;min-width:0;flex:1;max-width:96px}
+.pl .sh{width:38px;height:38px;border-radius:50%;background:var(--turf);color:#fff;display:grid;place-items:center;font-weight:700;border:2px solid #fff}
+.pl .sh.gk{background:var(--amber);color:var(--ink)}
+.pl .nm{font-weight:700;font-size:.85rem;margin-top:3px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px #000}
+.pl .ps{font-size:.68rem;color:#d1fae5}
+.over{position:fixed;inset:0;z-index:50;background:var(--ink);overflow:auto}
+.over main{padding-bottom:40px}
+.big{font-size:1.25rem;font-weight:700}
+.cons{counter-reset:c;list-style:none;padding:0;margin:0}
+.cons li{counter-increment:c;display:flex;gap:10px;align-items:flex-start;font-size:1.25rem;font-weight:700;margin:10px 0}
+.cons li::before{content:counter(c);flex:none;width:34px;height:34px;border-radius:50%;background:var(--turf);color:#fff;display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-style:italic}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+td,th{padding:6px 4px;border-top:1px solid var(--line);text-align:center}
+th{color:var(--mute);font-weight:600;border-top:0}
+td:first-child,th:first-child{text-align:left}
+.num{font-variant-numeric:tabular-nums}
+details>summary{cursor:pointer;font-weight:700}
+a{color:var(--turf)}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav id="nav"></nav>
+<div id="toast"></div>
+<div id="over"></div>
+<input id="impMin" type="file" accept=".json,application/json" hidden>
+<input id="impFt" type="file" accept=".json,application/json" hidden>
+<script>
+'use strict';
+/* ==========================================================
+   FTMS · Football Tactical & Methodological Suite · Fase 1
+   Club San José del Parque · Fútbol 7
+   - LEE (nunca escribe) los datos de la app de minutos: localStorage 'f7minutos.club.v2'
+   - Guarda lo suyo en 'ftms.v1'
+   ========================================================== */
+const SRC_KEY='f7minutos.club.v2',KEY='ftms.v1',VER=1;
+const TEAMS={pre:{name:'Prebenjamín A',half:20,cat:'pre'},ale:{name:'Alevín B',half:25,cat:'ale'}};
+const CATS={
+ pre:{n:'Prebenjamín',foco:'Juegos reducidos, coordinación, mucha toma de decisión individual y muchos contactos con balón. Mensajes cortos y en positivo.'},
+ ale:{n:'Alevín',foco:'Introducción a conceptos grupales: líneas de pase, apoyos, roles por posición y ayudas defensivas.'}};
+
+/* ---- Sistemas de fútbol 7 (los mismos 8 de la app de minutos). formato:'F7' deja sitio para añadir F11 ---- */
+const SIS={
+ '3-2-1':{fmt:'F7',car:'Equilibrado',idea:'Tres defensas y dos medios: siempre hay apoyos por detrás del balón.',fu:['Vigilancia tras pérdida con 3 por detrás','Salida de balón con varias opciones'],de:['Poca gente en el área rival','El delantero se queda solo si los medios no llegan']},
+ '3-1-2':{fmt:'F7',car:'Equilibrado',idea:'Tres atrás, un medio y dos puntas.',fu:['Dos delanteros para presionar la salida rival','Línea de 3 sólida'],de:['Un solo medio: el carril central se abre tras pérdida','Distancias largas entre defensa y ataque']},
+ '2-2-2':{fmt:'F7',car:'Ofensivo',idea:'Bloques de dos en cada línea.',fu:['Muchos jugadores cerca del área rival','Parejas fáciles de entender'],de:['Solo 2 defensas: sufre en contraataques','Bandas defensivas descubiertas']},
+ '2-3-1':{fmt:'F7',car:'Muy ofensivo',idea:'Línea de tres medios por delante de dos defensas.',fu:['Dominio del centro del campo','Muchas líneas de pase'],de:['Espalda de los medios muy expuesta','Exige mucho esfuerzo de vuelta']},
+ '1-3-2':{fmt:'F7',car:'Ofensivo',idea:'Un solo defensa, tres medios y dos puntas.',fu:['Mucha gente para atacar y presionar'],de:['Un defensa para todo: cualquier pérdida es peligrosa']},
+ '4-1-1':{fmt:'F7',car:'Defensivo',idea:'Cuatro defensas, un medio y un punta.',fu:['Área propia muy protegida','Defiende bien centros y bandas'],de:['Cuesta llegar arriba','El punta y el medio quedan aislados']},
+ '2-1-3':{fmt:'F7',car:'Muy ofensivo',idea:'Tres delanteros por delante de un medio.',fu:['Presión alta con tres jugadores','Mucha presencia en área rival'],de:['Muy expuesto en transición defensiva','Un solo medio para cerrar el centro']},
+ '3-3-0':{fmt:'F7',car:'Defensivo',idea:'Sin delantero fijo: tres atrás y tres medios.',fu:['Superioridad en el centro','Difícil de superar por dentro'],de:['Nadie fija a los defensas rivales','Pocos tiros']}};
+const DL={1:['DFC'],2:['DFC','DFC'],3:['LI','DFC','LD'],4:['LI','DFC','DFC','LD']},ML={0:[],1:['MC'],2:['MC','MC'],3:['MI','MC','MD']},FL={0:[],1:['DC'],2:['EI','ED'],3:['EI','DC','ED']};
+Object.keys(SIS).forEach(k=>{const[d,m,f]=k.split('-').map(Number),S=SIS[k],r=(s,n)=>Array.from({length:n},(_,i)=>s+i);
+ S.lab=['Portero',...DL[d],...ML[m],...FL[f]];S.rows=[r(1+d+m,f),r(1+d,m),r(1,d),[0]].filter(x=>x.length);S.d=d;S.m=m;S.f=f});
+const OFENS=k=>SIS[k]&&/fensivo/.test(SIS[k].car)&&SIS[k].car!=='Defensivo';
+
+/* ---- opciones del formulario post-partido ---- */
+const ZONAS=['Izquierda','Centro','Derecha'];
+const PERD=['Salida','Medio','Ataque','Sin pérdida'];
+const RANG=['0','1-2','3-5','6+'];
+const PRES=['Baja','Media','Alta'];
+const RAT=[['salida','Salida de balón','salida'],['ptp','Presión tras pérdida','transicion'],['repliegue','Repliegue y vuelta','repliegue'],['espacios','Ocupar espacios (amplitud)','espacios'],['final','Finalización','finalizacion'],['actitud','Actitud y comunicación','actitud']];
+
+/* ---- utilidades ---- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pctS=(a,b)=>b?Math.round(a/b*100)+'%':'—';
+const fdate=d=>{try{return new Date(d).toLocaleDateString('es-ES')}catch(e){return''}};
+const ymd=d=>{try{return new Date(d).toLocaleDateString('sv-SE')}catch(e){return''}};
+const C=(cat,pre,ale)=>cat==='pre'?pre:ale;
+function toast(t){const e=$('#toast');e.textContent=t;e.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.opacity=0,2600)}
+function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+
+/* ---- estado propio ---- */
+function loadState(){
+ let s=null;try{s=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+ if(!s||s.ver!==VER)s={ver:VER};
+ s.team=TEAMS[s.team]?s.team:'pre';s.tab=['inicio','post','plan','carga'].includes(s.tab)?s.tab:'inicio';
+ s.post=s.post||{};s.plans=s.plans||{};s.imported=s.imported||null;
+ s.cfg=Object.assign({win:3,red:85,amber:70,low:35},s.cfg||{});
+ return s;
+}
+let ST=loadState(),SEL=null,OVER=null;
+function save(){try{const o=Object.assign({},ST);localStorage.setItem(KEY,JSON.stringify(o))}catch(e){toast('⚠ No se pudo guardar: almacenamiento lleno. Exporta una copia FTMS.')}}
+
+/* ==========================================================
+   CONECTOR (solo lectura)
+   ========================================================== */
+function readSrc(){
+ try{const raw=localStorage.getItem(SRC_KEY);if(raw){const a=JSON.parse(raw);if(a&&a.teams)return{all:a,origen:'directo'}}}catch(e){}
+ if(ST.imported&&ST.imported.all&&ST.imported.all.teams)return{all:ST.imported.all,origen:'importado'};
+ return{all:null,origen:null};
+}
+function normG(g,i){
+ const acts=Array.isArray(g.acts)?g.acts:(g.shots||[]).map(s=>({k:'tiro',lado:s.lado,res:s.res,part:s.part,min:s.min,add:s.add||0,t:s.t||0}));
+ return{id:String(g.id),n:i+1,date:g.date,rival:g.rival||'',jornada:g.jornada||'',comp:g.comp||'',loc:g.loc||'',total:+g.total||0,half:+g.half||0,gf:g.gf,gc:g.gc,sis:g.sis||'',
+  sg:Array.isArray(g.sg)?g.sg:[],players:(g.players||[]).map(x=>({id:String(x.id),name:String(x.name||''),pos:String(x.pos||''),ms:+x.ms||0,titular:!!x.titular})),acts};
+}
+function team(id){
+ const {all,origen}=readSrc();if(!all||!all.teams[id])return null;const t=all.teams[id];
+ return{id,origen,cat:TEAMS[id].cat,half:TEAMS[id].half,enJuego:!!t.match,
+  players:(t.players||[]).map(p=>({id:String(p.id),name:String(p.name||''),pos:String(p.pos||''),conv:p.conv!==false})),
+  history:(t.history||[]).map(normG)};
+}
+function nameOf(T,id){const p=T.players.find(p=>p.id===id);if(p)return p.name;for(const g of T.history){const x=g.players.find(q=>q.id===id);if(x)return x.name}return'?'}
+function short(T,id){
+ if(!id)return'';const n=nameOf(T,id).trim(),[f,...r]=n.split(/\s+/);
+ const dup=T.players.filter(p=>p.name.trim().split(/\s+/)[0]===f).length>1;
+ return dup&&r.length?f+' '+r[0][0]+'.':f;
+}
+const pkey=(T,g)=>T.id+':'+g.id;
+const formOf=(T,g)=>ST.post[pkey(T,g)];
+const gkey=a=>String(a.t!=null?a.t:(a.part+'-'+a.min+'-'+(a.add||0)));
+
+/* ==========================================================
+   SEÑALES DE UN PARTIDO
+   ========================================================== */
+function sig(T,g){
+ const A=g.acts,c=f=>A.filter(f).length,isG=l=>a=>a.k==='tiro'&&a.lado===l&&a.res==='gol';
+ const s={};
+ s.gf=g.gf!=null?+g.gf:c(isG('favor'));s.gc=g.gc!=null?+g.gc:c(isG('contra'));
+ s.tpf=c(a=>a.k==='tiro'&&a.lado==='favor'&&a.res!=='fuera');s.tpc=c(a=>a.k==='tiro'&&a.lado==='contra'&&a.res!=='fuera');
+ s.tff=c(a=>a.k==='tiro'&&a.lado==='favor'&&a.res==='fuera');s.tfc=c(a=>a.k==='tiro'&&a.lado==='contra'&&a.res==='fuera');
+ s.parp=c(a=>a.k==='tiro'&&a.lado==='contra'&&a.res==='parada');
+ s.cf=c(a=>a.k==='corner'&&a.lado==='favor');s.cc=c(a=>a.k==='corner'&&a.lado==='contra');
+ s.of=c(a=>a.k==='ocasion'&&a.lado==='favor');s.oc=c(a=>a.k==='ocasion'&&a.lado==='contra');
+ s.tiros=s.tpf+s.tff;s.tirosC=s.tpc+s.tfc;
+ s.golesC=A.filter(isG('contra')).sort((a,b)=>(a.t||0)-(b.t||0));s.golesF=A.filter(isG('favor'));
+ s.causas={};s.golesC.forEach(a=>{const k=a.orig||'Sin anotar';s.causas[k]=(s.causas[k]||0)+1});
+ s.origenes={};s.golesF.forEach(a=>{const k=a.orig||'Sin anotar';s.origenes[k]=(s.origenes[k]||0)+1});
+ const half=g.half||T.half,late=a=>a.add>0||(a.part===1?a.min>half-5:a.min>2*half-5);
+ s.lateC=s.golesC.filter(late).length;s.lateF=s.golesF.filter(late).length;s.half=half;
+ const fld=g.players.filter(x=>x.pos!=='Portero').map(x=>x.ms/60000),mean=fld.reduce((a,b)=>a+b,0)/Math.max(1,fld.length);
+ s.minMean=mean;s.minSd=Math.sqrt(fld.reduce((a,b)=>a+(b-mean)*(b-mean),0)/Math.max(1,fld.length));
+ s.pocos=g.players.filter(x=>x.pos!=='Portero'&&x.ms/60000<mean*0.5);
+ const sg=g.sg.slice().sort((a,b)=>b.ms-a.ms);s.sisMain=sg.length?sg[0].f:(g.sis.split(' | ')[0]||'');
+ s.res=s.gf>s.gc?'G':s.gf===s.gc?'E':'P';
+ return s;
+}
+/* media de temporada sin el partido indicado */
+function base(T,g){
+ const H=T.history.filter(x=>x.id!==g.id);if(H.length<2)return null;
+ const S=H.map(x=>sig(T,x)),av=k=>S.reduce((a,s)=>a+s[k],0)/S.length;
+ return{n:H.length,tiros:av('tiros'),tirosC:av('tirosC'),gf:av('gf'),gc:av('gc'),of:av('of'),oc:av('oc')};
+}
+/* rendimiento por sistema en la temporada (minutos jugados y goles) */
+function sisTemp(T){
+ const o={};
+ T.history.forEach(g=>{g.sg.forEach(s=>{const x=o[s.f]=o[s.f]||{ms:0,gf:0,gc:0};x.ms+=s.ms});
+  g.acts.forEach(a=>{if(a.k==='tiro'&&a.res==='gol'&&a.form){const x=o[a.form]=o[a.form]||{ms:0,gf:0,gc:0};x[a.lado==='favor'?'gf':'gc']++}})});
+ return o;
+}
+
+/* ==========================================================
+   MOTOR DE REGLAS · informe post-partido
+   Cada regla devuelve {t:'f'|'m', area, peso, titulo, dato, charla, tarea}
+   t:'f' punto fuerte · t:'m' área de mejora. Todo explica el dato que la dispara.
+   ========================================================== */
+const TAREA={
+ salida:{pre:'Rondo 3x1 con portero en la zona de inicio: salir conduciendo o pasando a quien esté libre (5-8\').',ale:'Salida 3+P contra 2 presionadores: fijar al que presiona y pasar al lado contrario (8-10\').'},
+ transicion:{pre:'Juego 3x3 con la regla "¡robo!": al perder el balón, todos lo persiguen 5 segundos.',ale:'4x4 + comodines: 5 segundos de presión tras pérdida y siempre 2 jugadores por detrás del balón.'},
+ repliegue:{pre:'Carrera de vuelta: tras cada tiro, el primero que llega a su mitad suma un punto.',ale:'Transición 4x3: al perder, volver por dentro hacia la portería propia antes de presionar.'},
+ abp:{pre:'Córneres en juego: cada uno vigila a un rival y al balón, sin perderlos de vista.',ale:'Defensa de córner con roles: primer palo, segundo palo y rechace; rotar los roles.'},
+ finalizacion:{pre:'Conducción + tiro: mirar la portería, elegir palo y tirar raso. Muchas repeticiones.',ale:'Centro atrás desde banda: atacar primer y segundo palo, tirar raso y cruzado.'},
+ espacios:{pre:'Juego con 4 miniporterías: aprender a buscar el lado libre.',ale:'Posesión 4x4 por carriles: pisar las bandas para dar amplitud y alguien en profundidad.'},
+ actitud:{pre:'Juego con "pide y nombra": antes de recibir, se dice el nombre del compañero.',ale:'Partido condicionado: el gol solo vale si antes ha habido una indicación en voz alta.'},
+ ataque:{pre:'Juegos de 1x1 y 2x1 hacia portería: atreverse a regatear y tirar.',ale:'Ataque 3x2: buscar al compañero libre (tercer hombre) y terminar en tiro.'},
+ defensa:{pre:'1x1 defensivo en pasillo: perfilarse y no tirarse al suelo.',ale:'Defensa 3x3 con ayudas: si un compañero es superado, el más cercano cubre.'},
+ porteria:{pre:'Juegos de blocaje y caída lateral con balón blando.',ale:'Portero: blocaje, desvío y saque rápido con la mano al compañero libre.'}};
+function rules(T,g,F){
+ const s=sig(T,g),b=base(T,g),cat=T.cat,R=[],add=(o)=>{o.tarea=o.tarea||(TAREA[o.area]?TAREA[o.area][cat]:'');R.push(o)};
+ const tp=s.causas['Pérdida de balón']||0,ca=s.causas['Contraataque']||0,trans=tp+ca;
+ /* ---------- defensa ---------- */
+ if(s.gc===0)add({t:'f',area:'defensa',peso:8,titulo:'Portería a cero',dato:`0 goles encajados con ${s.tirosC} tiros del rival.`,charla:C(cat,'¡Nadie nos marcó! Defendimos todos juntos.','Portería a cero: la defensa y las ayudas funcionaron.')});
+ if(s.tpc>=3&&s.parp/s.tpc>=0.6)add({t:'f',area:'porteria',peso:5,titulo:'El portero sostuvo al equipo',dato:`${s.parp} paradas de ${s.tpc} tiros a puerta (${pctS(s.parp,s.tpc)}).`,charla:'El portero salvó varias ocasiones: reconocerlo delante del grupo.'});
+ if(s.gc>=2&&trans>=2&&trans/s.gc>=0.5)add({t:'m',area:'transicion',peso:8+trans,titulo:'Goles tras perder el balón',dato:`${trans} de ${s.gc} goles en contra llegaron tras pérdida o contraataque.`,charla:C(cat,'Cuando perdemos la pelota, ¡a por ella enseguida!','Al perder: presión inmediata del más cercano y vigilancia de los que están detrás del balón.')});
+ const abpC=s.causas['Balón parado']||0;
+ if(abpC>=1&&(abpC>=2||abpC/Math.max(1,s.gc)>=0.4))add({t:'m',area:'abp',peso:6+abpC,titulo:'Balón parado defensivo',dato:`${abpC} gol${abpC>1?'es':''} en contra a balón parado (${s.cc} córneres del rival).`,charla:C(cat,'En los córneres, cada uno mira a su rival y al balón.','En balón parado cada uno tiene un rol: primer palo, segundo palo y rechace.')});
+ const err=(s.causas['Error defensivo']||0)+(s.causas['Error del portero']||0);
+ if(err>=2)add({t:'m',area:'actitud',peso:5+err,titulo:'Errores individuales',dato:`${err} goles en contra por errores defensivos o del portero.`,charla:C(cat,'Equivocarse está bien: lo importante es avisar y ayudar al compañero.','Ante la duda, comunicación: hablar ("¡mía!", "¡solo!") evita errores.'),tarea:TAREA.actitud[cat]});
+ if(s.lateC>=2)add({t:'m',area:'actitud',peso:6,titulo:'Final de cada parte',dato:`${s.lateC} goles en contra en los últimos 5 minutos de alguna parte o en el añadido.`,charla:'Concentración hasta el pitido final: los últimos minutos también cuentan.'});
+ if(s.oc>=3&&s.oc>s.of)add({t:'m',area:'defensa',peso:5,titulo:'Ocasiones claras concedidas',dato:`El rival tuvo ${s.oc} ocasiones claras por ${s.of} nuestras.`,charla:C(cat,'Cerca de nuestra portería, todos ayudamos a defender.','Juntar líneas: menos distancia entre defensas y medios.')});
+ if(b&&s.tirosC>=b.tirosC*1.5&&s.tirosC>=6)add({t:'m',area:'defensa',peso:5,titulo:'Muchos tiros en contra',dato:`${s.tirosC} tiros del rival (media de la temporada: ${b.tirosC.toFixed(1)}).`,charla:C(cat,'Hay que llegar antes que el rival a tapar el tiro.','Cerrar el centro y obligar al rival a ir por fuera.')});
+ /* ---------- ataque ---------- */
+ if(s.gf>=2&&s.tpf>0&&s.gf/s.tpf>=0.5)add({t:'f',area:'finalizacion',peso:6+s.gf/2,titulo:'Eficacia de cara a puerta',dato:`${s.gf} goles en ${s.tpf} tiros a puerta (${pctS(s.gf,s.tpf)}).`,charla:C(cat,'Cuando tiramos a puerta, marcamos. ¡Hay que tirar más!','Buena definición: elegir bien el momento del tiro.')});
+ if(s.tff>s.tpf&&s.tff>=3)add({t:'m',area:'finalizacion',peso:6+s.tff/2,titulo:'Puntería',dato:`Más tiros fuera (${s.tff}) que a puerta (${s.tpf}).`,charla:C(cat,'Antes de tirar, mirar la portería.','Tirar con el interior y raso: es más difícil fallar.')});
+ if(b&&b.n>=2&&s.tiros>=b.tiros*1.3&&s.tiros>=5)add({t:'f',area:'ataque',peso:5,titulo:'Mucha llegada',dato:`${s.tiros} tiros (media de la temporada: ${b.tiros.toFixed(1)}).`,charla:'Llegamos mucho al área rival: seguir así.'});
+ if(b&&b.n>=2&&s.tiros<=b.tiros*0.6&&b.tiros>=3)add({t:'m',area:'ataque',peso:6,titulo:'Llegamos poco',dato:`Solo ${s.tiros} tiros (media de la temporada: ${b.tiros.toFixed(1)}).`,charla:C(cat,'Atreverse: si estás cerca de la portería, ¡tira!','Más jugadores llegando al área cuando atacamos.')});
+ if(!b&&s.tiros<=2)add({t:'m',area:'ataque',peso:4,titulo:'Llegamos poco',dato:`Solo ${s.tiros} tiro${s.tiros===1?'':'s'} en todo el partido.`,charla:C(cat,'Atreverse: si estás cerca de la portería, ¡tira!','Más jugadores llegando al área cuando atacamos.')});
+ if(s.of>=3&&s.of>s.oc)add({t:'f',area:'ataque',peso:5,titulo:'Generamos ocasiones claras',dato:`${s.of} ocasiones claras por ${s.oc} del rival.`,charla:'Creamos muchas ocasiones: buen trabajo colectivo en ataque.'});
+ const ctF=s.origenes['Contraataque']||0;
+ if(ctF>=2)add({t:'f',area:'transicion',peso:6,titulo:'Contraataques',dato:`${ctF} goles a la contra.`,charla:C(cat,'Cuando robamos, ¡corremos rápido hacia la portería!','Tras robo, primer pase hacia delante: así marcamos.')});
+ const abpF=(s.origenes['Córner']||0)+(s.origenes['Falta']||0);
+ if(abpF>=1)add({t:'f',area:'abp',peso:4+abpF,titulo:'Balón parado a favor',dato:`${abpF} gol${abpF>1?'es':''} de córner o falta.`,charla:'El balón parado nos da goles: mantener lo que hacemos.'});
+ if(s.res==='G'&&s.gf-s.gc>=3)add({t:'f',area:'actitud',peso:3,titulo:'Partido muy completo',dato:`Victoria ${s.gf}-${s.gc}.`,charla:'Buen partido de todos. Ahora, a seguir mejorando.'});
+ /* ---------- formulario post-partido ---------- */
+ if(F){
+  const gs=s.golesC.map(a=>(F.goles||{})[gkey(a)]||{});
+  const zs=gs.filter(x=>x.zona);
+  if(zs.length>=2){const cnt={};zs.forEach(x=>cnt[x.zona]=(cnt[x.zona]||0)+1);const[z,n]=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+   if(n/zs.length>=0.6)add({t:'m',area:z==='Centro'?'defensa':'repliegue',peso:6+n,titulo:z==='Centro'?'Nos entran por el centro':`Nos atacan por la ${z.toLowerCase()}`,dato:`${n} de ${zs.length} goles en contra (con zona anotada) llegaron por ${z==='Centro'?'el carril central':'el carril '+z.toLowerCase()}.`,
+    charla:z==='Centro'?C(cat,'Cerrar el medio: que el rival tenga que ir por la banda.','Los dos medios más cerca entre sí y de los centrales.'):C(cat,`Ayudar en la banda ${z.toLowerCase()}: nunca dejar a un compañero solo.`,`Basculación: si el balón va a la ${z.toLowerCase()}, todo el bloque se desplaza hacia ese lado.`)})}
+  const sal=gs.filter(x=>x.perdida==='Salida').length;
+  if(sal>=1)add({t:'m',area:'salida',peso:8+sal,titulo:'Pérdidas en la salida',dato:`${sal} gol${sal>1?'es':''} en contra tras perder el balón en nuestra salida.`,charla:C(cat,'En nuestra área: si no hay pase claro, ¡fuerte y lejos!','Salir con apoyos cerca y por fuera; si hay presión fuerte, jugar en largo.')});
+  if(F.perd==='3-5'||F.perd==='6+')add({t:'m',area:'salida',peso:F.perd==='6+'?8:6,titulo:'Balones perdidos al iniciar',dato:`${F.perd} pérdidas en la salida (estimación del entrenador)${F.presion?' con presión rival '+F.presion.toLowerCase():''}.`,charla:C(cat,'Antes de recibir, mirar dónde está el rival.','Perfilarse antes de recibir y ofrecer siempre un apoyo al compañero.')});
+  if((F.perd==='0'||F.perd==='1-2')&&F.presion==='Alta')add({t:'f',area:'salida',peso:7,titulo:'Salida limpia ante presión alta',dato:`Solo ${F.perd} pérdidas en la salida con el rival presionando arriba.`,charla:'Salimos jugando aunque el rival presionaba: ¡muy bien!'});
+  if(F.recu==='3-5'||F.recu==='6+')add({t:'f',area:'transicion',peso:F.recu==='6+'?7:6,titulo:'Robos en campo rival',dato:`${F.recu} recuperaciones altas (estimación del entrenador).`,charla:C(cat,'Cuando perdemos, la recuperamos rápido: ¡seguir así!','Buena presión tras pérdida: recuperamos cerca de su portería.')});
+  RAT.forEach(([k,lbl,area])=>{const v=+((F.rat||{})[k]||0);if(!v)return;
+   if(v>=4)add({t:'f',area,peso:2+v,titulo:lbl,dato:`Valoración del entrenador: ${v}/5.`,charla:`${lbl}: buen nivel en este partido.`});
+   if(v<=2)add({t:'m',area,peso:3+(3-v)*2,titulo:lbl,dato:`Valoración del entrenador: ${v}/5.`,charla:`${lbl}: lo trabajamos esta semana.`})});
+ }
+ return{s,b,R};
+}
+function pick(R,t){
+ const L=R.filter(x=>x.t===t).sort((a,b)=>b.peso-a.peso),out=[],areas=new Set();
+ L.forEach(x=>{if(out.length<3&&!areas.has(x.area)){out.push(x);areas.add(x.area)}});
+ L.forEach(x=>{if(out.length<3&&!out.includes(x)&&!out.some(y=>y.titulo===x.titulo))out.push(x)});
+ return out;
+}
+/* ---- ajuste táctico sugerido (sistema) ---- */
+function sugSis(T,g,F,s){
+ const out=[],cur=s.sisMain,S=SIS[cur],trans=(s.causas['Pérdida de balón']||0)+(s.causas['Contraataque']||0);
+ const zs=F?s.golesC.map(a=>((F.goles||{})[gkey(a)]||{}).zona).filter(Boolean):[];
+ const zc=z=>zs.filter(x=>x===z).length;
+ if(S&&s.gc>=2&&trans/s.gc>=0.5&&(OFENS(cur)||S.d<=2))out.push({de:cur,a:'3-2-1',por:`${trans} de ${s.gc} goles en contra tras pérdida o contraataque jugando con ${cur} (${S.car.toLowerCase()}). Con 3-2-1 quedan tres jugadores por detrás del balón y dos medios para la vigilancia tras pérdida.`});
+ if(S&&zs.length>=2&&zc('Centro')/zs.length>=0.6&&S.m<=1&&cur!=='3-2-1')out.push({de:cur,a:'3-2-1',por:`${zc('Centro')} de ${zs.length} goles por el carril central y un solo medio en ${cur}. Con dos medios por dentro (el "doble pivote" del F7) el centro queda más protegido.`});
+ if(S&&zs.length>=2&&(zc('Izquierda')+zc('Derecha'))/zs.length>=0.7&&S.d<=2)out.push({de:cur,a:S.f>=2?'3-1-2':'3-2-1',por:`Los goles llegan por las bandas y ${cur} solo tiene ${S.d} defensa${S.d>1?'s':''}. Con línea de 3 (LI-DFC-LD) cada banda tiene su defensa.`});
+ if(S&&s.tiros<=3&&!OFENS(cur))out.push({de:cur,a:cur==='3-2-1'||cur==='3-3-0'?'3-1-2':'3-2-1',por:`Solo ${s.tiros} tiros con ${cur} (${S.car.toLowerCase()}). Un punta más o un sistema menos conservador ayuda a llegar al área.`});
+ const ST_=sisTemp(T),rows=Object.entries(ST_).filter(([k,o])=>o.ms>=40*60000).map(([k,o])=>({k,m:o.ms/60000,d:(o.gf-o.gc)/(o.ms/60000)*10}));
+ const uniq=[];out.forEach(o=>{if(o.a!==o.de&&!uniq.some(u=>u.a===o.a)){const r=rows.find(x=>x.k===o.a);if(r)o.temp=`En la temporada, con ${o.a}: ${r.m.toFixed(0)} min y ${(r.d>0?'+':'')+r.d.toFixed(1)} goles de diferencia cada 10'.`;uniq.push(o)}});
+ return uniq.slice(0,2);
+}
+/* ---- notas solo para el entrenador (no para la charla) ---- */
+function cuaderno(T,g,s,F){
+ const out=[];
+ if(s.minMean>0){const cv=s.minSd/s.minMean;
+  if(cv<=0.2)out.push(`Reparto de minutos equilibrado (desviación ${s.minSd.toFixed(1)}' sobre una media de ${s.minMean.toFixed(1)}').`);
+  else if(cv>=0.35)out.push(`Reparto de minutos desigual (desviación ${s.minSd.toFixed(1)}'). Jugaron menos de la mitad de la media: ${s.pocos.map(x=>short(T,x.id)).join(', ')||'nadie'}.`)}
+ const sa=s.causas['Sin anotar']||0;if(sa)out.push(`${sa} gol${sa>1?'es':''} en contra sin causa anotada en la app de minutos: el informe pierde precisión.`);
+ if(s.golesC.length&&(!F||!F.goles||!Object.values(F.goles).some(x=>x.zona)))out.push('Falta la zona de los goles en contra en el formulario post-partido.');
+ if(!F)out.push('Sin formulario post-partido: el informe solo usa los datos de la app de minutos.');
+ return out;
+}
+function informeTxt(T,g,F){
+ const {s,R}=rules(T,g,F),f=pick(R,'f'),m=pick(R,'m');
+ const L=[`Charla · ${TEAMS[T.id].name} · ${g.rival||'Partido'} (${s.gf}-${s.gc}) · ${fdate(g.date)}`,'','LO QUE HICIMOS BIEN'];
+ f.forEach((x,i)=>L.push(`${i+1}. ${x.titulo}: ${x.charla}`));if(!f.length)L.push('—');
+ L.push('','LO QUE VAMOS A MEJORAR');m.forEach((x,i)=>L.push(`${i+1}. ${x.titulo}: ${x.charla}`,`   Tarea: ${x.tarea}`));if(!m.length)L.push('—');
+ return L.join('\n');
+}
+
+/* ==========================================================
+   SEMÁFORO DE CARGA (minutos)
+   ========================================================== */
+function carga(T){
+ const H=T.history,N=Math.max(1,+ST.cfg.win||3),last=H.slice(-N),prev=H.slice(-2*N,-N),tot=a=>a.reduce((s,g)=>s+g.total,0);
+ return T.players.map(p=>{
+  const ms=g=>{const x=g.players.find(q=>q.id===p.id);return x?x.ms:0},conv=g=>g.players.some(q=>q.id===p.id);
+  const lt=tot(last),lm=last.reduce((s,g)=>s+ms(g),0),pct=lt?lm/lt*100:0;
+  const pt=tot(prev),pp=prev.length&&pt?prev.reduce((s,g)=>s+ms(g),0)/pt*100:null;
+  let full=0;for(let i=H.length-1;i>=0;i--){const g=H[i];if(g.total&&ms(g)>=g.total*0.95)full++;else break}
+  const cn=H.filter(conv).length,sm=H.reduce((s,g)=>s+ms(g),0),gk=p.pos==='Portero';
+  let st='verde';
+  if(!last.length)st='nd';else if(gk)st='portero';else if(pct>=ST.cfg.red)st='rojo';else if(pct>=ST.cfg.amber)st='ambar';else if(pct<ST.cfg.low)st='bajo';
+  return{p,pct,pp,full,convL:last.filter(conv).length,nL:last.length,cn,media:cn?sm/cn/60000:0,total:sm/60000,st};
+ });
+}
+const STL={rojo:['🔴','Riesgo de sobrecarga'],ambar:['🟠','Carga alta'],verde:['🟢','Carga normal'],bajo:['🔵','Pocos minutos'],portero:['⚪','Portero (juega todo)'],nd:['⚫','Sin datos']};
+
+/* ==========================================================
+   VISTAS
+   ========================================================== */
+function noData(){
+ return`<div class="card"><h3>No encuentro datos de la app de minutos</h3>
+ <p class="mute">El FTMS lee los partidos que guarda la app de minutos en este mismo navegador. Para que funcione:</p>
+ <ol class="small"><li>Abre el FTMS desde la <b>misma dirección web</b> que la app de minutos, añadiendo <b>/ftms/</b> al final.</li>
+ <li>Usa el <b>mismo navegador</b> (y el mismo móvil) en el que registras los partidos.</li>
+ <li>Si no es posible, exporta una <b>Copia JSON</b> en la app de minutos (pestaña Historial) e impórtala aquí.</li></ol>
+ <button data-a="impMin" class="btn pri w">Importar copia JSON de la app de minutos</button></div>`;
+}
+function vInicio(T){
+ const {all,origen}=readSrc();
+ let h=`<h1>Inicio</h1><p class="mute">Suite táctica y metodológica · Fase 1</p>`;
+ if(!all)return h+noData()+vCopias();
+ const H=T?T.history:[],last=H[H.length-1],pend=H.filter(g=>!formOf(T,g)).length;
+ h+=`<div class="card"><div class="row"><span class="dot ${origen==='directo'?'d-verde':'d-ambar'}"></span><b class="grow">${origen==='directo'?'Conectado a la app de minutos':'Usando una copia importada'}</b></div>
+  <p class="small mute">${origen==='directo'?'Lectura directa en este navegador. El FTMS nunca modifica los datos de la app de minutos.':`Copia importada el ${fdate(ST.imported.at)}. No se actualiza sola: importa una copia nueva tras cada partido.`}</p>
+  <div class="grid2 small">${Object.keys(TEAMS).map(id=>{const t=all.teams[id];return`<div class="card" style="margin:0"><b>${TEAMS[id].name}</b><br><span class="mute">${(t&&t.history||[]).length} partidos · ${(t&&t.players||[]).length} jugadores</span></div>`}).join('')}</div>
+  ${T&&T.enJuego?`<p class="small" style="color:var(--amber)">● Hay un partido en curso en la app de minutos. Aparecerá aquí cuando lo finalices.</p>`:''}
+  ${origen==='importado'?`<button data-a="impMin" class="btn w" style="margin-top:8px">Importar copia más reciente</button>`:''}</div>`;
+ if(!T)return h+vCopias();
+ h+=`<h2>${TEAMS[T.id].name}</h2><p class="small mute">Enfoque ${CATS[T.cat].n}: ${CATS[T.cat].foco}</p>`;
+ if(last){const s=sig(T,last),f=formOf(T,last);
+  h+=`<div class="card"><div class="row"><div class="grow"><div class="mute small">Último partido · P${last.n}${last.jornada?' · J'+esc(last.jornada):''}</div><div class="big">${esc(last.rival||'Partido')}</div><div class="mute small">${fdate(last.date)}</div></div><span class="res ${s.res}">${s.gf} - ${s.gc}</span></div>
+  <div class="grid2" style="margin-top:10px"><button data-a="open" data-id="${esc(last.id)}" class="btn ${f?'':'pri'}">${f?'Ver informe':'Formulario + informe'}</button><button data-a="tab" data-id="plan" class="btn">Game Plan</button></div></div>`;
+ }else h+=`<div class="card mute">Aún no hay partidos de este equipo. Cuando finalices uno en la app de minutos, aparecerá aquí.</div>`;
+ if(pend)h+=`<div class="card row"><span class="tag t-pend">${pend}</span><span class="grow small">partido${pend>1?'s':''} sin formulario post-partido</span><button data-a="tab" data-id="post" class="btn">Ver</button></div>`;
+ const C_=carga(T),al=C_.filter(x=>x.st==='rojo'||x.st==='bajo');
+ if(al.length)h+=`<div class="card"><b>Semáforo de carga</b><p class="small">${al.map(x=>`${STL[x.st][0]} ${esc(short(T,x.p.id))}`).join(' · ')}</p><button data-a="tab" data-id="carga" class="btn w">Ver semáforo</button></div>`;
+ return h+vCopias();
+}
+function vCopias(){
+ return`<h2>Copias y exportación</h2><div class="card"><p class="small mute">Lo que haces en el FTMS (formularios, planes, umbrales) vive solo en este navegador. Haz una copia de vez en cuando y guárdala fuera del móvil.</p>
+ <div class="grid2"><button data-a="expFt" class="btn">Copia FTMS (.json)</button><button data-a="impFt" class="btn">Importar copia FTMS</button>
+ <button data-a="csvPost" class="btn">CSV post-partido</button><button data-a="csvGol" class="btn">CSV goles en contra</button></div>
+ <p class="xs mute">Los CSV usan <b>partido_id</b>, la misma columna que el Excel de la app de minutos, para unirlos en Power BI o pandas. Son datos de menores: no los subas a servicios públicos.</p></div>
+ <p class="small"><a href="../">← Volver a la app de minutos</a></p>`;
+}
+function vPostList(T){
+ let h=`<h1>Post-partido</h1><p class="mute">Completa el formulario (1-2 minutos) y obtén el informe con 3 puntos fuertes y 3 de mejora para la primera charla de la semana.</p>`;
+ if(!T.history.length)return h+`<div class="card mute">Aún no hay partidos de este equipo.</div>`;
+ h+=T.history.slice().reverse().map(g=>{const s=sig(T,g),f=formOf(T,g);
+  return`<button data-a="open" data-id="${esc(g.id)}" class="card row" style="width:100%;text-align:left"><div class="grow"><div class="b">P${g.n}${g.jornada?' · J'+esc(g.jornada):''} · ${esc(g.rival||'Partido')}</div><div class="mute small">${fdate(g.date)}${g.comp?' · '+esc(g.comp):''}</div></div>
+  <span class="tag ${f?'t-ok':'t-pend'}">${f?'Hecho':'Pendiente'}</span><span class="res ${s.res}">${s.gf}-${s.gc}</span></button>`}).join('');
+ return h;
+}
+const chipSet=(k,arr,cur,extra)=>`<div class="row wrap">${arr.map(v=>`<button data-a="fset" data-k="${k}" data-v="${esc(v)}" class="chip ${cur===v?'on':''}">${esc(v)}</button>`).join('')}${extra||''}</div>`;
+function vPost(T,g){
+ const s=sig(T,g),F=formOf(T,g)||{},has=!!formOf(T,g);
+ let h=`<button data-a="back" class="btn">← Partidos</button>
+ <div class="card" style="margin-top:12px"><div class="row"><div class="grow"><div class="mute small">P${g.n}${g.jornada?' · J'+esc(g.jornada):''} · ${fdate(g.date)}${g.loc?' · '+esc(g.loc):''}</div><div class="big">${esc(g.rival||'Partido')}</div></div><span class="res ${s.res}">${s.gf} - ${s.gc}</span></div>
+ <table class="num" style="margin-top:8px"><tr><th></th><th>Nosotros</th><th>Rival</th></tr>
+ <tr><td>Tiros a puerta</td><td>${s.tpf}</td><td>${s.tpc}</td></tr><tr><td>Tiros fuera</td><td>${s.tff}</td><td>${s.tfc}</td></tr>
+ <tr><td>Ocasiones claras</td><td>${s.of}</td><td>${s.oc}</td></tr><tr><td>Córneres</td><td>${s.cf}</td><td>${s.cc}</td></tr></table>
+ <p class="small mute">Sistema principal: <b>${esc(s.sisMain||'—')}</b>${SIS[s.sisMain]?' · '+SIS[s.sisMain].car:''}</p></div>
+ <h2>Formulario post-partido</h2><p class="small mute">Todo es opcional. Cuanto más rellenes, mejor razona el informe. Se guarda al tocar.</p>`;
+ /* goles en contra */
+ h+=`<div class="card"><h3 style="margin-top:0">Goles en contra</h3>`;
+ if(!s.golesC.length)h+=`<p class="mute small">No hay goles en contra registrados en este partido.</p>`;
+ s.golesC.forEach((a,i)=>{const k=gkey(a),x=(F.goles||{})[k]||{};
+  h+=`<div style="border-top:1px solid var(--line);padding-top:8px;margin-top:8px"><div class="b">Gol ${i+1} · min ${a.min}${a.add?'+'+a.add:''}'${a.orig?` · <span class="mute">${esc(a.orig)}</span>`:''}</div>
+  <div class="small mute" style="margin-top:4px">¿Por qué carril llegó?</div><div class="row wrap">${ZONAS.map(z=>`<button data-a="gset" data-g="${esc(k)}" data-k="zona" data-v="${z}" class="chip ${x.zona===z?'on':''}">${z}</button>`).join('')}</div>
+  <div class="small mute" style="margin-top:6px">¿Dónde perdimos el balón antes del gol?</div><div class="row wrap">${PERD.map(z=>`<button data-a="gset" data-g="${esc(k)}" data-k="perdida" data-v="${z}" class="chip ${x.perdida===z?'on':''}">${z}</button>`).join('')}</div></div>`});
+ if(s.golesC.length&&g.acts.some(a=>a.k==='tiro'&&a.lado==='contra'&&a.res==='gol'&&a.t==null))h+=`<p class="xs mute">Partido antiguo: algunos goles no tienen marca de tiempo.</p>`;
+ h+=`</div>`;
+ /* juego y rival */
+ h+=`<div class="card"><h3 style="margin-top:0">Juego</h3>
+ <div class="small mute">Pérdidas en nuestra salida (estimación)</div>${chipSet('perd',RANG,F.perd)}
+ <div class="small mute" style="margin-top:8px">Recuperaciones en campo rival (estimación)</div>${chipSet('recu',RANG,F.recu)}
+ <h3>Rival</h3><div class="small mute">Presión del rival</div>${chipSet('presion',PRES,F.presion)}
+ <label class="f">Sistema del rival<select data-f="sisR" class="inp"><option value=""></option>${Object.keys(SIS).map(k=>`<option ${F.sisR===k?'selected':''}>${k}</option>`).join('')}<option ${F.sisR==='Otro'?'selected':''}>Otro</option></select></label></div>`;
+ /* valoraciones */
+ h+=`<div class="card"><h3 style="margin-top:0">Valoración del equipo (1-5)</h3>`+RAT.map(([k,l])=>{const v=+((F.rat||{})[k]||0);
+  return`<div class="row" style="margin-top:6px"><span class="grow small">${l}</span>${[1,2,3,4,5].map(n=>`<button data-a="fset" data-k="rat.${k}" data-v="${n}" class="chip ${v===n?'on':''}" style="min-width:40px;padding:0">${n}</button>`).join('')}</div>`}).join('')+
+ `<label class="f">Nota del partido (opcional)<textarea data-f="nota" class="inp" placeholder="Ideas para la semana">${esc(F.nota||'')}</textarea></label>
+ <p class="xs mute">No escribas aquí datos de salud de los jugadores.</p>
+ ${has?`<button data-a="fdel" class="btn w" style="margin-top:8px;color:var(--red)">Borrar este formulario</button>`:''}</div>`;
+ return h+vInforme(T,g,has?F:null);
+}
+function vInforme(T,g,F){
+ const {s,R}=rules(T,g,F),f=pick(R,'f'),m=pick(R,'m'),ss=sugSis(T,g,F,s),cu=cuaderno(T,g,s,F);
+ const it=(x,c)=>`<div class="item ${c}"><div class="b">${esc(x.titulo)}</div><div class="q">Dato: ${esc(x.dato)}</div><div class="t">💬 ${esc(x.charla)}</div>${c==='m'&&x.tarea?`<div class="t">🏃 <b>Tarea:</b> ${esc(x.tarea)}</div>`:''}</div>`;
+ let h=`<h2>Informe para la charla</h2><p class="small mute">Generado por reglas a partir de los datos. Cada punto dice qué dato lo provoca: revísalo con tu criterio.</p>
+ <h3>✅ Lo que hicimos bien</h3>${f.map(x=>it(x,'f')).join('')||'<p class="mute small">No hay datos suficientes para destacar puntos fuertes. Completa el formulario.</p>'}
+ ${f.length&&f.length<3?`<p class="xs mute">Solo ${f.length} punto${f.length>1?'s':''} con datos que lo respalden.</p>`:''}
+ <h3>🎯 Lo que vamos a mejorar</h3>${m.map(x=>it(x,'m')).join('')||'<p class="mute small">No hay datos suficientes para señalar mejoras. Completa el formulario.</p>'}
+ ${m.length&&m.length<3?`<p class="xs mute">Solo ${m.length} punto${m.length>1?'s':''} con datos que lo respalden.</p>`:''}`;
+ if(ss.length)h+=`<h3>♟️ Ajuste táctico sugerido</h3>`+ss.map(o=>`<div class="item s"><div class="b">${esc(o.de)} → ${esc(o.a)} <span class="mute small">(${esc(SIS[o.a].car)})</span></div><div class="t">${esc(o.por)}</div>${o.temp?`<div class="q">${esc(o.temp)}</div>`:''}</div>`).join('')+`<p class="xs mute">Indicio con pocos partidos: en edades formativas el sistema importa menos que los principios. Pruébalo en entrenamiento antes que en partido.</p>`;
+ if(cu.length)h+=`<h3>📒 Solo para el entrenador</h3><div class="card small">${cu.map(x=>`<p>• ${esc(x)}</p>`).join('')}</div>`;
+ h+=`<div class="grid2" style="margin-top:10px"><button data-a="copy" data-id="${esc(g.id)}" class="btn pri">Copiar charla</button><button data-a="toPlan" data-id="${esc(g.id)}" class="btn">Mejoras → Game Plan</button></div>`;
+ return h;
+}
+/* ---- Game Plan ---- */
+function planOf(T){
+ let P=ST.plans[T.id];
+ if(!P){P=ST.plans[T.id]={rival:'',fecha:'',sis:'3-2-1',xi:Array(7).fill(''),abp:{cf:'',ff:'',pen:'',m1:'',m2:'',m3:''},cons:['','',''],nota:''}}
+ if(!SIS[P.sis])P.sis='3-2-1';
+ return P;
+}
+function optsPl(T,cur,CG,incl){
+ return`<option value=""></option>`+T.players.filter(p=>p.conv||p.id===cur||incl).map(p=>{const c=CG.find(x=>x.p.id===p.id);return`<option value="${esc(p.id)}" ${cur===p.id?'selected':''}>${c?STL[c.st][0]+' ':''}${esc(p.name)}${p.pos?' · '+esc(p.pos):''}</option>`}).join('');
+}
+function vPlan(T){
+ const P=planOf(T),S=SIS[P.sis],CG=carga(T),dup=P.xi.filter((x,i)=>x&&P.xi.indexOf(x)!==i);
+ const last=T.history[T.history.length-1],sugs=[];
+ if(last){const{R}=rules(T,last,formOf(T,last)||null);pick(R,'m').forEach(x=>sugs.push(x.charla))}
+ let h=`<h1>Game Plan</h1><p class="mute">Prepara el partido y ábrelo en grande en el banquillo.</p>
+ <button data-a="match" class="btn pri w" style="margin-top:8px">▶ Abrir vista de partido</button>
+ <div class="card"><label class="f">Rival<input data-p="rival" value="${esc(P.rival)}" class="inp"></label>
+ <label class="f">Fecha<input data-p="fecha" type="date" value="${esc(P.fecha)}" class="inp"></label>
+ <label class="f">Sistema inicial<select data-p="sis" class="inp">${Object.keys(SIS).map(k=>`<option value="${k}" ${P.sis===k?'selected':''}>${k} · ${SIS[k].car}</option>`).join('')}</select></label>
+ <p class="small mute" style="margin-top:8px">${esc(S.idea)}<br>✔ ${S.fu.map(esc).join(' · ')}<br>✖ ${S.de.map(esc).join(' · ')}</p></div>
+ <h2>Alineación</h2><p class="small mute">Solo convocados. El color es el semáforo de carga. Recuerda marcar luego los titulares en la app de minutos: el FTMS no la modifica.</p><div class="card">`;
+ S.lab.forEach((l,i)=>{h+=`<label class="f">${i+1}. ${l}<select data-xi="${i}" class="inp">${optsPl(T,P.xi[i],CG)}</select></label>`});
+ if(dup.length)h+=`<p class="small" style="color:var(--red)">Hay un jugador repetido en la alineación.</p>`;
+ h+=`</div><h2>Balón parado</h2><div class="card">
+ <label class="f">Lanzador de córners a favor<select data-ab="cf" class="inp">${optsPl(T,P.abp.cf,CG)}</select></label>
+ <label class="f">Lanzador de faltas<select data-ab="ff" class="inp">${optsPl(T,P.abp.ff,CG)}</select></label>
+ <label class="f">Penaltis<select data-ab="pen" class="inp">${optsPl(T,P.abp.pen,CG)}</select></label>
+ <h3>Córner en contra</h3>
+ <label class="f">Primer palo<select data-ab="m1" class="inp">${optsPl(T,P.abp.m1,CG)}</select></label>
+ <label class="f">Segundo palo<select data-ab="m2" class="inp">${optsPl(T,P.abp.m2,CG)}</select></label>
+ <label class="f">Rechace (frontal)<select data-ab="m3" class="inp">${optsPl(T,P.abp.m3,CG)}</select></label></div>
+ <h2>3 consignas clave</h2><div class="card">${[0,1,2].map(i=>`<label class="f">Consigna ${i+1}<input data-c="${i}" value="${esc(P.cons[i])}" maxlength="90" class="inp"></label>`).join('')}
+ ${sugs.length?`<div class="small mute" style="margin-top:10px">Sugerencias del último informe (toca para añadir):</div><div class="row wrap" style="margin-top:4px">${sugs.map((x,i)=>`<button data-a="sugc" data-id="${i}" class="chip" style="text-align:left;height:auto;padding:6px 12px">${esc(x)}</button>`).join('')}</div>`:''}
+ <label class="f">Nota (solo staff)<textarea data-p="nota" class="inp">${esc(P.nota)}</textarea></label></div>
+ <button data-a="pclear" class="btn w" style="margin-top:8px">Empezar un plan nuevo</button>`;
+ vPlan.sugs=sugs;
+ return h;
+}
+function vMatchView(T){
+ const P=planOf(T),S=SIS[P.sis],sh=id=>id?esc(short(T,id)):'—';
+ const tok=i=>`<div class="pl"><div class="sh ${i===0?'gk':''}">${P.xi[i]?esc(short(T,P.xi[i])[0]):'?'}</div><div class="nm">${sh(P.xi[i])}</div><div class="ps">${S.lab[i]}</div></div>`;
+ return`<main><div class="row"><div class="grow"><div class="mute small">${TEAMS[T.id].name}${P.fecha?' · '+fdate(P.fecha+'T12:00'):''}</div><h1>${esc(P.rival||'Partido')}</h1></div><button data-a="closeM" class="btn">Cerrar</button></div>
+ <div class="row" style="margin:8px 0"><span class="tag t-mute">${esc(P.sis)}</span><span class="small mute">${esc(S.car)}</span></div>
+ <div class="pitch">${S.rows.map(r=>`<div class="prow">${r.map(tok).join('')}</div>`).join('')}</div>
+ <h2>Consignas</h2><ol class="cons">${P.cons.filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join('')||'<li class="mute">Sin consignas</li>'}</ol>
+ <h2>Balón parado</h2><div class="card"><div class="grid2 big" style="font-size:1.05rem">
+  <div><span class="mute small">Córner a favor</span><br>${sh(P.abp.cf)}</div><div><span class="mute small">Faltas</span><br>${sh(P.abp.ff)}</div>
+  <div><span class="mute small">Penalti</span><br>${sh(P.abp.pen)}</div><div></div>
+  <div><span class="mute small">1er palo (en contra)</span><br>${sh(P.abp.m1)}</div><div><span class="mute small">2º palo</span><br>${sh(P.abp.m2)}</div>
+  <div><span class="mute small">Rechace</span><br>${sh(P.abp.m3)}</div></div></div></main>`;
+}
+/* ---- Semáforo ---- */
+function vCarga(T){
+ const L=carga(T),ord={rojo:0,ambar:1,bajo:2,verde:3,portero:4,nd:5},cf=ST.cfg;
+ let h=`<h1>Carga</h1><p class="mute">Porcentaje de los minutos disputados en los últimos ${cf.win} partidos del equipo. Es una referencia por minutos, no una medida médica.</p>
+ <div class="card small"><div class="row wrap">${Object.entries(STL).filter(([k])=>k!=='nd').map(([k,[e,t]])=>`<span>${e} ${t}</span>`).join(' · ')}</div>
+ <details style="margin-top:8px"><summary>Ajustar umbrales</summary>
+ <label class="f">Ventana (partidos)<select data-cfg="win" class="inp">${[2,3,4,5].map(v=>`<option ${+cf.win===v?'selected':''}>${v}</option>`).join('')}</select></label>
+ <label class="f">🔴 desde (%)<input data-cfg="red" type="number" min="50" max="100" value="${cf.red}" class="inp"></label>
+ <label class="f">🟠 desde (%)<input data-cfg="amber" type="number" min="30" max="100" value="${cf.amber}" class="inp"></label>
+ <label class="f">🔵 por debajo de (%)<input data-cfg="low" type="number" min="0" max="80" value="${cf.low}" class="inp"></label></details></div>`;
+ if(!T.history.length)return h+`<div class="card mute">Aún no hay partidos.</div>`;
+ h+=L.sort((a,b)=>ord[a.st]-ord[b.st]||b.pct-a.pct).map(x=>{const col={rojo:'var(--red)',ambar:'var(--amber)',verde:'var(--green)',bajo:'var(--blue)',portero:'var(--mute)',nd:'var(--line)'}[x.st];
+  const tr=x.pp==null?'':x.pct-x.pp>10?' ↑':x.pp-x.pct>10?' ↓':' →';
+  return`<div class="card"><div class="row"><span class="dot d-${x.st}"></span><b class="grow">${esc(x.p.name)}</b><span class="num big">${Math.round(x.pct)}%<span class="small mute">${tr}</span></span></div>
+  <div class="bar"><i style="width:${Math.min(100,x.pct)}%;background:${col}"></i></div>
+  <div class="xs mute" style="margin-top:6px">${STL[x.st][1]} · convocado ${x.convL}/${x.nL} recientes · media ${x.media.toFixed(1)}' por convocatoria · ${Math.round(x.total)}' en la temporada${x.full>=2&&x.st!=='portero'?` · <b style="color:var(--amber)">${x.full} partidos seguidos completos</b>`:''}${x.p.conv?'':' · no convocado ahora'}</div></div>`}).join('');
+ return h+`<p class="xs mute">↑ ↓ comparan con los ${cf.win} partidos anteriores. Un no convocado cuenta como 0 minutos: revisa el motivo antes de sacar conclusiones.</p>`;
+}
+
+/* ---- render ---- */
+function render(){
+ const T=team(ST.team);
+ const head=`<header class="top"><div class="logo">FT</div><div class="grow"><div class="big" style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:1.5rem">FTMS · ${TEAMS[ST.team].name}</div><div class="mute small">Club San José del Parque · Fútbol 7 · ${TEAMS[ST.team].half}×2</div></div></header>
+ <div class="teams">${Object.keys(TEAMS).map(id=>`<button data-a="team" data-id="${id}" class="${ST.team===id?'on':''}">${TEAMS[id].name}</button>`).join('')}</div>`;
+ let v;
+ if(!T&&ST.tab!=='inicio')v=`<h1>FTMS</h1>`+noData();
+ else if(ST.tab==='inicio')v=vInicio(T);
+ else if(ST.tab==='post'){const g=SEL&&T.history.find(x=>x.id===SEL);v=g?vPost(T,g):vPostList(T)}
+ else if(ST.tab==='plan')v=vPlan(T);
+ else v=vCarga(T);
+ $('#app').innerHTML=head+v;
+ $('#nav').innerHTML=[['inicio','🏠','Inicio'],['post','📝','Post-partido'],['plan','📋','Game Plan'],['carga','🚦','Carga']].map(([id,i,l])=>`<button data-a="tab" data-id="${id}" class="${ST.tab===id?'on':''}"><span>${i}</span>${l}</button>`).join('');
+ $('#over').innerHTML=OVER&&T?`<div class="over">${vMatchView(T)}</div>`:'';
+}
+
+/* ==========================================================
+   ACCIONES
+   ========================================================== */
+function form(T,g){const k=pkey(T,g);return ST.post[k]=ST.post[k]||{goles:{},rat:{},at:Date.now()}}
+function csvQ(v){v=String(v==null?'':v);return /[",\n\r;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+const csv=(H,R)=>'﻿'+[H.join(','),...R.map(r=>H.map(c=>csvQ(r[c])).join(','))].join('\r\n');
+function allRows(fn){const R=[];Object.keys(TEAMS).forEach(id=>{const T=team(id);if(T)T.history.forEach(g=>{const F=formOf(T,g);if(F)fn(T,g,F,R)})});return R}
+function exportPost(){
+ const H=['equipo','partido_id','partido_n','fecha','rival','perdidas_salida','recuperaciones_altas','presion_rival','sistema_rival',...RAT.map(r=>'val_'+r[0]),'nota'];
+ const R=allRows((T,g,F,R)=>R.push({equipo:TEAMS[T.id].name,partido_id:g.id,partido_n:g.n,fecha:ymd(g.date),rival:g.rival,perdidas_salida:F.perd||'',recuperaciones_altas:F.recu||'',presion_rival:F.presion||'',sistema_rival:F.sisR||'',...Object.fromEntries(RAT.map(r=>['val_'+r[0],(F.rat||{})[r[0]]||''])),nota:F.nota||''}));
+ if(!R.length){toast('Aún no hay formularios');return}dl('ftms-postpartido.csv',csv(H,R),'text/csv');
+}
+function exportGol(){
+ const H=['equipo','partido_id','partido_n','fecha','rival','parte','minuto','anadido','causa','zona','perdida_previa'];
+ const R=allRows((T,g,F,R)=>sig(T,g).golesC.forEach(a=>{const x=(F.goles||{})[gkey(a)]||{};R.push({equipo:TEAMS[T.id].name,partido_id:g.id,partido_n:g.n,fecha:ymd(g.date),rival:g.rival,parte:a.part,minuto:a.min,anadido:a.add||0,causa:a.orig||'',zona:x.zona||'',perdida_previa:x.perdida||''})}));
+ if(!R.length){toast('No hay goles en contra con formulario');return}dl('ftms-goles-contra.csv',csv(H,R),'text/csv');
+}
+function copyText(t){
+ const fb=()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('Charla copiada')}catch(e){toast('No se pudo copiar')}a.remove()};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast('Charla copiada'),fb);else fb();
+}
+let WL=null;
+async function wake(on){try{if(on&&navigator.wakeLock)WL=await navigator.wakeLock.request('screen');else if(WL){await WL.release();WL=null}}catch(e){}}
+
+document.addEventListener('click',ev=>{
+ const b=ev.target.closest('[data-a]');if(!b||b.disabled)return;
+ const a=b.dataset.a,id=b.dataset.id,T=team(ST.team);
+ if(a==='tab'){ST.tab=id;SEL=null;scrollTo(0,0)}
+ else if(a==='team'){ST.team=id;SEL=null}
+ else if(a==='open'){ST.tab='post';SEL=id;scrollTo(0,0)}
+ else if(a==='back'){SEL=null}
+ else if(a==='fset'||a==='gset'){
+  const g=T.history.find(x=>x.id===SEL);if(!g)return;const F=form(T,g),k=b.dataset.k,v=b.dataset.v;
+  if(a==='gset'){const x=F.goles[b.dataset.g]=F.goles[b.dataset.g]||{};x[k]=x[k]===v?'':v}
+  else if(k.startsWith('rat.')){const r=k.slice(4);F.rat[r]=+F.rat[r]===+v?0:+v}
+  else F[k]=F[k]===v?'':v;
+  F.at=Date.now();
+ }
+ else if(a==='fdel'){const g=T.history.find(x=>x.id===SEL);if(g&&confirm('¿Borrar el formulario de este partido?'))delete ST.post[pkey(T,g)]}
+ else if(a==='copy'){const g=T.history.find(x=>x.id===id);if(g)copyText(informeTxt(T,g,formOf(T,g)||null));return}
+ else if(a==='toPlan'){const g=T.history.find(x=>x.id===id);if(!g)return;const P=planOf(T),{R}=rules(T,g,formOf(T,g)||null),m=pick(R,'m');
+  let n=0;m.forEach(x=>{const i=P.cons.findIndex(c=>!c.trim());if(i>=0&&!P.cons.includes(x.charla)){P.cons[i]=x.charla.slice(0,90);n++}});
+  toast(n?`${n} consigna${n>1?'s':''} añadida${n>1?'s':''} al Game Plan`:'No hay huecos libres en las consignas');ST.tab='plan';SEL=null}
+ else if(a==='sugc'){const P=planOf(T),x=(vPlan.sugs||[])[+id];if(!x)return;const i=P.cons.findIndex(c=>!c.trim());if(i<0){toast('Las 3 consignas están ocupadas');return}P.cons[i]=x.slice(0,90)}
+ else if(a==='pclear'){if(confirm('¿Empezar un plan nuevo? Se borra el plan actual de este equipo.'))delete ST.plans[T.id]}
+ else if(a==='match'){OVER=true;wake(true);scrollTo(0,0)}
+ else if(a==='closeM'){OVER=null;wake(false)}
+ else if(a==='impMin'){$('#impMin').click();return}
+ else if(a==='impFt'){$('#impFt').click();return}
+ else if(a==='expFt'){dl('ftms-copia.json',JSON.stringify({app:'ftms',version:VER,exportado:new Date().toISOString(),post:ST.post,plans:ST.plans,cfg:ST.cfg},null,1),'application/json');return}
+ else if(a==='csvPost'){exportPost();return}
+ else if(a==='csvGol'){exportGol();return}
+ save();render();
+});
+document.addEventListener('change',ev=>{
+ const e=ev.target,T=team(ST.team);if(!T)return;
+ if(e.dataset.f){const g=T.history.find(x=>x.id===SEL);if(!g)return;const F=form(T,g);F[e.dataset.f]=e.value;F.at=Date.now();save();if(e.tagName==='SELECT')render();return}
+ const P=T&&planOf(T);
+ if(e.dataset.p){P[e.dataset.p]=e.value;save();if(e.dataset.p==='sis')render();return}
+ if(e.dataset.xi!=null){P.xi[+e.dataset.xi]=e.value;save();render();return}
+ if(e.dataset.ab){P.abp[e.dataset.ab]=e.value;save();return}
+ if(e.dataset.c!=null){P.cons[+e.dataset.c]=e.value.trim();save();return}
+ if(e.dataset.cfg){const k=e.dataset.cfg,v=+e.value;if(!isFinite(v))return;ST.cfg[k]=v;save();render();return}
+});
+/* textos: guardar mientras se escribe sin repintar (no perder el foco) */
+document.addEventListener('input',ev=>{
+ const e=ev.target,T=team(ST.team);if(!T)return;
+ if(e.dataset.f==='nota'){const g=T.history.find(x=>x.id===SEL);if(g){form(T,g).nota=e.value;save()}}
+ else if(e.dataset.p==='rival'||e.dataset.p==='nota'){planOf(T)[e.dataset.p]=e.value;save()}
+ else if(e.dataset.c!=null){planOf(T).cons[+e.dataset.c]=e.value;save()}
+});
+function readFile(input,cb){input.addEventListener('change',()=>{const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{cb(JSON.parse(r.result))}catch(x){toast('Archivo no válido')}input.value=''};r.readAsText(f)})}
+readFile($('#impMin'),d=>{
+ const all=d&&d.all&&d.all.teams?d.all:(d&&d.teams?d:null);
+ if(!all){toast('No es una copia de la app de minutos');return}
+ if(readSrc().origen==='directo'&&!confirm('Este navegador ya tiene los datos de la app de minutos y se seguirán usando esos. ¿Guardar igualmente la copia como respaldo?'))return;
+ ST.imported={at:Date.now(),all};save();render();toast('Copia de la app de minutos importada');
+});
+readFile($('#impFt'),d=>{
+ if(!d||d.app!=='ftms'||!d.post){toast('No es una copia del FTMS');return}
+ if(!confirm('Se reemplazarán los formularios, planes y umbrales del FTMS por la copia. ¿Continuar?'))return;
+ ST.post=d.post||{};ST.plans=d.plans||{};ST.cfg=Object.assign(ST.cfg,d.cfg||{});save();render();toast('Copia FTMS importada');
+});
+/* si la app de minutos guarda en otra pestaña, refrescar */
+addEventListener('storage',e=>{if(e.key===SRC_KEY)render()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();if(OVER)wake(true)}});
+if('serviceWorker' in navigator&&location.protocol!=='file:')addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{}));
+render();
+</script>
+</body>
+</html>
