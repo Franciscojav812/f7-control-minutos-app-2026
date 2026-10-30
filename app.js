@@ -2,26 +2,49 @@
 'use strict';
 /* ===== Minutos F7 · Club San José del Parque · v3 ===== */
 const CREST='crest.jpg',KEY='f7minutos.club.v2',BK='f7minutos.bak';
-const TEAMS={
- pre:{name:'Prebenjamín A',half:20,pfx:'pre',x:'minutos-app.xlsx',c:'minutos-csv.zip',j:'minutos-copia.json'},
- ale:{name:'Alevín B',half:25,pfx:'ale',x:'minutos-alevin-b-app.xlsx',c:'minutos-alevin-b-csv.zip',j:'minutos-copia-alevin-b.json'}};
+/* Equipos base (no cambian: su prefijo y sus archivos son el contrato con los Excel maestros) */
+const BASE_TEAMS={
+ pre:{name:'Prebenjamín A',half:20,pfx:'pre',cat:'pre',fmt:'F7',n:7,base:1,x:'minutos-app.xlsx',c:'minutos-csv.zip',j:'minutos-copia.json'},
+ ale:{name:'Alevín B',half:25,pfx:'ale',cat:'ale',fmt:'F7',n:7,base:1,x:'minutos-alevin-b-app.xlsx',c:'minutos-alevin-b-csv.zip',j:'minutos-copia-alevin-b.json'}};
+const CATS={pre:'Prebenjamín',ben:'Benjamín',ale:'Alevín',inf:'Infantil',cad:'Cadete',juv:'Juvenil',sen:'Sénior'};
+const FMTS={F7:{n:7,def:'3-2-1',half:25,lbl:'Fútbol 7'},F11:{n:11,def:'4-3-3',half:35,lbl:'Fútbol 11'}};
+let TEAMS={};
+/* equipos = base (con sus ajustes editables) + equipos creados desde la app (ALL.cfgTeams) */
+function buildTeams(a){
+  const cfg=(a&&a.cfgTeams)||{},T={};
+  Object.keys(BASE_TEAMS).forEach(id=>{const o=cfg[id]||{};T[id]=Object.assign({},BASE_TEAMS[id],{name:o.name||BASE_TEAMS[id].name,half:o.half||BASE_TEAMS[id].half,cat:o.cat||BASE_TEAMS[id].cat})});
+  Object.keys(cfg).forEach(id=>{if(!T[id]&&cfg[id]&&cfg[id].fmt)T[id]=Object.assign({},cfg[id],{n:FMTS[cfg[id].fmt].n})});
+  TEAMS=T;
+}
+const teamFmt=()=>TEAMS[ALL.cur].fmt||'F7',NF=()=>TEAMS[ALL.cur].n||7;
 const DEF={
  pre:{n:['Rodrigo Marín','Cayetano Aragonés','Gonzalo Barquín','Alfredo González','Antonio Herráiz','Arturo Marqués','Alfredo Martín','Pietro Mónaco','Adrián Otero','Gabriel Olarte','Matteo Soria','Hugo Louzao','Maverick Pinto','Platón Kudishin','Tomás Antoranz'],
   p:{'Hugo Louzao':'Portero','Matteo Soria':'MC','Platón Kudishin':'DFC','Antonio Herráiz':'DC','Tomás Antoranz':'DC','Adrián Otero':'MC','Maverick Pinto':'DC','Gabriel Olarte':'DFC','Arturo Marqués':'MC','Cayetano Aragonés':'DFC','Alfredo Martín':'DFC','Alfredo González':'DC'}},
  ale:{n:['Youna','Daniel','Lucas','Miguel','Hugo G','Jaime','Lucho','Vizu','Moli','Hugo A','Diego'],
   p:{'Youna':'Portero','Daniel':'LD','Lucas':'LI','Miguel':'DFC','Hugo G':'DFC','Jaime':'ED','Lucho':'EI','Vizu':'DC','Moli':'DC','Hugo A':'DC','Diego':'MC'}}};
 const POS=['Portero','DFC','LI','LD','MC','MI','MD','EI','ED','DC'];
+const POS11=['Portero','DFC','LI','LD','CAI','CAD','MCD','MC','MI','MD','MCO','EI','ED','DC'];
+const posList=()=>teamFmt()==='F11'?POS11:POS;
 const COMPS=['Liga','Copa','Amistoso','Torneo'],LOCS=['Local','Visitante','Neutral'];
 const ORIG=['Jugada','Córner','Falta','Penalti','Contraataque','Rebote','Error rival'];
 const CAUS=['Pérdida de balón','Balón parado','Error defensivo','Error del portero','Contraataque','Penalti','Acción individual'];
 const MIN_OPTS=[0,5,8,10,12,15,18,20,25];
 const FORMS={'3-2-1':{c:'Equilibrado',k:'eq'},'2-2-2':{c:'Ofensivo',k:'of'},'3-1-2':{c:'Equilibrado',k:'eq'},'2-3-1':{c:'Muy ofensivo',k:'mo'},'1-3-2':{c:'Ofensivo',k:'of'},'4-1-1':{c:'Defensivo',k:'de'},'2-1-3':{c:'Muy ofensivo',k:'mo'},'3-3-0':{c:'Defensivo',k:'de'}};
+/* Fútbol 11 (sin contar al portero). Varias líneas de medio campo: 4-2-3-1, 4-1-4-1, 4-4-1-1 */
+Object.assign(FORMS,{'4-4-2':{c:'Equilibrado',k:'eq',fmt:'F11'},'4-3-3':{c:'Ofensivo',k:'of',fmt:'F11'},'4-2-3-1':{c:'Equilibrado',k:'eq',fmt:'F11'},'3-5-2':{c:'Equilibrado',k:'eq',fmt:'F11'},'4-1-4-1':{c:'Defensivo',k:'de',fmt:'F11'},'5-3-2':{c:'Defensivo',k:'de',fmt:'F11'},'3-4-3':{c:'Muy ofensivo',k:'mo',fmt:'F11'},'4-4-1-1':{c:'Equilibrado',k:'eq',fmt:'F11'}});
 const DL={1:['DFC'],2:['DFC','DFC'],3:['LI','DFC','LD'],4:['LI','DFC','DFC','LD']},ML={0:[],1:['MC'],2:['MC','MC'],3:['MI','MC','MD']},FL={0:[],1:['DC'],2:['EI','ED'],3:['EI','DC','ED']};
 const BADGE={eq:'bg-turf text-ink',of:'bg-amber text-ink',mo:'bg-red-500 text-ink',de:'bg-benchl text-ink'};
+/* etiquetas de posición en fútbol 11 */
+const D11={3:['DFC','DFC','DFC'],4:['LI','DFC','DFC','LD'],5:['CAI','DFC','DFC','DFC','CAD']},
+ M11={3:['MC','MCD','MC'],4:['MI','MC','MC','MD'],5:['CAI','MC','MCD','MC','CAD']},
+ M11a={1:['MCD'],2:['MCD','MCD'],4:['MI','MC','MC','MD']},M11b={1:['MCO'],3:['EI','MCO','ED'],4:['MI','MC','MC','MD']},
+ F11L={1:['DC'],2:['DC','DC'],3:['EI','DC','ED']};
 Object.keys(FORMS).forEach(k=>{
-  const [d,m,f]=k.split('-').map(Number),F=FORMS[k],r=(s,n)=>Array.from({length:n},(_,i)=>s+i);
-  F.lab=['Portero',...DL[d],...ML[m],...FL[f]];
-  F.rows=[r(1+d+m,f),r(1+d,m),r(1,d),[0]].filter(x=>x.length);
+  const F=FORMS[k],L=k.split('-').map(Number);F.fmt=F.fmt||'F7';F.lines=L;
+  if(F.fmt==='F7')F.lab=['Portero',...DL[L[0]],...ML[L[1]],...FL[L[2]]];
+  else F.lab=['Portero',...D11[L[0]],...(L.length===3?M11[L[1]]:[...M11a[L[1]],...M11b[L[2]]]),...F11L[L[L.length-1]]];
+  let st=1;const rows=L.map(c=>{const r=Array.from({length:c},(_,i)=>st+i);st+=c;return r});
+  F.rows=[...rows.reverse(),[0]].filter(x=>x.length);
 });
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -32,8 +55,8 @@ const vib=n=>{try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}};
 
 /* ---- estado: un bloque por equipo ---- */
 function newTeam(id){
-  const D=DEF[id],players=D.n.map((n,i)=>({id:'p'+(i+1),name:n,pos:D.p[n]||'',conv:true}));
-  return{players,starters:players.slice(0,7).map(p=>p.id),match:null,history:[],nid:players.length+1,form:'3-2-1',minMin:0,runMin:Math.floor(TEAMS[id].half/2)};
+  const D=DEF[id]||{n:[],p:{}},players=D.n.map((n,i)=>({id:'p'+(i+1),name:n,pos:D.p[n]||'',conv:true})),T=TEAMS[id];
+  return{players,starters:players.slice(0,T.n||7).map(p=>p.id),match:null,history:[],nid:players.length+1,form:FMTS[T.fmt||'F7'].def,minMin:0,runMin:Math.floor(T.half/2)};
 }
 const nameId=(t,n)=>{const p=t.players.find(p=>p.name===n);return p?p.id:null};
 function fixG(g,t){
@@ -53,7 +76,7 @@ function fixMatch(m,t){
 }
 function fixTeam(t,id){
   t.players.forEach(p=>{delete p.dorsal;if(p.conv===undefined)p.conv=true;if(p.pos===undefined)p.pos=''});
-  t.form=t.form||'3-2-1';t.history=t.history||[];delete t.tab;delete t.half;
+  t.form=t.form||FMTS[(TEAMS[id]||{}).fmt||'F7'].def;t.history=t.history||[];delete t.tab;delete t.half;
   if(t.minMin==null)t.minMin=0;if(t.runMin==null)t.runMin=Math.floor(TEAMS[id].half/2);
   t.history.forEach(g=>fixG(g,t));
   if(t.match)fixMatch(t.match,t);
@@ -61,8 +84,9 @@ function fixTeam(t,id){
 function load(){
   let a=null;try{a=JSON.parse(localStorage.getItem(KEY))}catch(e){}
   if(!a||!a.teams)a={cur:'pre',tab:'setup',teams:{}};
+  a.cfgTeams=a.cfgTeams||{};buildTeams(a);if(!TEAMS[a.cur])a.cur='pre';
   Object.keys(TEAMS).forEach(id=>{
-    if(!a.teams[id]){let t=null;try{t=JSON.parse(localStorage.getItem(id==='pre'?'f7minutos.v1':'f7minutos.alevinb.v1'))}catch(e){}
+    if(!a.teams[id]){let t=null;const lk={pre:'f7minutos.v1',ale:'f7minutos.alevinb.v1'}[id];try{if(lk)t=JSON.parse(localStorage.getItem(lk))}catch(e){}
       a.teams[id]=t&&t.players?t:newTeam(id)}
     fixTeam(a.teams[id],id);
   });
@@ -86,7 +110,7 @@ function listBak(){
     return{i,at:o.at,why:o.why,n:Object.values(a.teams).reduce((s,t)=>s+(t.history||[]).length,0)}}catch(e){return null}}).filter(Boolean);
 }
 function restoreBak(rawItem){
-  const o=JSON.parse(rawItem);ALL=JSON.parse(o.raw);
+  const o=JSON.parse(rawItem);ALL=JSON.parse(o.raw);ALL.cfgTeams=ALL.cfgTeams||{};buildTeams(ALL);
   Object.keys(TEAMS).forEach(id=>{if(!ALL.teams[id])ALL.teams[id]=newTeam(id);fixTeam(ALL.teams[id],id)});
   ALL.set=Object.assign({auto:true,lastBak:0},ALL.set||{});setTeam(TEAMS[ALL.cur]?ALL.cur:'pre');ALL.tab='hist';
 }
@@ -131,7 +155,7 @@ function stint(m,id,e){
 }
 function assign(ids,form){
   const L=FORMS[form].lab,pos=id=>(pl(id)&&pl(id).pos)||'';
-  const g=x=>x==='Portero'?'P':/^(DFC|LI|LD)$/.test(x)?'D':/^(MC|MI|MD)$/.test(x)?'M':'F';
+  const g=x=>x==='Portero'?'P':/^(DFC|LI|LD|CAI|CAD)$/.test(x)?'D':/^(MC|MI|MD|MCD|MCO)$/.test(x)?'M':'F';
   const res=Array(L.length).fill(null),rest=ids.slice();
   [(i,id)=>pos(id)===L[i],(i,id)=>pos(id)&&g(pos(id))===g(L[i]),()=>true].forEach(f=>L.forEach((_,i)=>{
     if(res[i])return;const id=rest.find(x=>f(i,x));if(id){res[i]=id;rest.splice(rest.indexOf(id),1)}}));
@@ -169,7 +193,7 @@ const cnt=(acts,f)=>acts.filter(f).length;
 /* Sugerencia FORMATIVA (UEFA C: en formación la competición es un medio; no se cambia el sistema por el marcador).
    Prebenjamín: sin sugerencia. Alevín: recordatorio según el momento del partido, sin proponer sistemas. */
 function suggest(m){
-  if(ALL.cur!=='ale')return null;
+  if(['pre','ben'].includes(TEAMS[ALL.cur].cat))return null;
   const {f,c}=sc(m),d=f-c,e=el(),H=m.half*60000,inPart=m.part===1?e:e-m.p1End,leftPart=(H-inPart)/60000;
   let txt;
   if(d>=3)txt=`Ventaja amplia (${f}-${c}): buen momento para dar minutos y probar posiciones nuevas.`;
@@ -256,7 +280,7 @@ function advice(m){
 /* ---- 03-views.js ---- */
 /* ===== vistas ===== */
 const sheet=h=>`<div class="sheet"><div>${h}</div></div>`;
-const optsForm=sel=>Object.entries(FORMS).map(([k,F])=>`<option value="${k}" ${sel===k?'selected':''}>${k} · ${F.c}</option>`).join('');
+const optsForm=sel=>Object.entries(FORMS).filter(([k,F])=>F.fmt===teamFmt()).map(([k,F])=>`<option value="${k}" ${sel===k?'selected':''}>${k} · ${F.c}</option>`).join('');
 const inp='w-full h-12 rounded-xl bg-ink px-3 text-chalk text-lg outline-none border border-line';
 const btn2='min-h-14 rounded-2xl bg-bench font-bold';
 const sel=(id,arr,val,e)=>`<select ${e?`data-e="${e}"`:`id="${id}"`} class="${inp}"><option value=""></option>${arr.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
@@ -264,11 +288,11 @@ const sel=(id,arr,val,e)=>`<select ${e?`data-e="${e}"`:`id="${id}"`} class="${in
 function vSetup(){
   const m=S.match,cv=S.players.filter(p=>p.conv),n=S.starters.length;
   let h=`<h1 class="font-disp text-5xl font-bold italic tracking-tight">Plantilla</h1>
-  <p class="text-mute mb-3">1) Marca quién está convocado. 2) Elige los 7 titulares. El resto de convocados empieza en el banquillo.</p>`;
+  <p class="text-mute mb-3">1) Marca quién está convocado. 2) Elige los ${NF()} titulares. El resto de convocados empieza en el banquillo.</p>`;
   if(m)h+=`<button data-a="tab" data-id="match" class="w-full mb-3 min-h-14 rounded-2xl bg-amber text-ink font-bold text-lg">Hay un partido en curso · Volver</button>`;
-  h+=`<div class="flex gap-2 mb-3 text-sm font-semibold"><span class="bg-panel rounded-full px-3 py-1">Convocados ${cv.length}/${S.players.length}</span><span class="bg-panel rounded-full px-3 py-1 ${n===7?'':'text-amber'}">Titulares ${n}/7</span></div><div class="space-y-2">`;
+  h+=`<div class="flex gap-2 mb-3 text-sm font-semibold"><span class="bg-panel rounded-full px-3 py-1">Convocados ${cv.length}/${S.players.length}</span><span class="bg-panel rounded-full px-3 py-1 ${n===NF()?'':'text-amber'}">Titulares ${n}/${NF()}</span></div><div class="space-y-2">`;
   S.players.forEach(p=>{
-    const on=S.starters.includes(p.id),opts=POS.includes(p.pos)||!p.pos?POS:[...POS,p.pos];
+    const on=S.starters.includes(p.id),PL=posList(),opts=PL.includes(p.pos)||!p.pos?PL:[...PL,p.pos];
     h+=`<div class="bg-panel border border-line rounded-2xl p-2 ${p.conv?'':'opacity-70'}"><div class="flex items-center gap-2">
       <button data-a="conv" data-id="${p.id}" ${m?'disabled':''} aria-pressed="${p.conv}" class="shrink-0 w-28 h-12 rounded-xl font-bold text-sm ${p.conv?'bg-turf text-ink':'bg-line text-mute'}">${p.conv?'Convocado':'No convocado'}</button>
       <input data-a="ren" data-id="${p.id}" value="${esc(p.name)}" class="min-w-0 flex-1 bg-transparent text-lg font-semibold px-1 h-12 outline-none focus:bg-ink rounded-lg" aria-label="Nombre">
@@ -283,7 +307,14 @@ function vSetup(){
    <label class="flex items-center gap-2"><span class="flex-1 text-sm">Avisar si un jugador lleva seguidos más de</span><select data-a="runmin" class="h-11 rounded-lg bg-ink px-2">${[6,8,10,12,15,20].map(v=>`<option value="${v}" ${S.runMin===v?'selected':''}>${v} min</option>`).join('')}</select></label>
    <label class="flex items-center gap-2"><span class="flex-1 text-sm">Mínimo de minutos por jugador (opcional)</span><select data-a="minmin" class="h-11 rounded-lg bg-ink px-2">${MIN_OPTS.map(v=>`<option value="${v}" ${S.minMin===v?'selected':''}>${v?v+' min':'Sin mínimo'}</option>`).join('')}</select></label>
    <label class="flex items-center gap-2"><span class="flex-1 text-sm">Descargar copia JSON al finalizar cada partido</span><button data-a="auto" aria-pressed="${ALL.set.auto}" class="w-20 h-11 rounded-xl font-bold ${ALL.set.auto?'bg-turf text-ink':'bg-line text-mute'}">${ALL.set.auto?'Sí':'No'}</button></label></div>`;
-  if(!m){const ok=n===7;h+=`<button data-a="start" ${ok?'':'disabled'} class="w-full mt-5 min-h-16 rounded-2xl font-disp text-3xl font-bold italic tracking-wide ${ok?'bg-turf text-ink':'bg-line text-mute'}">${ok?'Comenzar partido':`Titulares ${n}/7`}</button>`}
+  const TT=TEAMS[ALL.cur],hasH=S.history.length>0;
+  h+=`<div class="bg-panel border border-line rounded-2xl p-3 mt-3 space-y-2"><h2 class="font-disp text-2xl font-bold italic">Equipo</h2>
+   <label class="flex items-center gap-2"><span class="w-32 text-sm">Nombre</span><input data-a="tname" value="${esc(TT.name)}" maxlength="30" class="min-w-0 flex-1 h-11 rounded-lg bg-ink px-2 border border-line"></label>
+   <label class="flex items-center gap-2"><span class="w-32 text-sm">Categoría</span><select data-a="tcat" class="flex-1 h-11 rounded-lg bg-ink px-2">${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${TT.cat===k?'selected':''}>${v}</option>`).join('')}</select></label>
+   <label class="flex items-center gap-2"><span class="w-32 text-sm">Minutos por parte</span><input data-a="thalf" type="number" min="5" max="60" inputmode="numeric" value="${TT.half}" ${m?'disabled':''} class="w-24 h-11 rounded-lg bg-ink px-2 border border-line text-center"></label>
+   <p class="text-sm text-mute">${FMTS[TT.fmt||'F7'].lbl} · ${TT.n} en el campo${TT.base?' · equipo original (su formato y sus archivos no cambian)':''}</p>
+   <div class="grid grid-cols-2 gap-2"><button data-a="tnew" class="min-h-12 rounded-xl bg-bench font-bold">＋ Nuevo equipo</button>${TT.base?'':`<button data-a="tdel" ${m?'disabled':''} class="min-h-12 rounded-xl bg-red-500/20 text-red-300 font-bold">Borrar equipo</button>`}</div></div>`;
+  if(!m){const ok=n===NF();h+=`<button data-a="start" ${ok?'':'disabled'} class="w-full mt-5 min-h-16 rounded-2xl font-disp text-3xl font-bold italic tracking-wide ${ok?'bg-turf text-ink':'bg-line text-mute'}">${ok?'Comenzar partido':`Titulares ${n}/${NF()}`}</button>`}
   return h;
 }
 const SG={favor:'a favor',contra:'en contra'};
@@ -316,8 +347,8 @@ function vMatch(){
   <button data-a="tab" data-id="setup" class="w-full min-h-14 rounded-2xl bg-turf text-ink font-bold text-lg">Ir a la plantilla</button>`;
   const {f,c}=sc(m),F=FORMS[m.form],sg=suggest(m),bench=m.roster.filter(id=>!m.onField.includes(id));
   const tf=cnt(m.acts,a=>a.k==='tiro'&&a.lado==='favor'&&a.res!=='fuera'),tc=cnt(m.acts,a=>a.k==='tiro'&&a.lado==='contra'&&a.res!=='fuera');
-  const tok=i=>{const id=m.onField[i],s=m.sel===id;
-    return`<button data-a="out" data-id="${id}" aria-label="${esc(short(id))}" class="tok ${s?'sel':''} ${m.last===id?'pop':''}"><span class="pl">${lab(m,i)}</span>
+  const tok=(i,w)=>{const id=m.onField[i],s=m.sel===id;
+    return`<button data-a="out" data-id="${id}" aria-label="${esc(short(id))}" class="tok ${s?'sel':''} ${m.last===id?'pop':''}" style="width:${w}%"><span class="pl">${lab(m,i)}</span>
       <span class="jersey ${s?'amb':'red'}">${esc(short(id)[0])}</span><span class="tag">${esc(short(id))}</span>
       <span data-pm="${id}" class="num tm">${fmt(pm(id))}</span>${s?'<span class="out">SELECC.</span>':''}</button>`};
   const u=m.undo&&m.undo.length?m.undo[m.undo.length-1]:null;
@@ -346,7 +377,7 @@ function vMatch(){
     ${sg?`<p class="mt-2 text-sm text-mute">💡 ${esc(sg.txt)}</p>`:''}</div>
   <div class="flex items-baseline justify-between mt-5 mb-2"><h2 class="font-disp text-3xl font-bold italic text-turf">EN CAMPO</h2>
     <span class="text-sm font-semibold text-right ${m.sel?'text-amber':'text-mute'}">${m.sel?'Toca a un suplente (cambio) o a otro jugador del campo (intercambiar posición)':'Toca a un jugador para cambiarlo o moverlo de posición'}</span></div>
-  <div class="pitch">${F.rows.map(r=>`<div class="prow">${r.map(tok).join('')}</div>`).join('')}</div>
+  <div class="pitch ${NF()>7?'f11':''}">${F.rows.map(r=>`<div class="prow">${r.map(i=>tok(i,r.length>=5?19:r.length===4?24:31)).join('')}</div>`).join('')}</div>
   <h2 class="font-disp text-3xl font-bold italic text-benchl mt-5 mb-2">BANQUILLO <span class="text-mute">${bench.length}</span></h2><div class="grid grid-cols-2 gap-2">`;
   const mn=(S.minMin||0)*60000;
   bench.forEach(id=>{const low=mn&&pm(id)<mn;h+=`<button data-a="in" data-id="${id}" class="bcard ${m.sel?'go':''}"><span class="jersey blu">${esc(short(id)[0])}</span>
@@ -386,6 +417,14 @@ function vDlg(){
       <button data-a="vneg" data-id="${id}" class="w-20 h-12 rounded-xl bg-red-500/80 text-ink font-bold text-lg">－ ${vn}</button><button data-a="vpos" data-id="${id}" class="w-20 h-12 rounded-xl bg-turf text-ink font-bold text-lg">＋ ${vp}</button></div>`}).join('')}</div>
     <button data-a="dcancel" class="w-full mt-4 ${btn2}">Cerrar</button>`)}
   if(d.k==='edit')return vEdit();
+  if(d.k==='team')return sheet(`<h2 class="font-disp text-3xl font-bold italic mb-3">Nuevo equipo</h2>
+    <label class="block text-mute text-sm mb-1">Nombre<input id="tn" class="${inp}" maxlength="30" placeholder="Ej.: Infantil A"></label>
+    <div class="grid grid-cols-2 gap-2"><label class="text-mute text-sm">Categoría<select id="tc" class="${inp}">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
+    <label class="text-mute text-sm">Formato<select id="tf" class="${inp}">${Object.entries(FMTS).map(([k,v])=>`<option value="${k}">${v.lbl} (${v.n})</option>`).join('')}</select></label>
+    <label class="text-mute text-sm">Minutos por parte<input id="th" type="number" min="5" max="60" inputmode="numeric" value="25" class="${inp} text-center"></label>
+    <label class="text-mute text-sm">Código (2-6 letras)<input id="tp" maxlength="6" placeholder="infa" class="${inp}"></label></div>
+    <p class="text-mute text-sm mt-2">El código forma el identificador de cada jugador (código-p1, código-p2…) en los Excel. No se puede cambiar después.</p>
+    <div class="grid grid-cols-2 gap-2 mt-4"><button data-a="dcancel" class="${btn2}">Cancelar</button><button data-a="tsave" class="min-h-14 rounded-2xl bg-turf text-ink font-bold">Crear equipo</button></div>`);
   const fav=d.lado==='favor';
   let h=`<h2 class="font-disp text-3xl font-bold italic mb-3">${fav?'Tiro a favor':'Tiro en contra'}</h2><div class="grid grid-cols-3 gap-2">
     <button data-a="dres" data-id="gol" class="min-h-16 rounded-2xl font-disp text-xl font-bold italic ${d.res==='gol'?'bg-amber text-ink':'bg-bench'}">${fav?'GOL':'GOL EN CONTRA'}</button>
@@ -481,9 +520,9 @@ function render(){
   document.body.dataset.sec=ALL.tab;
   const T=TEAMS[ALL.cur],v={setup:vSetup,match:vMatch,hist:vHist,ana:vAna}[ALL.tab]();
   const keep=$('#newp')?$('#newp').value:'';
-  $('#app').innerHTML=`<header class="flex items-center gap-3 mb-3"><img src="${CREST}" alt="Escudo Club San José del Parque" class="w-14 h-14 rounded-full shrink-0 ring-2 ring-turf"><div class="leading-tight min-w-0"><div class="app-kicker">Minutos F7</div><div class="font-disp text-3xl font-bold italic">${T.name}</div><div class="text-mute text-sm font-semibold">Club San José del Parque · Fútbol 7 · ${T.half}×2 min</div></div><a href="ftms/" data-a="ftms" class="ml-auto shrink-0 h-11 px-3 rounded-xl bg-bench border border-line font-bold text-sm text-benchl flex items-center gap-1" aria-label="Abrir FTMS (suite táctica)">📋 FTMS</a></header>
-  <div class="grid grid-cols-2 gap-2 mb-4">`+Object.keys(TEAMS).map(id=>{const t=TEAMS[id],run=ALL.teams[id].match&&ALL.teams[id].match.running;
-    return`<button data-a="team" data-id="${id}" class="min-h-12 rounded-2xl font-bold ${ALL.cur===id?'bg-turf text-ink':'bg-bench text-benchl'}">${t.name}${run?' ●':''}</button>`}).join('')+`</div>`+v+(DLG&&(S.match||DLG.k==='edit')?vDlg():'');
+  $('#app').innerHTML=`<header class="flex items-center gap-3 mb-3"><img src="${CREST}" alt="Escudo Club San José del Parque" class="w-14 h-14 rounded-full shrink-0 ring-2 ring-turf"><div class="leading-tight min-w-0"><div class="app-kicker">Minutos F7</div><div class="font-disp text-3xl font-bold italic">${T.name}</div><div class="text-mute text-sm font-semibold">Club San José del Parque · ${FMTS[T.fmt||'F7'].lbl} · ${T.half}×2 min</div></div><a href="ftms/" data-a="ftms" class="ml-auto shrink-0 h-11 px-3 rounded-xl bg-bench border border-line font-bold text-sm text-benchl flex items-center gap-1" aria-label="Abrir FTMS (suite táctica)">📋 FTMS</a></header>
+  <div class="teamsel">`+Object.keys(TEAMS).map(id=>{const t=TEAMS[id],run=ALL.teams[id].match&&ALL.teams[id].match.running;
+    return`<button data-a="team" data-id="${id}" class="min-h-12 rounded-2xl font-bold ${ALL.cur===id?'bg-turf text-ink':'bg-bench text-benchl'}">${t.name}${run?' ●':''}</button>`}).join('')+`</div>`+v+(DLG&&(S.match||DLG.k==='edit'||DLG.k==='team')?vDlg():'');
   if($('#newp'))$('#newp').value=keep;
   $('#nav').innerHTML=[['setup','📋','Plantilla'],['match','⚽','Partido'],['hist','🏆','Historial'],['ana','📊','Análisis']].map(([id,i,l])=>
     `<button data-a="tab" data-id="${id}" class="min-h-16 font-bold text-sm ${ALL.tab===id?'text-turf':'text-mute'}"><span class="block text-xl leading-none">${i}</span>${l}${id==='match'&&S.match&&S.match.running?' ●':''}</button>`).join('');
@@ -672,13 +711,13 @@ document.getElementById('imp').addEventListener('change',e=>{
     if((d.version===2||d.version===3)&&d.all&&d.all.teams){
       if(!confirm('Se reemplazarán las plantillas y los historiales de LOS DOS equipos por la copia. ¿Continuar?'))return;
       bak('antes de importar');
-      ALL=d.all;Object.keys(TEAMS).forEach(id=>{if(!ALL.teams[id])ALL.teams[id]=newTeam(id);fixTeam(ALL.teams[id],id)});
+      ALL=d.all;ALL.cfgTeams=ALL.cfgTeams||{};buildTeams(ALL);Object.keys(TEAMS).forEach(id=>{if(!ALL.teams[id])ALL.teams[id]=newTeam(id);fixTeam(ALL.teams[id],id)});
       ALL.set=Object.assign({auto:true,lastBak:0},ALL.set||{});setTeam(TEAMS[ALL.cur]?ALL.cur:'pre');
     }else if(Array.isArray(d.players)&&Array.isArray(d.history)){
       if(S.match){toast('Termina el partido en curso antes de importar');return}
       if(!confirm('Se reemplazarán la plantilla y el historial de '+TEAMS[ALL.cur].name+' por la copia ('+d.history.length+' partidos). ¿Continuar?'))return;
       bak('antes de importar');
-      S.players=d.players;S.history=d.history;fixTeam(S,ALL.cur);S.starters=S.players.filter(p=>p.conv).slice(0,7).map(p=>p.id);
+      S.players=d.players;S.history=d.history;fixTeam(S,ALL.cur);S.starters=S.players.filter(p=>p.conv).slice(0,NF()).map(p=>p.id);
       S.nid=Math.max(0,...S.players.map(p=>+String(p.id).slice(1)||0))+1;
     }else throw 0;
     ALL.tab='hist';DLG=null;save();render();toast('Copia importada');
@@ -725,8 +764,21 @@ document.addEventListener('click',ev=>{
   if(m)m.last=null;
   if(a==='tab'){ALL.tab=id;DLG=null}
   else if(a==='team'){setTeam(id);DLG=null}
+  else if(a==='tnew'){DLG={k:'team'}}
+  else if(a==='tsave'){
+    const name=($('#tn').value||'').trim(),cat=$('#tc').value,fmt_=$('#tf').value,half=Math.max(5,Math.min(60,parseInt($('#th').value,10)||25));
+    const code=($('#tp').value||name.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g,'').slice(0,4)).toLowerCase();
+    if(!name){toast('Escribe el nombre del equipo');return}
+    if(!/^[a-z0-9]{2,6}$/.test(code)){toast('El código debe tener 2-6 letras o números, sin espacios');return}
+    if(TEAMS[code]||ALL.teams[code]){toast('Ya existe un equipo con ese código');return}
+    ALL.cfgTeams[code]={name,cat,fmt:fmt_,half,pfx:code,x:`minutos-${code}.xlsx`,c:`minutos-${code}-csv.zip`,j:`minutos-copia-${code}.json`};
+    buildTeams(ALL);ALL.teams[code]=newTeam(code);fixTeam(ALL.teams[code],code);setTeam(code);DLG=null;ALL.tab='setup';bak('al crear equipo');toast('Equipo creado: añade su plantilla');
+  }
+  else if(a==='tdel'){const T=TEAMS[ALL.cur];if(T.base)return;
+    if(!confirm('¿Borrar el equipo '+T.name+' con su plantilla y sus '+S.history.length+' partidos? Antes se guarda una copia interna.'))return;
+    bak('antes de borrar equipo');const idd=ALL.cur;delete ALL.teams[idd];delete ALL.cfgTeams[idd];buildTeams(ALL);setTeam('pre');}
   else if(a==='conv'){const p=pl(id);p.conv=!p.conv;if(!p.conv)S.starters=S.starters.filter(x=>x!==id)}
-  else if(a==='tog'){if(S.starters.includes(id))S.starters=S.starters.filter(x=>x!==id);else if(S.starters.length<7)S.starters.push(id);else toast('Ya hay 7 titulares. Quita uno antes.')}
+  else if(a==='tog'){if(S.starters.includes(id))S.starters=S.starters.filter(x=>x!==id);else if(S.starters.length<NF())S.starters.push(id);else toast('Ya hay '+NF()+' titulares. Quita uno antes.')}
   else if(a==='del'){if(confirm('¿Borrar a '+pl(id).name+' de la plantilla?')){S.players=S.players.filter(p=>p.id!==id);S.starters=S.starters.filter(x=>x!==id)}}
   else if(a==='add'){const i=$('#newp'),n=i.value.trim();if(!n){toast('Escribe un nombre');return}S.players.push({id:'p'+(S.nid++),name:n,pos:'',conv:true});i.value=''}
   else if(a==='auto'){ALL.set.auto=!ALL.set.auto}
@@ -791,6 +843,12 @@ document.addEventListener('change',ev=>{
   const a=i.dataset.a;if(!a)return;
   if(a==='form'){if(S.match&&ALL.tab==='match')changeForm(S.match,i.value);else S.form=i.value;save();render();return}
   if(a==='runmin'){S.runMin=+i.value;save();return}
+  if(a==='tname'||a==='tcat'||a==='thalf'){const c=ALL.cfgTeams[ALL.cur]=ALL.cfgTeams[ALL.cur]||{},T=TEAMS[ALL.cur];
+    if(a==='tname'){const v=i.value.trim();if(!v){i.value=T.name;return}c.name=v}
+    else if(a==='tcat')c.cat=i.value;
+    else{const v=parseInt(i.value,10);if(!(v>=5&&v<=60)){i.value=T.half;toast('Entre 5 y 60 minutos');return}c.half=v}
+    if(!T.base){Object.assign(c,{name:c.name||T.name})}
+    buildTeams(ALL);save();render();return}
   if(a==='minmin'){S.minMin=+i.value;save();return}
   const p=pl(i.dataset.id);if(!p)return;
   if(a==='ren'){const n=i.value.trim();if(!n){i.value=p.name;return}p.name=n;save()}

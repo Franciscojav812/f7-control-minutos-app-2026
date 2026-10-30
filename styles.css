@@ -1086,3 +1086,13 @@ body{background:linear-gradient(180deg,var(--top) 0,#0b0b12 300px) #0b0b12 no-re
 #app h2.font-disp:not(.text-turf):not(.text-benchl){color:var(--acc)}
 #nav{border-top-color:color-mix(in srgb,var(--acc) 40%,#2b2b42)}
 #nav button.text-turf{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
+
+/* ===== Varios equipos y fútbol 11 ===== */
+.teamsel{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px}
+.pitch.f11{padding:18px 2px 12px}
+.pitch.f11 .prow{margin-bottom:10px}
+.pitch.f11 .tok{min-height:78px;max-width:84px}
+.pitch.f11 .jersey{width:40px;height:40px;font-size:21px;border-radius:12px 12px 16px 16px}
+.pitch.f11 .tag{font-size:12px;padding:1px 6px}
+.pitch.f11 .tm{font-size:13px}
+.pitch.f11 .pl{font-size:10px}

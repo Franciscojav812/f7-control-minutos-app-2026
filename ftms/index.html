@@ -73,7 +73,7 @@ header.top img{width:56px;height:56px;border-radius:50%;flex:none;box-shadow:0 0
 .app-kicker{font:700 12px Barlow,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:2px}
 .team-t{font-family:var(--disp);font-style:italic;font-weight:700;font-size:1.875rem;line-height:1.05}
 .hbtn{flex:none;margin-left:auto;display:flex;align-items:center;gap:4px;height:44px;padding:0 12px;border-radius:12px;background:var(--bench);border:1px solid var(--line);color:var(--benchl);font-weight:700;font-size:.875rem;text-decoration:none}
-.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px}
 .teams button{min-height:48px;border-radius:16px;font-weight:700;background:var(--bench);color:var(--benchl)}
 .teams button.on{background:var(--turf);color:var(--ink)}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(22,22,34,.95);border-top:1px solid color-mix(in srgb,var(--acc) 40%,var(--line));display:grid;grid-template-columns:repeat(5,1fr);max-width:28rem;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
@@ -88,6 +88,7 @@ nav button.on{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
 .prow{position:relative;z-index:1;display:flex;justify-content:space-around;margin-bottom:18px}
 .prow:last-child{margin:0}
 .pl{display:flex;flex-direction:column;align-items:center;width:31%;max-width:108px;min-width:0}
+.pitch.f11 .prow{margin-bottom:10px}.pitch.f11 .jersey{width:40px;height:40px;font-size:21px;border-radius:12px 12px 16px 16px}.pitch.f11 .pl .nm{font-size:12px;padding:1px 6px}.pitch.f11 .pl .ps{font-size:12px}
 .jersey{display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:16px 16px 22px 22px;font:italic 700 28px var(--disp);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.28)}
 .jersey.red{background:linear-gradient(90deg,#ec2f93 0 17%,#14141c 17% 83%,#ec2f93 83%);color:#ff4fae;box-shadow:inset 0 5px 0 #ec2f93,0 4px 0 rgba(0,0,0,.3)}
 .jersey.amb{background:var(--amber);color:var(--ink)}
@@ -141,8 +142,15 @@ a{color:var(--turf)}
    - Guarda lo suyo en 'ftms.v1'
    ========================================================== */
 const SRC_KEY='f7minutos.club.v2',KEY='ftms.v1',VER=1;
-const TEAMS={pre:{name:'Prebenjamín A',half:20,cat:'pre'},ale:{name:'Alevín B',half:25,cat:'ale'}};
+/* Equipos: los dos originales + los creados en la app de minutos (se leen de sus datos: cfgTeams) */
+const BASE_TEAMS={pre:{name:'Prebenjamín A',half:20,cat:'pre',fmt:'F7',n:7},ale:{name:'Alevín B',half:25,cat:'ale',fmt:'F7',n:7}};
+const FMT_N={F7:7,F11:11},FMT_DEF={F7:'3-2-1',F11:'4-3-3'},FMT_LBL={F7:'Fútbol 7',F11:'Fútbol 11'};
+let TEAMS=Object.assign({},BASE_TEAMS);
+/* grupo metodológico de cada categoría: reglas del informe (pre | ale) y filtro de ejercicios (pre | ale | inf) */
+const catRule=c=>['pre','ben'].includes(c)?'pre':'ale',catEx=c=>['pre','ben'].includes(c)?'pre':(c==='ale'?'ale':'inf');
 const CATS={
+ ben:{n:'Benjamín',foco:'Como en Prebenjamín, con algo más de juego: 35 % coordinación, 50 % técnico-táctico y 15 % juego. Un objetivo por sesión.'},
+ inf:{n:'Infantil en adelante',foco:'Fútbol 11 y edades mayores: la parte táctica, física y de planificación se ampliará en la actualización de fútbol 11.'},
  pre:{n:'Prebenjamín',foco:'Formar antes que ganar. Reparto orientativo del entrenamiento: 40 % coordinación, 50 % técnico-táctico y 10 % juego. Prioridad: pase, control y conducción. Un objetivo por sesión, explicaciones muy breves y por imitación.'},
  ale:{n:'Alevín',foco:'Reparto orientativo: 25 % coordinación, 50 % técnico-táctico y 25 % juego. Ganan peso el regate, el remate, la protección y las acciones defensivas. Uno o dos objetivos por sesión; empezar a explicar el porqué.'}};
 
@@ -156,9 +164,23 @@ const SIS={
  '4-1-1':{fmt:'F7',car:'Defensivo',idea:'Cuatro defensas, un medio y un punta.',fu:['Área propia muy protegida','Defiende bien centros y bandas'],de:['Cuesta llegar arriba','El punta y el medio quedan aislados']},
  '2-1-3':{fmt:'F7',car:'Muy ofensivo',idea:'Tres delanteros por delante de un medio.',fu:['Presión alta con tres jugadores','Mucha presencia en área rival'],de:['Muy expuesto en transición defensiva','Un solo medio para cerrar el centro']},
  '3-3-0':{fmt:'F7',car:'Defensivo',idea:'Sin delantero fijo: tres atrás y tres medios.',fu:['Superioridad en el centro','Difícil de superar por dentro'],de:['Nadie fija a los defensas rivales','Pocos tiros']}};
+Object.assign(SIS,{
+ '4-4-2':{fmt:'F11',car:'Equilibrado',idea:'Dos líneas de cuatro y dos puntas.',fu:['Ocupación equilibrada del campo','Dos delanteros para presionar y finalizar'],de:['Inferioridad en el centro ante tres medios']},
+ '4-3-3':{fmt:'F11',car:'Ofensivo',idea:'Tres medios y tres delanteros con extremos abiertos.',fu:['Amplitud con los extremos','Presión alta con tres arriba'],de:['Espalda de los laterales si suben a la vez']},
+ '4-2-3-1':{fmt:'F11',car:'Equilibrado',idea:'Doble pivote, línea de tres mediapuntas y un punta.',fu:['Vigilancia tras pérdida con el doble pivote','Muchas líneas de pase por dentro'],de:['El punta puede quedar aislado']},
+ '3-5-2':{fmt:'F11',car:'Equilibrado',idea:'Tres centrales, dos carrileros y dos puntas.',fu:['Superioridad en el centro','Carrileros para dar amplitud'],de:['Exige mucho físico a los carrileros','Espacio a la espalda de los carrileros']},
+ '4-1-4-1':{fmt:'F11',car:'Defensivo',idea:'Un mediocentro defensivo por delante de la defensa.',fu:['Bloque compacto entre líneas','Protege bien el centro'],de:['Poca presencia en el área rival']},
+ '5-3-2':{fmt:'F11',car:'Defensivo',idea:'Línea de cinco con carrileros y dos puntas.',fu:['Área muy protegida','Salida rápida con dos delanteros'],de:['Cuesta tener el balón y llegar arriba']},
+ '3-4-3':{fmt:'F11',car:'Muy ofensivo',idea:'Tres centrales, cuatro medios y tres delanteros.',fu:['Mucha gente en ataque','Presión alta'],de:['Bandas defensivas expuestas']},
+ '4-4-1-1':{fmt:'F11',car:'Equilibrado',idea:'Un segundo punta conecta el medio con el delantero.',fu:['Enlace entre líneas','Bloque defensivo de dos líneas de cuatro'],de:['Depende mucho del segundo punta']}});
 const DL={1:['DFC'],2:['DFC','DFC'],3:['LI','DFC','LD'],4:['LI','DFC','DFC','LD']},ML={0:[],1:['MC'],2:['MC','MC'],3:['MI','MC','MD']},FL={0:[],1:['DC'],2:['EI','ED'],3:['EI','DC','ED']};
-Object.keys(SIS).forEach(k=>{const[d,m,f]=k.split('-').map(Number),S=SIS[k],r=(s,n)=>Array.from({length:n},(_,i)=>s+i);
- S.lab=['Portero',...DL[d],...ML[m],...FL[f]];S.rows=[r(1+d+m,f),r(1+d,m),r(1,d),[0]].filter(x=>x.length);S.d=d;S.m=m;S.f=f});
+const D11={3:['DFC','DFC','DFC'],4:['LI','DFC','DFC','LD'],5:['CAI','DFC','DFC','DFC','CAD']},M11={3:['MC','MCD','MC'],4:['MI','MC','MC','MD'],5:['CAI','MC','MCD','MC','CAD']},
+ M11a={1:['MCD'],2:['MCD','MCD'],4:['MI','MC','MC','MD']},M11b={1:['MCO'],3:['EI','MCO','ED'],4:['MI','MC','MC','MD']},F11L={1:['DC'],2:['DC','DC'],3:['EI','DC','ED']};
+Object.keys(SIS).forEach(k=>{const S=SIS[k],L=k.split('-').map(Number);S.fmt=S.fmt||'F7';
+ S.lab=S.fmt==='F7'?['Portero',...DL[L[0]],...ML[L[1]],...FL[L[2]]]:['Portero',...D11[L[0]],...(L.length===3?M11[L[1]]:[...M11a[L[1]],...M11b[L[2]]]),...F11L[L[L.length-1]]];
+ let st=1;const rows=L.map(c=>{const r=Array.from({length:c},(_,i)=>st+i);st+=c;return r});S.rows=[...rows.reverse(),[0]].filter(x=>x.length);
+ S.d=L[0];S.m=L.length===3?L[1]:L[1]+L[2];S.f=L[L.length-1]});
+const sisDe=fmt=>Object.keys(SIS).filter(k=>SIS[k].fmt===fmt);
 const OFENS=k=>SIS[k]&&/fensivo/.test(SIS[k].car)&&SIS[k].car!=='Defensivo';
 
 /* ---- opciones del formulario post-partido ---- */
@@ -204,9 +226,16 @@ function normG(g,i){
  return{id:String(g.id),n:i+1,date:g.date,rival:g.rival||'',jornada:g.jornada||'',comp:g.comp||'',loc:g.loc||'',total:+g.total||0,half:+g.half||0,gf:g.gf,gc:g.gc,sis:g.sis||'',
   sg:Array.isArray(g.sg)?g.sg:[],players:(g.players||[]).map(x=>({id:String(x.id),name:String(x.name||''),pos:String(x.pos||''),ms:+x.ms||0,titular:!!x.titular})),acts};
 }
+function syncTeams(){
+ const {all}=readSrc(),cfg=(all&&all.cfgTeams)||{},T={};
+ Object.keys(BASE_TEAMS).forEach(id=>{const o=cfg[id]||{};T[id]=Object.assign({},BASE_TEAMS[id],{name:o.name||BASE_TEAMS[id].name,half:o.half||BASE_TEAMS[id].half,cat:o.cat||BASE_TEAMS[id].cat})});
+ Object.keys(cfg).forEach(id=>{const c=cfg[id];if(!T[id]&&c&&c.fmt)T[id]={name:c.name||id,half:c.half||25,cat:c.cat||'ale',fmt:c.fmt,n:FMT_N[c.fmt]||7}});
+ TEAMS=T;if(!TEAMS[ST.team])ST.team='pre';
+}
 function team(id){
  const {all,origen}=readSrc();if(!all||!all.teams[id])return null;const t=all.teams[id];
- return{id,origen,cat:TEAMS[id].cat,half:TEAMS[id].half,enJuego:!!t.match,
+ if(!TEAMS[id])return null;
+ return{id,origen,cat:catRule(TEAMS[id].cat),catRaw:TEAMS[id].cat,fmt:TEAMS[id].fmt||'F7',n:TEAMS[id].n||7,half:TEAMS[id].half,enJuego:!!t.match,
   players:(t.players||[]).map(p=>({id:String(p.id),name:String(p.name||''),pos:String(p.pos||''),conv:p.conv!==false})),
   history:(t.history||[]).map(normG)};
 }
@@ -417,7 +446,7 @@ function vInicio(T){
   ${T&&T.enJuego?`<p class="small" style="color:var(--amber)">● Hay un partido en curso en la app de minutos. Aparecerá aquí cuando lo finalices.</p>`:''}
   ${origen==='importado'?`<button data-a="impMin" class="btn w" style="margin-top:8px">Importar copia más reciente</button>`:''}</div>`;
  if(!T)return h+vCopias();
- h+=`<h2>${TEAMS[T.id].name}</h2><p class="small mute">Enfoque ${CATS[T.cat].n}: ${CATS[T.cat].foco}</p>`;
+ h+=`<h2>${TEAMS[T.id].name}</h2><p class="small mute">Enfoque ${(CATS[T.catRaw]||CATS[catEx(T.catRaw)]||CATS[T.cat]).n}: ${(CATS[T.catRaw]||CATS[catEx(T.catRaw)]||CATS[T.cat]).foco}</p>`;
  if(last){const s=sig(T,last),f=formOf(T,last);
   h+=`<div class="card"><div class="row"><div class="grow"><div class="mute small">Último partido · P${last.n}${last.jornada?' · J'+esc(last.jornada):''}</div><div class="big">${esc(last.rival||'Partido')}</div><div class="mute small">${fdate(last.date)}</div></div><span class="res ${s.res}">${s.gf} - ${s.gc}</span></div>
   <div class="grid2" style="margin-top:10px"><button data-a="open" data-id="${esc(last.id)}" class="btn ${f?'':'pri'}">${f?'Ver informe':'Formulario + informe'}</button><button data-a="tab" data-id="plan" class="btn">Game Plan</button></div></div>`;
@@ -466,7 +495,7 @@ function vPost(T,g){
  <div class="small mute">Pérdidas en nuestra salida (estimación)</div>${chipSet('perd',RANG,F.perd)}
  <div class="small mute" style="margin-top:8px">Recuperaciones en campo rival (estimación)</div>${chipSet('recu',RANG,F.recu)}
  <h3>Rival</h3><div class="small mute">Presión del rival</div>${chipSet('presion',PRES,F.presion)}
- <label class="f">Sistema del rival<select data-f="sisR" class="inp"><option value=""></option>${Object.keys(SIS).map(k=>`<option ${F.sisR===k?'selected':''}>${k}</option>`).join('')}<option ${F.sisR==='Otro'?'selected':''}>Otro</option></select></label></div>`;
+ <label class="f">Sistema del rival<select data-f="sisR" class="inp"><option value=""></option>${sisDe(T.fmt).map(k=>`<option ${F.sisR===k?'selected':''}>${k}</option>`).join('')}<option ${F.sisR==='Otro'?'selected':''}>Otro</option></select></label></div>`;
  /* valoraciones */
  h+=`<div class="card"><h3 style="margin-top:0">Valoración del equipo (1-5)</h3>`+RAT.map(([k,l])=>{const v=+((F.rat||{})[k]||0);
   return`<div class="row" style="margin-top:6px"><span class="grow small">${l}</span>${[1,2,3,4,5].map(n=>`<button data-a="fset" data-k="rat.${k}" data-v="${n}" class="chip ${v===n?'on':''}" style="min-width:40px;padding:0">${n}</button>`).join('')}</div>`}).join('')+
@@ -483,7 +512,7 @@ function fichaHtml(f){
  <tr><td>Consignas</td><td style="text-align:left">${f.con.map(esc).join('<br>')}</td></tr></table></details>`;
 }
 function vInforme(T,g,F){
- const {s,R}=rules(T,g,F),f=pick(R,'f'),{m,resto}=mejoras(T,R),ss=T.cat==='ale'?sugSis(T,g,F,s):[],cu=cuaderno(T,g,s,F),max=MAXM[T.cat]||2;
+ const {s,R}=rules(T,g,F),f=pick(R,'f'),{m,resto}=mejoras(T,R),ss=T.cat==='ale'&&T.fmt==='F7'?sugSis(T,g,F,s):[],cu=cuaderno(T,g,s,F),max=MAXM[T.cat]||2;
  if(resto.length)cu.unshift('Otras mejoras detectadas, para más adelante: '+resto.map(x=>x.titulo).join(', ')+'.');
  const it=(x,c)=>`<div class="item ${c}"><div class="b">${esc(c==='m'&&x.ficha?x.ficha.obj:x.titulo)}</div>${c==='m'&&x.ficha?`<div class="q">${esc(x.titulo)}</div>`:''}<div class="q">Dato: ${esc(x.dato)}</div>${x.concepto?`<div class="q">Concepto UEFA C: ${esc(x.concepto)}</div>`:''}<div class="t">💬 ${esc(x.charla)}</div>${c==='m'?fichaHtml(x.ficha):''}</div>`;
  let h=`<h2>Informe para la charla</h2><p class="small mute">Generado por reglas a partir de los datos. Cada punto dice qué dato lo provoca: revísalo con tu criterio. Sigue la formación UEFA C: ${T.cat==='pre'?'en Prebenjamín, <b>un solo objetivo</b> por semana y mensajes muy breves y en positivo':'en Alevín, <b>uno o dos objetivos</b> por semana y explicar el porqué'}.</p>
@@ -497,9 +526,10 @@ function vInforme(T,g,F){
 }
 /* ---- Game Plan ---- */
 function planOf(T){
- let P=ST.plans[T.id];
- if(!P){P=ST.plans[T.id]={rival:'',fecha:'',sis:'3-2-1',xi:Array(7).fill(''),abp:{cf:'',ff:'',pen:'',m1:'',m2:'',m3:''},cons:['','',''],nota:''}}
- if(!SIS[P.sis])P.sis='3-2-1';
+ const fmt=T.fmt||'F7',n=T.n||7;let P=ST.plans[T.id];
+ if(!P){P=ST.plans[T.id]={rival:'',fecha:'',sis:FMT_DEF[fmt],xi:Array(n).fill(''),abp:{cf:'',ff:'',pen:'',m1:'',m2:'',m3:''},cons:['','',''],nota:''}}
+ if(!SIS[P.sis]||SIS[P.sis].fmt!==fmt)P.sis=FMT_DEF[fmt];
+ if(P.xi.length!==n)P.xi=Array.from({length:n},(_,i)=>P.xi[i]||'');
  return P;
 }
 function optsPl(T,cur,CG,incl){
@@ -513,7 +543,7 @@ function vPlan(T){
  <button data-a="match" class="btn pri w" style="margin-top:8px">▶ Abrir vista de partido</button>
  <div class="card"><label class="f">Rival<input data-p="rival" value="${esc(P.rival)}" class="inp"></label>
  <label class="f">Fecha<input data-p="fecha" type="date" value="${esc(P.fecha)}" class="inp"></label>
- <label class="f">Sistema inicial<select data-p="sis" class="inp">${Object.keys(SIS).map(k=>`<option value="${k}" ${P.sis===k?'selected':''}>${k} · ${SIS[k].car}</option>`).join('')}</select></label>
+ <label class="f">Sistema inicial<select data-p="sis" class="inp">${sisDe(T.fmt).map(k=>`<option value="${k}" ${P.sis===k?'selected':''}>${k} · ${SIS[k].car}</option>`).join('')}</select></label>
  <p class="small mute" style="margin-top:8px">${esc(S.idea)}<br>✔ ${S.fu.map(esc).join(' · ')}<br>✖ ${S.de.map(esc).join(' · ')}</p></div>
  <h2>Alineación</h2><p class="small mute">Solo convocados. El color es el reparto de minutos. Recuerda marcar luego los titulares en la app de minutos: el FTMS no la modifica.</p><div class="card">`;
  S.lab.forEach((l,i)=>{h+=`<label class="f">${i+1}. ${l}<select data-xi="${i}" class="inp">${optsPl(T,P.xi[i],CG)}</select></label>`});
@@ -538,7 +568,7 @@ function vMatchView(T){
  const tok=i=>`<div class="pl"><span class="jersey ${i===0?'amb':'red'}">${P.xi[i]?esc(short(T,P.xi[i])[0]):'?'}</span><div class="nm">${sh(P.xi[i])}</div><div class="ps">${S.lab[i]}</div></div>`;
  return`<main><div class="row"><div class="grow"><div class="mute small">${TEAMS[T.id].name}${P.fecha?' · '+fdate(P.fecha+'T12:00'):''}</div><h1>${esc(P.rival||'Partido')}</h1></div><button data-a="closeM" class="btn">Cerrar</button></div>
  <div class="row" style="margin:8px 0"><span class="tag t-mute">${esc(P.sis)}</span><span class="small mute">${esc(S.car)}</span></div>
- <div class="pitch">${S.rows.map(r=>`<div class="prow">${r.map(tok).join('')}</div>`).join('')}</div>
+ <div class="pitch ${T.n>7?'f11':''}">${S.rows.map(r=>`<div class="prow">${r.map(i=>tok(i).replace('<div class="pl">',`<div class="pl" style="width:${r.length>=5?19:r.length===4?24:31}%">`)).join('')}</div>`).join('')}</div>
  <h2>Consignas</h2>${P.cons.some(x=>x.trim())?`<ol class="cons">${P.cons.filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:'<p class="mute">Sin consignas. Añádelas en el Game Plan.</p>'}
  <h2>Balón parado</h2><div class="card"><div class="grid2 big" style="font-size:1.05rem">
   <div><span class="mute small">Córner a favor</span><br>${sh(P.abp.cf)}</div><div><span class="mute small">Faltas</span><br>${sh(P.abp.ff)}</div>
@@ -773,7 +803,7 @@ function ejFilter(){
 function vEjer(){
  if(EJS.edit)return vEjEdit();
  if(EJS.sel){const e=ejById(EJS.sel);if(e)return vEjDet(e);EJS.sel=null}
- const cat=TEAMS[ST.team].cat,catN=cat==='pre'?'Prebenjamín':'Alevín';
+ const cat=catEx(TEAMS[ST.team].cat),catN={pre:'Prebenjamín',ale:'Alevín',inf:'Infantil+'}[cat];
  const L=allEj().filter(e=>(!EJS.f||e.f===EJS.f)&&(!EJS.n||e.n===EJS.n)&&(!EJS.fav||isFav(e.id))&&(!EJS.cat||!(e.cat||[]).length||e.cat.includes(cat)));
  const chip=(a,v,on,txt)=>`<button data-a="${a}" data-v="${v}" class="chip ${on?'on':''}">${txt}</button>`;
  let h=`<h1>Ejercicios</h1><p class="mute">Elige el fundamento y empieza a entrenar.</p>
@@ -848,7 +878,7 @@ function ejClick(a,b){
  else if(a==='ejopen'){EJS.sel=id;scrollTo(0,0)}
  else if(a==='ejback'){EJS.sel=null}
  else if(a==='ejstar'){const F=ST.ejer.fav;ST.ejer.fav=F.includes(id)?F.filter(x=>x!==id):[...F,id]}
- else if(a==='ejnew'){EJS.edit={id:null,tit:'',f:EJS.f||'pase',n:1,dur:10,ser:1,cat:[TEAMS[ST.team].cat],org:[],eje:[],con:[],est:'Partido',sit:'—',dg:null};scrollTo(0,0)}
+ else if(a==='ejnew'){EJS.edit={id:null,tit:'',f:EJS.f||'pase',n:1,dur:10,ser:1,cat:[catEx(TEAMS[ST.team].cat)],org:[],eje:[],con:[],est:'Partido',sit:'—',dg:null};scrollTo(0,0)}
  else if(a==='ejdup'){const e=ejById(id);if(e){EJS.edit=JSON.parse(JSON.stringify(e));EJS.edit.id=null;EJS.edit.tit=(e.tit+' (propio)').slice(0,60);scrollTo(0,0)}}
  else if(a==='ejedit'){const e=ejById(id);if(e)EJS.edit=JSON.parse(JSON.stringify(e));scrollTo(0,0)}
  else if(a==='ejdel'){const e=ejById(id);if(e&&confirm('¿Borrar el ejercicio «'+e.tit+'»?')){ST.ejer.custom=ST.ejer.custom.filter(x=>x.id!==id);ST.ejer.fav=ST.ejer.fav.filter(x=>x!==id);EJS.sel=null}}
@@ -942,8 +972,8 @@ function aniHtml(e){
 /* ---- render ---- */
 function render(){
  const T=team(ST.team);
- document.body.dataset.sec=ST.tab;
- const head=`<header class="top"><img src="../crest.jpg" alt="Escudo Club San José del Parque"><div class="grow"><div class="app-kicker">FTMS · Táctica</div><div class="team-t">${TEAMS[ST.team].name}</div><div class="mute small" style="font-weight:600">Club San José del Parque · Fútbol 7 · ${TEAMS[ST.team].half}×2 min</div></div><a href="../" class="hbtn" aria-label="Abrir la app de minutos">⏱ Minutos</a></header>
+ syncTeams();document.body.dataset.sec=ST.tab;
+ const head=`<header class="top"><img src="../crest.jpg" alt="Escudo Club San José del Parque"><div class="grow"><div class="app-kicker">FTMS · Táctica</div><div class="team-t">${TEAMS[ST.team].name}</div><div class="mute small" style="font-weight:600">Club San José del Parque · ${FMT_LBL[TEAMS[ST.team].fmt||'F7']} · ${TEAMS[ST.team].half}×2 min</div></div><a href="../" class="hbtn" aria-label="Abrir la app de minutos">⏱ Minutos</a></header>
  <div class="teams">${Object.keys(TEAMS).map(id=>`<button data-a="team" data-id="${id}" class="${ST.team===id?'on':''}">${TEAMS[id].name}</button>`).join('')}</div>`;
  let v;
  if(ST.tab==='ejer')v=vEjer();

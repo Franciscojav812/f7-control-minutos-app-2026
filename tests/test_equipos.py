@@ -1,0 +1,102 @@
+import subprocess, sys, os, threading, http.server, functools, zipfile, tempfile
+from playwright.sync_api import sync_playwright
+# Prueba automática (Playwright + Chromium) con datos SINTÉTICOS: equipos configurables y fútbol 11.
+SP = os.path.dirname(os.path.abspath(__file__))
+SITE = os.path.abspath(os.path.join(SP, '..'))
+OUT = os.environ.get('TEST_OUT') or tempfile.mkdtemp(prefix='f7tests-')
+DATA = subprocess.check_output(['node', os.path.join(SP, 'datos_sinteticos.js')]).decode()
+class Q(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *a): pass
+srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(Q, directory=SITE))
+threading.Thread(target=srv.serve_forever, daemon=True).start()
+B = 'http://127.0.0.1:%d' % srv.server_address[1]; fails = []
+def ok(c, m):
+    print(('OK   ' if c else 'FALLO') + ' ' + m)
+    if not c: fails.append(m)
+def xlsx_text(path):
+    with zipfile.ZipFile(path) as z:
+        return ''.join(z.read(n).decode('utf-8', 'ignore') for n in z.namelist() if n.startswith('xl/worksheets/'))
+with sync_playwright() as p:
+    br = p.chromium.launch(); ctx = br.new_context(viewport={'width': 390, 'height': 844}, accept_downloads=True)
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.on('dialog', lambda d: d.accept())
+    pg.goto(B + '/'); pg.evaluate('d=>localStorage.setItem("f7minutos.club.v2",d)', DATA); pg.reload(); pg.wait_for_timeout(400)
+    # 1) equipos originales intactos
+    pg.click('nav [data-id=hist]'); pg.wait_for_timeout(100)
+    with pg.expect_download() as d: pg.click('button[data-a=xl]')
+    f = os.path.join(OUT, d.value.suggested_filename); d.value.save_as(f)
+    ok(d.value.suggested_filename == 'minutos-app.xlsx' and 'pre-p1' in xlsx_text(f), 'equipo original: mismo archivo y jugador_id pre-p1')
+    # 2) crear equipo de fútbol 11
+    pg.click('nav [data-id=setup]'); pg.wait_for_timeout(100)
+    ok('Equipo' in pg.inner_text('#app') and 'equipo original' in pg.inner_text('#app'), 'ajustes del equipo en Plantilla')
+    pg.click('button[data-a=tnew]'); pg.wait_for_timeout(100)
+    pg.fill('#tn', 'Infantil Prueba'); pg.select_option('#tc', 'inf'); pg.select_option('#tf', 'F11'); pg.fill('#th', '35'); pg.fill('#tp', 'infp')
+    pg.click('button[data-a=tsave]'); pg.wait_for_timeout(200)
+    t = pg.inner_text('#app')
+    ok('Infantil Prueba' in t and 'Fútbol 11 · 35' in t and 'Titulares 0/11' in t, 'equipo F11 creado y seleccionado')
+    ok(pg.locator('.teamsel button').count() == 3, 'selector con 3 equipos')
+    opts = pg.eval_on_selector('select[data-a=form]', 'e=>[...e.options].map(o=>o.value)')
+    ok('4-3-3' in opts and '3-2-1' not in opts and len(opts) == 8, 'solo sistemas de fútbol 11: ' + ','.join(opts))
+    pos = pg.locator('select[data-a=pos]').count()
+    for i in range(13):
+        pg.fill('#newp', f'Jugador F11 {i+1:02d}'); pg.click('button[data-a=add]'); pg.wait_for_timeout(30)
+    pg.select_option('select[data-a=pos] >> nth=0', 'Portero')
+    ok('MCD' in pg.eval_on_selector('select[data-a=pos]', 'e=>[...e.options].map(o=>o.value).join()'), 'posiciones de F11 (MCD, MCO, carrileros)')
+    for i in range(11):
+        pg.locator('button[data-a=tog]').nth(i).click(); pg.wait_for_timeout(20)
+    ok('Titulares 11/11' in pg.inner_text('#app'), '11 titulares')
+    pg.locator('button[data-a=tog]').nth(11).click(); pg.wait_for_timeout(50)
+    ok('Titulares 11/11' in pg.inner_text('#app'), 'no deja un duodécimo titular')
+    pg.click('button[data-a=start]'); pg.wait_for_timeout(300)
+    ok(pg.locator('.pitch.f11 .tok').count() == 11, 'campo de partido con 11 jugadores')
+    pg.screenshot(path=os.path.join(OUT, 'f11_partido.png'), full_page=True)
+    pg.select_option('select[data-a=form]', '4-2-3-1'); pg.wait_for_timeout(150)
+    labs = pg.eval_on_selector_all('.tok .pl', 'e=>e.map(x=>x.textContent)')
+    ok(pg.locator('.tok').count() == 11 and 'MCO' in labs and labs.count('MCD') == 2, 'sistema 4-2-3-1: ' + ' '.join(labs))
+    pg.locator('.tok').nth(10).click(); pg.locator('button[data-a=in]').first.click(); pg.wait_for_timeout(100)
+    ok('Entra' in pg.inner_text('#app'), 'sustitución en fútbol 11')
+    pg.click('button[data-a=play]'); pg.wait_for_timeout(1200); pg.click('button[data-a=play]')
+    pg.click('button[data-a=fin]'); pg.wait_for_timeout(100); pg.fill('#fr', 'Rival F11'); pg.click('button[data-a=dfin]'); pg.wait_for_timeout(300)
+    pg.click('button[data-a=dcancel]'); pg.wait_for_timeout(100)
+    ok('Rival F11' in pg.inner_text('#app'), 'partido de F11 guardado')
+    with pg.expect_download() as d: pg.click('button[data-a=xl]')
+    f = os.path.join(OUT, d.value.suggested_filename); d.value.save_as(f)
+    ok(d.value.suggested_filename == 'minutos-infp.xlsx' and 'infp-p1' in xlsx_text(f), 'exporta minutos-infp.xlsx con jugador_id infp-p1')
+    # 3) renombrar un equipo original no cambia su contrato
+    pg.click('button[data-a=team][data-id=pre]'); pg.click('nav [data-id=setup]'); pg.wait_for_timeout(100)
+    pg.fill('input[data-a=tname]', 'Prebenjamín A (prueba)'); pg.press('input[data-a=tname]', 'Tab'); pg.wait_for_timeout(150)
+    pg.reload(); pg.wait_for_timeout(300)
+    ok('Prebenjamín A (prueba)' in pg.inner_text('header'), 'nombre editado y guardado tras recargar')
+    pg.click('nav [data-id=hist]')
+    with pg.expect_download() as d: pg.click('button[data-a=xl]')
+    ok(d.value.suggested_filename == 'minutos-app.xlsx', 'renombrar no cambia el archivo del equipo original')
+    # 4) FTMS con el equipo de F11
+    pg.goto(B + '/ftms/'); pg.wait_for_timeout(400)
+    ok(pg.locator('.teams button').count() == 3 and 'Infantil Prueba' in pg.inner_text('.teams'), 'FTMS lee los 3 equipos')
+    pg.click('button[data-a=team][data-id=infp]'); pg.wait_for_timeout(150)
+    t = pg.inner_text('#app'); ok('Fútbol 11' in t and 'Infantil en adelante' in t, 'FTMS: formato y enfoque del equipo F11')
+    pg.click('nav [data-id=plan]'); pg.wait_for_timeout(150)
+    sis = pg.eval_on_selector('select[data-p=sis]', 'e=>[...e.options].map(o=>o.value)')
+    ok('4-3-3' in sis and '3-2-1' not in sis and pg.locator('select[data-xi]').count() == 11, 'Game Plan con sistemas y 11 puestos de F11')
+    for i in range(11):
+        pg.locator(f'select[data-xi="{i}"]').select_option(index=i + 1); pg.wait_for_timeout(20)
+    pg.click('button[data-a=match]'); pg.wait_for_timeout(200)
+    ok(pg.locator('#over .pitch.f11 .pl').count() == 11, 'vista de partido con 11 jugadores')
+    pg.screenshot(path=os.path.join(OUT, 'f11_gameplan.png'), full_page=True)
+    pg.click('button[data-a=closeM]'); pg.click('nav [data-id=post]'); pg.click('button[data-a=open]'); pg.wait_for_timeout(150)
+    ok('Informe para la charla' in pg.inner_text('#app') and '♟️' not in pg.inner_text('#app'), 'post-partido de F11 sin ajustes de F7')
+    pg.click('nav [data-id=ejer]'); pg.wait_for_timeout(100)
+    ok('Solo Infantil+' in pg.inner_text('#app') and pg.locator('.ej').count() >= 4, 'ejercicios filtrados para infantil')
+    pg.click('button[data-a=team][data-id=pre]'); pg.wait_for_timeout(100)
+    ok('Prebenjamín A (prueba)' in pg.inner_text('.teams'), 'FTMS muestra el nombre editado')
+    # 5) borrar el equipo creado
+    pg.goto(B + '/'); pg.wait_for_timeout(300)
+    pg.click('button[data-a=team][data-id=infp]'); pg.click('nav [data-id=setup]'); pg.wait_for_timeout(100)
+    pg.click('button[data-a=tdel]'); pg.wait_for_timeout(200)
+    ok(pg.locator('.teamsel button').count() == 2 and 'infp' not in pg.evaluate('Object.keys(JSON.parse(localStorage.getItem("f7minutos.club.v2")).teams).join()'), 'borrar equipo creado')
+    ok(pg.locator('button[data-a=tdel]').count() == 0, 'los equipos originales no se pueden borrar')
+    ok(not errs, 'sin errores de JavaScript ' + str(errs[:3]))
+    br.close()
+srv.shutdown()
+print('\nRESULTADO:', 'TODO OK' if not fails else f'{len(fails)} FALLOS'); sys.exit(1 if fails else 0)
