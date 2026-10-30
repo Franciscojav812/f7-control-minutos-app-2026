@@ -53,6 +53,7 @@ label.f>.inp{margin-top:4px;color:var(--chalk);font-size:1rem}
 .item .t{font-size:.9rem;margin-top:6px}
 header.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 header.top .logo{width:48px;height:48px;border-radius:50%;background:var(--turf);display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-style:italic;font-size:1.2rem;color:#fff;flex:none}
+.hbtn{flex:none;display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);color:var(--chalk);font-weight:700;font-size:.85rem;text-decoration:none}
 .teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .teams button{min-height:46px;border-radius:14px;font-weight:700;background:var(--panel2);color:var(--mute)}
 .teams button.on{background:var(--turf);color:#fff}
@@ -498,7 +499,7 @@ function vCarga(T){
 /* ---- render ---- */
 function render(){
  const T=team(ST.team);
- const head=`<header class="top"><div class="logo">FT</div><div class="grow"><div class="big" style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:1.5rem">FTMS · ${TEAMS[ST.team].name}</div><div class="mute small">Club San José del Parque · Fútbol 7 · ${TEAMS[ST.team].half}×2</div></div></header>
+ const head=`<header class="top"><div class="logo">FT</div><div class="grow"><div class="big" style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:1.5rem">FTMS · ${TEAMS[ST.team].name}</div><div class="mute small">Club San José del Parque · Fútbol 7 · ${TEAMS[ST.team].half}×2</div></div><a href="../" class="hbtn" aria-label="Abrir la app de minutos">⏱ Minutos</a></header>
  <div class="teams">${Object.keys(TEAMS).map(id=>`<button data-a="team" data-id="${id}" class="${ST.team===id?'on':''}">${TEAMS[id].name}</button>`).join('')}</div>`;
  let v;
  if(!T&&ST.tab!=='inicio')v=`<h1>FTMS</h1>`+noData();
